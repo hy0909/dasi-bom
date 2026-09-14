@@ -82,13 +82,7 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
         </Button>
       </div>
 
-      <p className="mt-4 text-center text-xs leading-relaxed text-body-mid">
-        처음이라면 다음 단계에서 약관을 확인해요.
-        <br />
-        프로토타입이라 실제 계정 정보는 저장되지 않아요.
-      </p>
-
-      <div className="mt-7 flex items-center gap-3" aria-hidden>
+      <div className="mt-8 flex items-center gap-3" aria-hidden>
         <span className="h-px flex-1 bg-border" />
         <small className="text-xs font-semibold text-body-mid">초대받아 오셨나요?</small>
         <span className="h-px flex-1 bg-border" />
