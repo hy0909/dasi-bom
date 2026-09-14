@@ -13,7 +13,7 @@ export type Account = {
   email: string;
   /** 가족에게 보이는 이름 */
   name: string;
-  /** InitialsAvatar tone 인덱스 */
+  /** 프로필 캐릭터 인덱스 (CHARACTERS) */
   tone: number;
   /** 선택 약관(소식 받기) 동의 여부 */
   marketing: boolean;

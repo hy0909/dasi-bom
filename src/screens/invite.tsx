@@ -5,16 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { InitialsAvatar } from "@/components/initials-avatar";
+import { CharacterAvatar } from "@/components/character-avatar";
 import { ListRow } from "@/components/list-row";
 import { photos } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import type { Go, Notify } from "@/types";
 
-const participants: [string, string, string, "완료" | "참여 중" | "초대됨"][] = [
-  ["엄", "엄마", "답변 4개", "완료"],
-  ["아", "아버지", "답변 2개", "참여 중"],
-  ["민", "동생 민준", "아직 답변 없음", "초대됨"],
+/** [캐릭터 인덱스, 이름, 답변 수, 상태] */
+const participants: [number, string, string, "완료" | "참여 중" | "초대됨"][] = [
+  [2, "엄마", "답변 4개", "완료"],
+  [1, "아버지", "답변 2개", "참여 중"],
+  [4, "동생 민준", "아직 답변 없음", "초대됨"],
 ];
 
 const statusVariant = { 완료: "ink", "참여 중": "primary", 초대됨: "default" } as const;
@@ -100,11 +101,11 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           description="답변이 도착하면 알려드릴게요"
         />
         <div className="flex flex-col">
-          {participants.map(([initial, name, count, status], i) => (
+          {participants.map(([character, name, count, status]) => (
             <ListRow
               key={name}
               onClick={() => notify(`${name} · ${count}`)}
-              leading={<InitialsAvatar name={initial} tone={i} size="lg" />}
+              leading={<CharacterAvatar index={character} size="lg" />}
               title={name}
               description={count}
               trailing={<Badge variant={statusVariant[status]}>{status}</Badge>}
