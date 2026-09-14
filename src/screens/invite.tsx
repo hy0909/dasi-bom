@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Topbar } from "@/components/topbar";
+import { BottomNav } from "@/components/bottom-nav";
 import { Eyebrow } from "@/components/eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { InitialsAvatar } from "@/components/initials-avatar";
@@ -20,7 +21,15 @@ const participants: [string, string, string, "완료" | "참여 중" | "초대�
 
 const statusVariant = { 완료: "ink", "참여 중": "primary", 초대됨: "default" } as const;
 
-export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function InviteScreen({
+  go,
+  back,
+  notify,
+}: {
+  go: Go;
+  back: () => void;
+  notify: Notify;
+}) {
   const [link, setLink] = useState("초대 링크 준비 중…");
   useEffect(() => setLink(`${window.location.origin}${window.location.pathname}?invite=EU23`), []);
 
@@ -44,7 +53,7 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
 
   return (
     <>
-      <Topbar back={() => go("detail")} title="가족 초대하기" />
+      <Topbar back={back} title="가족 초대하기" />
 
       <section className="mt-6 flex flex-col gap-3">
         <div className="mb-2 flex -space-x-4">
@@ -115,6 +124,8 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           ))}
         </div>
       </section>
+
+      <BottomNav go={go} active="invite" />
     </>
   );
 }

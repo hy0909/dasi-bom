@@ -23,8 +23,13 @@ function notify(text: string) {
   toast(text);
 }
 
+/** 하단 탭으로 오가는 최상위 화면 — 탭끼리 이동할 때는 뒤로가기 기록을 쌓지 않는다. */
+const TAB_SCREENS: Screen[] = ["home", "invite", "notices", "profile"];
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
+  /** 뒤로가기용 방문 기록. 화면마다 돌아갈 곳을 하드코딩하면 진입 경로가 둘 이상일 때 어긋난다. */
+  const [, setHistory] = useState<Screen[]>([]);
   const [title, setTitle] = useState("2023년 유럽여행");
   const [ready, setReady] = useState(false);
 
@@ -41,7 +46,22 @@ export default function App() {
   }, []);
 
   const go: Go = (next) => {
-    setScreen(next);
+    if (next !== screen) {
+      setHistory((past) =>
+        // 탭 사이 이동은 기록하지 않는다 — 탭은 서로의 상위 화면이 아니다.
+        TAB_SCREENS.includes(next) && TAB_SCREENS.includes(screen) ? [] : [...past, screen],
+      );
+      setScreen(next);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /** 실제로 거쳐온 화면으로 돌아간다. 기록이 없으면 홈으로. */
+  const goBack = () => {
+    setHistory((past) => {
+      setScreen(past.at(-1) ?? "home");
+      return past.slice(0, -1);
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -60,7 +80,8 @@ export default function App() {
     );
   }
 
-  const roomy = screen === "home" || screen === "detail";
+  // 하단 탭이나 플로팅 버튼이 뜨는 화면은 그만큼 아래 여백이 필요하다.
+  const roomy = TAB_SCREENS.includes(screen) || screen === "detail";
 
   return (
     <AppShell>
@@ -77,10 +98,10 @@ export default function App() {
         {screen === "interview" && <InterviewScreen go={go} notify={notify} />}
         {screen === "voice" && <VoiceScreen go={go} notify={notify} />}
         {screen === "story" && <StoryScreen go={go} notify={notify} />}
-        {screen === "invite" && <InviteScreen go={go} notify={notify} />}
+        {screen === "invite" && <InviteScreen go={go} back={goBack} notify={notify} />}
         {screen === "upload" && <UploadScreen go={go} notify={notify} />}
-        {screen === "notices" && <NoticesScreen go={go} />}
-        {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
+        {screen === "notices" && <NoticesScreen go={go} back={goBack} />}
+        {screen === "profile" && <ProfileScreen go={go} back={goBack} notify={notify} />}
         {screen === "guest" && <GuestWelcome go={go} />}
         {screen === "guestInfo" && <GuestInfo go={go} notify={notify} />}
         {screen === "guestAnswer" && <GuestAnswer go={go} notify={notify} />}

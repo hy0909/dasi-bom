@@ -1,13 +1,14 @@
 import { Sparkles } from "lucide-react";
 import { Topbar } from "@/components/topbar";
+import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { InitialsAvatar } from "@/components/initials-avatar";
 import type { Go } from "@/types";
 
-export function NoticesScreen({ go }: { go: Go }) {
+export function NoticesScreen({ go, back }: { go: Go; back: () => void }) {
   return (
     <>
-      <Topbar back={() => go("home")} title="알림" />
+      <Topbar back={back} title="알림" />
       <section className="mt-2 flex flex-col divide-y divide-border">
         <ListRow
           onClick={() => go("detail")}
@@ -28,6 +29,8 @@ export function NoticesScreen({ go }: { go: Go }) {
           chevron
         />
       </section>
+
+      <BottomNav go={go} active="notices" />
     </>
   );
 }

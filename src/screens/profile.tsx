@@ -4,20 +4,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Topbar } from "@/components/topbar";
+import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { InitialsAvatar } from "@/components/initials-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
 import { deleteAccount, initialOf, providerMeta, signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
-export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function ProfileScreen({
+  go,
+  back,
+  notify,
+}: {
+  go: Go;
+  back: () => void;
+  notify: Notify;
+}) {
   const [alert, setAlert] = useState(true);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const session = useSession();
 
   return (
     <>
-      <Topbar back={() => go("home")} title="내 설정" />
+      <Topbar back={back} title="내 설정" />
 
       <Card size="sm" className="mt-2">
         <CardContent className="flex items-center gap-4">
@@ -92,6 +101,8 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
           {confirmLeave ? "정말 탈퇴할게요" : "회원 탈퇴"}
         </Button>
       </div>
+
+      <BottomNav go={go} active="profile" />
     </>
   );
 }

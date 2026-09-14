@@ -57,16 +57,16 @@
 
   /* 타이포 스케일 */
   --text-display-xl: 32px;
-  --text-display-xl--line-height: 1.15;
+  --text-display-xl--line-height: 1.32;
   --text-display-xl--letter-spacing: -0.02em;
   --text-display-lg: 28px;
-  --text-display-lg--line-height: 1.2;
+  --text-display-lg--line-height: 1.32;
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-md: 24px;
-  --text-display-md--line-height: 1.25;
+  --text-display-md--line-height: 1.32;
   --text-display-md--letter-spacing: -0.02em;
   --text-display-sm: 22px;
-  --text-display-sm--line-height: 1.25;
+  --text-display-sm--line-height: 1.32;
   --text-display-sm--letter-spacing: -0.02em;
   --text-eyebrow: 13px;
   --text-eyebrow--line-height: 1;
