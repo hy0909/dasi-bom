@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
-import { providerMeta, signOut, useSession } from "@/lib/auth";
+import { signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
@@ -34,13 +34,6 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
           </Button>
         </CardContent>
       </Card>
-
-      {session && (
-        <p className="mt-3 text-xs text-body-mid">
-          {providerMeta[session.provider].label} 계정으로 로그인했어요 ·{" "}
-          {new Date(session.createdAt).toLocaleDateString("ko-KR")} 가입
-        </p>
-      )}
 
       <Card variant="outline" size="sm" className="mt-4 py-1">
         <CardContent className="flex flex-col px-3">

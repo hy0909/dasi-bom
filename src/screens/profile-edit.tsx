@@ -2,12 +2,12 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Topbar } from "@/components/topbar";
-import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { StickyBar } from "@/components/sticky-bar";
 import { CharacterAvatar, characterAt } from "@/components/character-avatar";
 import { CharacterPicker } from "@/components/character-picker";
-import { deleteAccount, updateProfile, useSession } from "@/lib/auth";
+import { ProviderIcon } from "@/components/provider-icons";
+import { deleteAccount, providerMeta, updateProfile, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function ProfileEditScreen({
@@ -41,17 +41,14 @@ export function ProfileEditScreen({
   return (
     <>
       <Topbar back={back} title="프로필 수정" />
-      <PageIntro
-        title="가족에게 어떻게 보일까요?"
-        description="앨범과 알림에 이 캐릭터와 이름으로 표시돼요."
-      />
 
-      <form className="mt-8 flex flex-col gap-6 pb-20" onSubmit={submit}>
+      <form className="mt-6 flex flex-col gap-6 pb-20" onSubmit={submit}>
         <div className="flex items-center gap-4">
           <CharacterAvatar index={character} size="xl" />
           <div className="min-w-0">
-            <b className="block text-[15px] font-semibold">{characterAt(character).label}</b>
-            <p className="mt-0.5 text-sm text-body">프로필 캐릭터</p>
+            <b className="block text-[15px] font-semibold">
+              {characterAt(character).label} 프로필 이미지
+            </b>
             <Button
               type="button"
               variant="outline"
@@ -82,9 +79,22 @@ export function ProfileEditScreen({
           />
         </Field>
 
-        <p className="text-xs text-body-mid">
-          이메일과 로그인 수단은 바꿀 수 없어요. 계정을 바꾸려면 로그아웃한 뒤 다시 로그인해주세요.
-        </p>
+        {/* 바꿀 수 없는 값이라 위계를 한 단계 낮춰 아래에 따로 둔다. */}
+        {session && (
+          <section className="mt-2 flex flex-col gap-2 rounded-lg bg-muted px-4 py-3.5">
+            <b className="text-xs font-semibold text-body">연결된 계정</b>
+            <div className="flex items-center gap-2 text-sm">
+              <ProviderIcon provider={session.provider} className="size-4 shrink-0" />
+              <span className="min-w-0 truncate text-ink">{session.email}</span>
+            </div>
+            <p className="text-xs text-body-mid">
+              {providerMeta[session.provider].label} 계정 ·{" "}
+              {new Date(session.createdAt).toLocaleDateString("ko-KR")} 가입
+              <br />
+              이메일과 로그인 수단은 바꿀 수 없어요.
+            </p>
+          </section>
+        )}
 
         {/* 탈퇴는 확인 모달 대신 두 번 누르기로 막는다 — 프로토타입에 다이얼로그 프리미티브가 없다. */}
         <div className="mt-4 border-t border-border pt-6">
