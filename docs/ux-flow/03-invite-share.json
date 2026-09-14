@@ -1,0 +1,57 @@
+{
+  "page": "가족 초대",
+  "feature": "참여 링크 공유",
+  "title": "[가족 초대] 참여 링크 공유 플로우",
+  "docLinks": [
+    { "label": "src/App.tsx (InviteScreen)", "url": "https://github.com/hy0909/dasi-bom/blob/main/src/App.tsx" }
+  ],
+  "figmaLinks": [
+    { "label": "프로토타입 (원본)", "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/" },
+    { "label": "클론 배포", "url": "https://hy0909.github.io/dasi-bom/" }
+  ],
+  "nodes": [
+    { "id": "start", "type": "start", "label": "GNB - [초대]", "role": "기록 소유자", "col": 0, "row": 0,
+      "details": ["경로: 하단 탭 [초대]", "기록 상세 우상단 [가족 초대]로도 진입"] },
+    { "id": "invite", "type": "screen", "label": "가족 초대 화면", "owner": "FE", "col": 1, "row": 0,
+      "details": ["링크: {origin}/?invite=EU23", "만료 안내 (2026.09.28)", "참여 가족 3명 현황", "[←] → 기록 상세"] },
+    { "id": "copy", "type": "action", "label": "[복사] 탭", "owner": "FE", "col": 2, "row": 0,
+      "details": ["clipboard.writeText()"] },
+    { "id": "d_clip", "type": "decision", "label": "클립보드 API 성공?", "owner": "FE", "col": 3, "row": 0,
+      "details": ["비보안 컨텍스트·권한 거부 시 실패"] },
+    { "id": "copied", "type": "end", "label": "복사 완료 토스트", "col": 4, "row": 0,
+      "details": ["\"실제 가족 참여 링크를 복사했어요\"", "화면 유지"] },
+    { "id": "fallback", "type": "action", "label": "textarea 폴백 복사", "case": "exception", "owner": "FE", "col": 3, "row": 1,
+      "details": ["임시 textarea 생성", "execCommand(copy) 폴백", "요소 제거"] },
+    { "id": "share", "type": "action", "label": "[공유하기] 탭", "owner": "FE", "col": 2, "row": 2,
+      "details": ["title · text · url 전달"] },
+    { "id": "d_share", "type": "decision", "label": "Web Share 지원?", "owner": "FE", "col": 3, "row": 2,
+      "details": ["모바일 브라우저 대부분 지원", "데스크톱은 대체로 미지원"] },
+    { "id": "sheet", "type": "end", "label": "OS 공유 시트", "col": 4, "row": 2,
+      "details": ["사용자 취소 시 조용히 종료", "토스트 없음"] },
+    { "id": "share_fb", "type": "end", "label": "복사로 대체", "case": "exception", "owner": "FE", "col": 4, "row": 3,
+      "details": ["[복사]와 동일 동작", "복사 완료 토스트"] },
+    { "id": "sms", "type": "end", "label": "[문자로 보내기]", "owner": "FE", "col": 2, "row": 3,
+      "details": ["sms:?&body=초대문구+링크", "OS 문자 앱으로 이동", "미지원 환경은 무반응"] },
+    { "id": "guest_demo", "type": "end", "label": "[초대 화면 체험]", "owner": "FE", "col": 2, "row": 4,
+      "details": ["게스트 초대 화면으로 이동", "→ [게스트 참여] 플로우 참조"] },
+    { "id": "participant", "type": "end", "label": "참여자 행 탭", "col": 2, "row": 1,
+      "details": ["토스트 \"{이름}: 답변 n개 · 상태\"", "완료 / 참여 중 / 초대됨"] },
+    { "id": "note", "type": "note", "label": "정책 확정 필요", "col": 1, "row": 2,
+      "details": ["초대 코드는 EU23 하드코딩 — 기록별 발급·만료 정책 없음", "링크 만료일(2026.09.28)은 문구만 존재, 검증 로직 없음", "참여자 현황은 고정 데이터"] }
+  ],
+  "edges": [
+    { "from": "start", "to": "invite" },
+    { "from": "invite", "to": "copy", "label": "[복사]" },
+    { "from": "invite", "to": "participant", "label": "참여자 탭" },
+    { "from": "invite", "to": "share", "label": "[공유하기]" },
+    { "from": "invite", "to": "sms", "label": "[문자로 보내기]" },
+    { "from": "invite", "to": "guest_demo", "label": "[초대 화면 체험]" },
+    { "from": "copy", "to": "d_clip" },
+    { "from": "d_clip", "to": "copied", "label": "YES" },
+    { "from": "d_clip", "to": "fallback", "label": "NO" },
+    { "from": "fallback", "to": "copied" },
+    { "from": "share", "to": "d_share" },
+    { "from": "d_share", "to": "sheet", "label": "YES" },
+    { "from": "d_share", "to": "share_fb", "label": "NO" }
+  ]
+}

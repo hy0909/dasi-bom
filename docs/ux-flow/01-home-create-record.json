@@ -1,0 +1,59 @@
+{
+  "page": "홈",
+  "feature": "새 기록 만들기",
+  "title": "[홈] 새 기록 만들기 플로우",
+  "docLinks": [
+    { "label": "src/App.tsx (CreateScreen)", "url": "https://github.com/hy0909/dasi-bom/blob/main/src/App.tsx" }
+  ],
+  "figmaLinks": [
+    { "label": "프로토타입 (원본)", "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/" },
+    { "label": "클론 배포", "url": "https://hy0909.github.io/dasi-bom/" }
+  ],
+  "nodes": [
+    { "id": "start", "type": "start", "label": "홈 - [새 기록 만들기]", "role": "기록 소유자", "col": 0, "row": 0,
+      "details": ["경로: 홈 > [새 기록 만들기]", "하단 탭 [＋]로도 진입", "기록 카드 [•••]는 메뉴 토스트"] },
+    { "id": "form", "type": "screen", "label": "새 기록 폼", "owner": "FE", "col": 1, "row": 0,
+      "details": ["01 어떤 순간을 기록해볼까요?", "[←] → 홈", "제목 인풋 autoFocus"] },
+    { "id": "f_title", "type": "action", "label": "기록 제목*", "owner": "FE", "col": 2, "row": 0,
+      "details": ["예시: 2023년 유럽여행", "공백만 입력은 미입력 처리"] },
+    { "id": "f_date", "type": "action", "label": "시작일·종료일 (선택)", "owner": "FE", "col": 2, "row": 1,
+      "details": ["type=date 2개", "기본값 07.10 / 07.17", "입력 여부 검사 없음"] },
+    { "id": "f_desc", "type": "action", "label": "짧은 설명 (선택)", "owner": "FE", "col": 2, "row": 2,
+      "details": ["textarea, 기본 문구 제공", "입력 여부 검사 없음"] },
+    { "id": "f_cover", "type": "action", "label": "대표 사진 (선택)", "owner": "FE", "col": 2, "row": 3,
+      "details": ["accept=image/*", "JPG, PNG · 최대 10MB 안내", "입력 여부 검사 없음"] },
+    { "id": "d_title", "type": "decision", "label": "제목 입력됨?", "owner": "FE", "col": 3, "row": 0,
+      "details": ["필수 항목만 검사: 제목", "title.trim() 길이 > 0"] },
+    { "id": "disabled", "type": "end", "label": "[기록 만들기] 비활성", "case": "exception", "state": "제목 미입력", "col": 3, "row": 1,
+      "details": ["disabled 상태 유지", "입력 시 즉시 활성화"] },
+    { "id": "d_img", "type": "decision", "label": "이미지 파일?", "owner": "FE", "col": 3, "row": 3,
+      "details": ["file.type이 image/ 로 시작"] },
+    { "id": "preview", "type": "end", "label": "대표 사진 미리보기", "col": 4, "row": 3,
+      "details": ["FileReader → dataURL", "버튼 문구 → 대표 사진 변경", "폼 유지"] },
+    { "id": "img_err", "type": "end", "label": "이미지만 선택 토스트", "case": "error", "owner": "FE", "col": 3, "row": 4,
+      "details": ["\"이미지 파일만 선택해주세요\"", "2초 후 자동 닫힘", "기존 미리보기 유지"] },
+    { "id": "submit", "type": "action", "label": "[기록 만들기] 탭", "owner": "FE", "col": 4, "row": 0,
+      "details": ["form submit", "제목 상태에 저장 (setTitle)"] },
+    { "id": "creating", "type": "action", "label": "생성 중 상태", "owner": "FE", "state": "ready", "col": 5, "row": 0,
+      "details": ["버튼 \"기록을 만들고 있어요…\"", "버튼 재비활성 (중복 방지)", "500ms 후 화면 이동"] },
+    { "id": "done", "type": "end", "label": "[기록 상세] 진입", "col": 6, "row": 0,
+      "details": ["히어로 제목 = 입력한 제목", "홈 카드 제목도 갱신"] },
+    { "id": "note", "type": "note", "label": "프로토타입 범위", "col": 5, "row": 1,
+      "details": ["서버 저장 없음 — 제목만 React 상태에 보관", "날짜·설명·대표 사진은 상세에 반영되지 않음", "새로고침 시 초기값(2023년 유럽여행)으로 복귀"] }
+  ],
+  "edges": [
+    { "from": "start", "to": "form" },
+    { "from": "form", "to": "f_title", "label": "병렬" },
+    { "from": "form", "to": "f_date", "label": "병렬" },
+    { "from": "form", "to": "f_desc", "label": "병렬" },
+    { "from": "form", "to": "f_cover", "label": "병렬" },
+    { "from": "f_title", "to": "d_title" },
+    { "from": "d_title", "to": "submit", "label": "YES" },
+    { "from": "d_title", "to": "disabled", "label": "NO" },
+    { "from": "f_cover", "to": "d_img", "label": "파일 선택" },
+    { "from": "d_img", "to": "preview", "label": "YES" },
+    { "from": "d_img", "to": "img_err", "label": "NO" },
+    { "from": "submit", "to": "creating" },
+    { "from": "creating", "to": "done" }
+  ]
+}
