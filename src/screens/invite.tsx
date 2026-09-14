@@ -61,9 +61,9 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           <br />빈 이야기를 채워주세요
         </h1>
         <p className="text-base leading-relaxed text-body">
-          링크를 받은 가족은 회원가입 없이
+          링크를 통해 회원가입하지 않아도
           <br />
-          바로 사진을 보고 답할 수 있어요.
+          사진을 추가할 수 있어요.
         </p>
       </section>
 
