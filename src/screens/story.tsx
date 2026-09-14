@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Ellipsis, Pause, Play, Quote, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Ellipsis, Pause, Play, Quote, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +18,8 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [editing, setEditing] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [style, setStyle] = useState(styles[0]);
+  const [index, setIndex] = useState(0);
+  const photo = photos[index];
 
   return (
     <>
@@ -32,21 +34,37 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
       />
 
       <article className={cn("flex flex-col gap-5", editing && "pb-24")}>
-        <MediaFrame className="mt-2" src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족">
+        <MediaFrame className="mt-2" src={photo.src} alt={photo.title}>
           <Badge variant="glass" className="absolute top-3 right-3 tabular-nums">
-            1 / 3
+            {index + 1} / {photos.length}
           </Badge>
+
+          {/* 사진 위 좌우 이동 — 사진을 가리지 않게 canvas 90% 채움의 원형 버튼 */}
+          <SlideButton
+            side="left"
+            disabled={index === 0}
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          />
+          <SlideButton
+            side="right"
+            disabled={index === photos.length - 1}
+            onClick={() => setIndex((i) => Math.min(photos.length - 1, i + 1))}
+          />
         </MediaFrame>
 
         <Eyebrow className="flex items-center gap-2">
-          2023년 7월 10일
+          {photo.date.replace(/^(\d{4})\. (\d{2})\. (\d{2})$/, (_, y, m, d) => `${y}년 ${+m}월 ${+d}일`)}
           <i className="size-1 rounded-full bg-mute" />
-          Paris, France
+          {photo.place}
         </Eyebrow>
 
         {editing ? (
           <div className="flex flex-col gap-3">
-            <Input defaultValue="파리에 도착한 첫날" className="font-heading text-display-sm font-bold h-14" />
+            <Input
+              key={photo.title}
+              defaultValue={photo.title}
+              className="font-heading text-display-sm font-bold h-14"
+            />
             <div className="flex flex-wrap gap-2">
               {styles.map((item) => (
                 <Button
@@ -62,11 +80,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
             </div>
           </div>
         ) : (
-          <h1 className="font-heading text-display-xl font-bold">
-            파리에 도착한
-            <br />
-            첫날
-          </h1>
+          <h1 className="font-heading text-display-xl font-bold">{photo.title}</h1>
         )}
 
         <div className="flex flex-wrap gap-2">
@@ -153,5 +167,33 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
         </div>
       )}
     </>
+  );
+}
+
+/** 사진 위 좌우 이동 버튼 — canvas 90% 채움 + 블러로 사진 위에서도 읽힌다. */
+function SlideButton({
+  side,
+  disabled,
+  onClick,
+}: {
+  side: "left" | "right";
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  const Icon = side === "left" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={side === "left" ? "이전 사진" : "다음 사진"}
+      className={cn(
+        "absolute top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-canvas/90 text-ink shadow-card backdrop-blur-sm transition-opacity outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
+        side === "left" ? "left-3" : "right-3",
+        disabled ? "pointer-events-none opacity-0" : "hover:bg-canvas",
+      )}
+    >
+      <Icon className="size-5" />
+    </button>
   );
 }
