@@ -91,7 +91,7 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           icon={<MessageSquare className="size-5" />}
           label="문자로 보내기"
           onClick={() => {
-            window.location.href = `sms:?&body=${encodeURIComponent(`2023년 유럽여행 기록에 초대해요 ${link}`)}`;
+            window.location.href = `sms:?&body=${encodeURIComponent(`2023년 유럽여행 앨범에 초대해요 ${link}`)}`;
           }}
         />
         <ShareButton icon={<Smartphone className="size-5" />} label="초대 화면 체험" onClick={() => go("guest")} />

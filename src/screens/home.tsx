@@ -32,7 +32,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
         </h1>
       </div>
 
-      {/* card-feature-dark — 새 기록 CTA */}
+      {/* card-feature-dark — 새 앨범 CTA */}
       <Card
         variant="dark"
         size="sm"
@@ -47,7 +47,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
             <Plus className="size-6" strokeWidth={2.5} />
           </span>
           <span className="min-w-0 flex-1">
-            <b className="block text-[17px] font-semibold text-canvas">새 기록 만들기</b>
+            <b className="block text-[17px] font-semibold text-canvas">새 앨범 만들기</b>
             <small className="block text-sm text-canvas-soft/70">사진 한 장에서 시작해보세요</small>
           </span>
           <ArrowRight className="size-5 text-canvas-soft/80" />
@@ -56,7 +56,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
 
       <SectionHeading
         className="mt-9"
-        title="내 기록"
+        title="내 앨범"
         action={
           <Button
             variant="ghost"
@@ -64,7 +64,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
             className="-mr-2"
             onClick={() => {
               setRecent(!recent);
-              notify(recent ? "오래된 기록부터 정렬했어요" : "최근 수정한 기록부터 정렬했어요");
+              notify(recent ? "오래된 앨범부터 정렬했어요" : "최근 수정한 앨범부터 정렬했어요");
             }}
           >
             {recent ? "최근 수정순" : "오래된 순"}
@@ -102,7 +102,7 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
       <div className="relative -mt-(--card-spacing) aspect-[16/10] overflow-hidden">
         <img src={photos[0].src} alt="파리 에펠탑 풍경" className="size-full object-cover" />
         <Badge variant="glass" className="absolute top-3 left-3">
-          기록 수집 중
+          이야기 수집 중
         </Badge>
       </div>
       <CardContent className="flex flex-col gap-4">
@@ -117,14 +117,14 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
                 variant="ghost"
                 size="icon-sm"
                 className="-mt-1 -mr-2"
-                aria-label="기록 더보기"
+                aria-label="앨범 더보기"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Ellipsis className="size-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onSelect={() => notify("기록 이름 수정 화면을 준비했어요")}>
+              <DropdownMenuItem onSelect={() => notify("앨범 이름 수정 화면을 준비했어요")}>
                 이름 수정
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => go("invite")}>공유</DropdownMenuItem>

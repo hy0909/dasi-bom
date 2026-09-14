@@ -32,9 +32,8 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
 
   return (
     <>
-      <Topbar back={() => go("home")} title="새 기록 만들기" />
+      <Topbar back={() => go("home")} title="새 앨범 만들기" />
       <PageIntro
-        eyebrow="01 · 기록 만들기"
         title={
           <>
             어떤 순간을
@@ -52,7 +51,7 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
       />
 
       <form className="mt-8 flex flex-col gap-6" onSubmit={submit}>
-        <Field label="기록 제목" htmlFor="record-title" required>
+        <Field label="앨범 제목" htmlFor="record-title" required>
           <Input
             id="record-title"
             autoFocus
@@ -98,7 +97,7 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
         </label>
 
         <Button size="lg" className="w-full" disabled={!title.trim() || ready}>
-          {ready ? "기록을 만들고 있어요…" : "기록 만들기"}
+          {ready ? "앨범을 만들고 있어요…" : "앨범 만들기"}
         </Button>
       </form>
     </>

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import type { Go, Screen } from "@/types";
 
 const items: { key: Screen; label: string; icon: typeof Bell; count?: number }[] = [
-  { key: "home", label: "기록", icon: LayoutGrid },
+  { key: "home", label: "앨범", icon: LayoutGrid },
   { key: "invite", label: "초대", icon: Users },
   { key: "notices", label: "알림", icon: Bell, count: 2 },
   { key: "profile", label: "나", icon: User },
@@ -24,7 +24,7 @@ export function BottomNav({ go, active = "home" }: { go: Go; active?: Screen }) 
           <Button
             size="icon-lg"
             onClick={() => go("create")}
-            aria-label="새 기록 만들기"
+            aria-label="새 앨범 만들기"
             className="-translate-y-4 shadow-float"
           >
             <Plus className="size-6" strokeWidth={2.5} />

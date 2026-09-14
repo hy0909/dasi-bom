@@ -29,18 +29,11 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <Card variant="outline" size="sm" className="mt-4 py-1">
         <CardContent className="flex flex-col px-3">
-          <ListRow
-            title="가족 답변 알림"
-            onClick={() => setAlert(!alert)}
-            trailing={
-              <Switch
-                checked={alert}
-                onCheckedChange={setAlert}
-                onClick={(e) => e.stopPropagation()}
-                aria-label="가족 답변 알림"
-              />
-            }
-          />
+          {/* 스위치 행은 ListRow(button)를 쓰지 않는다 — 버튼 중첩은 유효하지 않은 마크업 */}
+          <div className="flex w-full items-center gap-3 px-1 py-3">
+            <span className="min-w-0 flex-1 text-[15px] font-semibold">가족 답변 알림</span>
+            <Switch checked={alert} onCheckedChange={setAlert} aria-label="가족 답변 알림" />
+          </div>
           <Separator />
           <ListRow title="공유 링크 관리" chevron onClick={() => notify("공유 링크 1개가 활성화되어 있어요")} />
           <Separator />

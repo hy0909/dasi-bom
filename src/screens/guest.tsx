@@ -39,7 +39,7 @@ export function GuestWelcome({ go }: { go: Go }) {
       <MediaFrame className="mt-2" src={photos[0].src} alt="2023년 유럽여행" caption="하연님이 초대했어요" />
 
       <section className="mt-6 flex flex-col gap-3">
-        <Eyebrow>가족 기록 초대</Eyebrow>
+        <Eyebrow>가족 앨범 초대</Eyebrow>
         <h1 className="font-heading text-display-xl font-medium">
           2023년
           <br />
@@ -67,7 +67,7 @@ export function GuestWelcome({ go }: { go: Go }) {
       </Card>
 
       <Button size="lg" className="mt-6 w-full" onClick={() => go("guestInfo")}>
-        이 기록에 참여하기
+        이 앨범에 참여하기
       </Button>
       <div className="mt-2 flex justify-center">
         <Button variant="link" size="sm" className="text-body" onClick={() => leaveGuest(go)}>
@@ -95,7 +95,7 @@ export function GuestInfo({ go, notify }: { go: Go; notify: Notify }) {
             알려주세요
           </>
         }
-        description="기록에 표시될 이름과 관계를 입력해주세요."
+        description="앨범에 표시될 이름과 관계를 입력해주세요."
       />
 
       <form
