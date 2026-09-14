@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/topbar";
 import { MediaFrame } from "@/components/media-frame";
 import { Eyebrow } from "@/components/eyebrow";
-import { photos } from "@/data/photos";
+import { formatDate, formatTime, photos } from "@/data/photos";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
@@ -53,7 +53,9 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
         </MediaFrame>
 
         <Eyebrow className="flex items-center gap-2">
-          {photo.date.replace(/^(\d{4})\. (\d{2})\. (\d{2})$/, (_, y, m, d) => `${y}년 ${+m}월 ${+d}일`)}
+          {formatDate(photo.takenAt)}
+          <i className="size-1 rounded-full bg-mute" />
+          {formatTime(photo.takenAt)}
           <i className="size-1 rounded-full bg-mute" />
           {photo.place}
         </Eyebrow>

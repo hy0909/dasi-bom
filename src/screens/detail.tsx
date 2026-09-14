@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { Topbar } from "@/components/topbar";
 import { SectionHeading } from "@/components/section-heading";
-import { photos } from "@/data/photos";
+import { formatShortDate, photos } from "@/data/photos";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
@@ -277,7 +277,7 @@ function TimelineTab({ go }: { go: Go }) {
               className="flex w-full items-center gap-3 rounded-md py-3 pl-5 text-left outline-none hover:bg-muted/70 focus-visible:ring-3 focus-visible:ring-ring/40"
             >
               <time className="absolute -left-[58px] w-[46px] text-right text-xs font-semibold tabular-nums text-body">
-                {photo.date.replace("2023. ", "")}
+                {formatShortDate(photo.takenAt)}
               </time>
               <span
                 className={cn(

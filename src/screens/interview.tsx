@@ -7,7 +7,7 @@ import { Topbar } from "@/components/topbar";
 import { StepProgress } from "@/components/step-progress";
 import { MediaFrame } from "@/components/media-frame";
 import { QuestionCard } from "@/components/question-card";
-import { photos } from "@/data/photos";
+import { formatDate, formatTime, photos } from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 const questions = [
@@ -20,6 +20,8 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [question, setQuestion] = useState(0);
   const [textMode, setTextMode] = useState(false);
   const [answer, setAnswer] = useState("");
+  // 답변을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
+  const photo = photos[1];
 
   function submit() {
     if (!answer.trim()) return;
@@ -49,9 +51,9 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <MediaFrame
         className="mt-5"
-        src={photos[1].src}
+        src={photo.src}
         alt="조명 아래에서 다 함께한 저녁 식사"
-        caption="2023. 07. 11 · 파리"
+        caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`}
       />
 
       <QuestionCard eyebrow="AI가 사진을 보고 물어봐요" question={questions[question]}>

@@ -21,7 +21,7 @@ import { Field } from "@/components/field";
 import { MediaFrame } from "@/components/media-frame";
 import { StepProgress } from "@/components/step-progress";
 import { QuestionCard } from "@/components/question-card";
-import { photos } from "@/data/photos";
+import { formatDate, formatTime, photos } from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 function leaveGuest(go: Go) {
@@ -159,7 +159,7 @@ export function GuestAnswer({ go, notify }: { go: Go; notify: Notify }) {
       <Topbar back={() => go("guestInfo")} title="이야기 남기기" />
       <StepProgress step={saved + 1} total={3} />
 
-      <MediaFrame className="mt-5" src={photo.src} alt={photo.title} caption={`${photo.date} · ${photo.place}`} />
+      <MediaFrame className="mt-5" src={photo.src} alt={photo.title} caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`} />
 
       <QuestionCard eyebrow="이 사진에 대해 궁금해요" question={guestQuestions[saved]} />
 
