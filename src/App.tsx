@@ -15,6 +15,7 @@ import { UploadScreen } from "@/screens/upload";
 import { GuestWelcome, GuestInfo, GuestAnswer, GuestDone } from "@/screens/guest";
 import { NoticesScreen } from "@/screens/notices";
 import { ProfileScreen } from "@/screens/profile";
+import { ProfileEditScreen } from "@/screens/profile-edit";
 import { LoginScreen } from "@/screens/login";
 import { SignupTerms, SignupProfile } from "@/screens/signup";
 import { getSession } from "@/lib/auth";
@@ -101,7 +102,10 @@ export default function App() {
         {screen === "invite" && <InviteScreen go={go} notify={notify} />}
         {screen === "upload" && <UploadScreen go={go} notify={notify} />}
         {screen === "notices" && <NoticesScreen go={go} back={goBack} />}
-        {screen === "profile" && <ProfileScreen go={go} back={goBack} notify={notify} />}
+        {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
+        {screen === "profileEdit" && (
+          <ProfileEditScreen go={go} back={goBack} notify={notify} />
+        )}
         {screen === "guest" && <GuestWelcome go={go} />}
         {screen === "guestInfo" && <GuestInfo go={go} notify={notify} />}
         {screen === "guestAnswer" && <GuestAnswer go={go} notify={notify} />}

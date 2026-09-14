@@ -3,32 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { InitialsAvatar } from "@/components/initials-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
-import { deleteAccount, initialOf, providerMeta, signOut, useSession } from "@/lib/auth";
+import { initialOf, providerMeta, signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
-export function ProfileScreen({
-  go,
-  back,
-  notify,
-}: {
-  go: Go;
-  back: () => void;
-  notify: Notify;
-}) {
+export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [alert, setAlert] = useState(true);
-  const [confirmLeave, setConfirmLeave] = useState(false);
   const session = useSession();
 
   return (
     <>
-      <Topbar back={back} title="내 설정" />
+      {/* 탭 최상위 화면이라 상단 바가 없다 — 돌아갈 상위 화면이 없다. */}
+      <h1 className="mt-8 font-heading text-display-lg font-bold">내 설정</h1>
 
-      <Card size="sm" className="mt-2">
+      <Card size="sm" className="mt-6">
         <CardContent className="flex items-center gap-4">
           <InitialsAvatar
             name={initialOf(session?.name)}
@@ -42,7 +33,7 @@ export function ProfileScreen({
               <span className="truncate">{session?.email ?? "로그인이 필요해요"}</span>
             </small>
           </div>
-          <Button variant="outline" size="sm" onClick={() => notify("프로필 수정 화면을 준비했어요")}>
+          <Button variant="outline" size="sm" onClick={() => go("profileEdit")}>
             수정
           </Button>
         </CardContent>
@@ -80,27 +71,6 @@ export function ProfileScreen({
           />
         </CardContent>
       </Card>
-
-      {/* 탈퇴는 확인 모달 대신 두 번 누르기로 막는다 — 프로토타입에 다이얼로그 프리미티브가 없다. */}
-      <div className="mt-6 flex justify-center">
-        <Button
-          variant="link"
-          size="sm"
-          className="text-body-mid"
-          onClick={() => {
-            if (!confirmLeave) {
-              setConfirmLeave(true);
-              return notify("한 번 더 누르면 계정과 가입 정보가 지워져요");
-            }
-            localStorage.removeItem("dasiBomGuest");
-            deleteAccount();
-            notify("회원 탈퇴가 완료됐어요");
-            go("login");
-          }}
-        >
-          {confirmLeave ? "정말 탈퇴할게요" : "회원 탈퇴"}
-        </Button>
-      </div>
 
       <BottomNav go={go} active="profile" />
     </>

@@ -12,6 +12,7 @@ export type Screen =
   | "upload"
   | "notices"
   | "profile"
+  | "profileEdit"
   | "guest"
   | "guestInfo"
   | "guestAnswer"
