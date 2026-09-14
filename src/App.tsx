@@ -101,7 +101,7 @@ export default function App() {
         {screen === "story" && <StoryScreen go={go} notify={notify} />}
         {screen === "invite" && <InviteScreen go={go} notify={notify} />}
         {screen === "upload" && <UploadScreen go={go} notify={notify} />}
-        {screen === "notices" && <NoticesScreen go={go} back={goBack} />}
+        {screen === "notices" && <NoticesScreen go={go} />}
         {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />

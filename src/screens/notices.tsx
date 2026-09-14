@@ -1,15 +1,15 @@
 import { Sparkles } from "lucide-react";
-import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { InitialsAvatar } from "@/components/initials-avatar";
 import type { Go } from "@/types";
 
-export function NoticesScreen({ go, back }: { go: Go; back: () => void }) {
+export function NoticesScreen({ go }: { go: Go }) {
   return (
     <>
-      <Topbar back={back} title="알림" />
-      <section className="mt-2 flex flex-col divide-y divide-border">
+      {/* 탭 최상위 화면이라 상단 바가 없다 — 돌아갈 상위 화면이 없다. */}
+      <h1 className="mt-8 font-heading text-display-lg font-bold">알림</h1>
+      <section className="mt-6 flex flex-col">
         <ListRow
           onClick={() => go("detail")}
           leading={<InitialsAvatar name="엄" tone={1} size="lg" />}
