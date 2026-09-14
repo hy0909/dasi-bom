@@ -8,21 +8,21 @@ export type Photo = {
 
 export const photos: Photo[] = [
   {
-    src: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=85",
+    src: "https://images.unsplash.com/photo-1638290046742-b5030c6b56b4?auto=format&fit=crop&w=1200&q=85",
     title: "파리에 도착한 첫날",
     date: "2023. 07. 10",
     place: "Paris, France",
     status: "이야기 완성",
   },
   {
-    src: "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1200&q=85",
+    src: "https://images.unsplash.com/photo-1747409729637-646f000b9bf9?auto=format&fit=crop&w=1200&q=85",
     title: "다 함께한 저녁 식사",
     date: "2023. 07. 11",
     place: "Paris, France",
     status: "답변 기다리는 중",
   },
   {
-    src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=85",
+    src: "https://images.unsplash.com/photo-1777466966234-ed84dd087a94?auto=format&fit=crop&w=1200&q=85",
     title: "여행의 마지막 날",
     date: "2023. 07. 17",
     place: "Rome, Italy",

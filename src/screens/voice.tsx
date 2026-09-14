@@ -65,7 +65,7 @@ export function VoiceScreen({ go, notify }: { go: Go; notify: Notify }) {
   return (
     <>
       <Topbar back={() => go("interview")} title="목소리로 답하기" />
-      <MediaFrame className="mt-2" ratio="aspect-[16/9]" src={photos[1].src} alt="가족 저녁 식사" />
+      <MediaFrame className="mt-2" ratio="aspect-[16/9]" src={photos[1].src} alt="조명 아래에서 다 함께한 저녁 식사" />
 
       <section className="mt-6 flex flex-col gap-2">
         <Eyebrow>AI 질문</Eyebrow>

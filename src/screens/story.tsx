@@ -32,7 +32,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
       />
 
       <article className={cn("flex flex-col gap-5", editing && "pb-24")}>
-        <MediaFrame className="mt-2" src={photos[0].src} alt="파리 에펠탑">
+        <MediaFrame className="mt-2" src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족">
           <Badge variant="glass" className="absolute top-3 right-3 tabular-nums">
             1 / 3
           </Badge>

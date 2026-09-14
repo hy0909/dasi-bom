@@ -50,7 +50,7 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
       <MediaFrame
         className="mt-5"
         src={photos[1].src}
-        alt="가족 저녁 식사"
+        alt="조명 아래에서 다 함께한 저녁 식사"
         caption="2023. 07. 11 · 파리"
       />
 

@@ -106,7 +106,7 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
       onKeyDown={(e) => e.key === "Enter" && go("detail")}
     >
       <div className="relative -mt-(--card-spacing) aspect-[16/10] overflow-hidden">
-        <img src={photos[0].src} alt="파리 에펠탑 풍경" className="size-full object-cover" />
+        <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
         <Badge variant="glass" className="absolute top-3 left-3">
           이야기 수집 중
         </Badge>

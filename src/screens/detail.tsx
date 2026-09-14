@@ -32,7 +32,7 @@ export function DetailScreen({ go, title, notify }: { go: Go; title: string; not
 
       {/* hero — 사진 위 ink 그라데이션, display-lg 헤드라인 */}
       <section className="relative mt-1 aspect-[4/4.4] overflow-hidden rounded-xl bg-ink">
-        <img src={photos[0].src} alt="에펠탑을 바라보는 여행 풍경" className="size-full object-cover" />
+        <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
           <p className="text-sm font-medium text-canvas-soft/80">2023. 07. 10 — 07. 17</p>
@@ -247,7 +247,7 @@ function StoryTab({ go }: { go: Go }) {
         className="cursor-pointer transition-colors hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex gap-4">
-          <img src={photos[0].src} alt="에펠탑" className="size-20 shrink-0 rounded-lg object-cover" />
+          <img src={photos[0].src} alt="해질 녘 에펠탑을 바라보는 가족" className="size-20 shrink-0 rounded-lg object-cover" />
           <span className="min-w-0">
             <small className="block text-xs text-body-mid">2023. 07. 10 · 파리</small>
             <b className="mt-0.5 block text-[15px] font-semibold">파리에 도착한 첫날</b>
