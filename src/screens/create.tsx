@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
+import { StickyBar } from "@/components/sticky-bar";
 import type { Go } from "@/types";
 import { toast } from "sonner";
 
@@ -50,7 +51,7 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
         }
       />
 
-      <form className="mt-8 flex flex-col gap-6" onSubmit={submit}>
+      <form className="mt-8 flex flex-col gap-6 pb-20" onSubmit={submit}>
         <Field label="앨범 제목" htmlFor="record-title" required>
           <Input
             id="record-title"
@@ -96,9 +97,11 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
           />
         </label>
 
-        <Button size="lg" className="w-full" disabled={!title.trim() || ready}>
-          {ready ? "앨범을 만들고 있어요…" : "앨범 만들기"}
-        </Button>
+        <StickyBar>
+          <Button size="lg" className="w-full" disabled={!title.trim() || ready}>
+            {ready ? "앨범을 만들고 있어요…" : "앨범 만들기"}
+          </Button>
+        </StickyBar>
       </form>
     </>
   );
