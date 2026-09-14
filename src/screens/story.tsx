@@ -46,7 +46,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
 
         {editing ? (
           <div className="flex flex-col gap-3">
-            <Input defaultValue="파리에 도착한 첫날" className="font-heading text-display-sm font-semibold h-14" />
+            <Input defaultValue="파리에 도착한 첫날" className="font-heading text-display-sm font-bold h-14" />
             <div className="flex flex-wrap gap-2">
               {styles.map((item) => (
                 <Button
@@ -62,7 +62,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
             </div>
           </div>
         ) : (
-          <h1 className="font-heading text-display-xl font-semibold">
+          <h1 className="font-heading text-display-xl font-bold">
             파리에 도착한
             <br />
             첫날
@@ -94,7 +94,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
         <Card>
           <CardContent className="flex flex-col gap-3">
             <Quote className="size-5 text-primary" />
-            <p className="font-heading text-display-sm font-semibold">
+            <p className="font-heading text-display-sm font-bold">
               다 같이 너무 피곤했지만
               <br />
               정말 행복했어요.

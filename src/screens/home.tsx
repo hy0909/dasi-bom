@@ -24,7 +24,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
       <Topbar go={go} />
 
       <div className="mt-7">
-        <h1 className="font-heading text-display-xl font-semibold">
+        <h1 className="font-heading text-display-xl font-bold">
           함께 기억하고 싶은
           <br />
           순간이 있나요?
@@ -39,7 +39,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
         tabIndex={0}
         onClick={() => go("create")}
         onKeyDown={(e) => e.key === "Enter" && go("create")}
-        className="mt-7 cursor-pointer transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+        className="mt-7 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex items-center gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas">
@@ -110,8 +110,8 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
       <CardContent className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-heading text-display-sm font-semibold">{title}</h3>
-            <p className="mt-1 text-sm text-body">2023. 07. 10 — 07. 17</p>
+            <h3 className="font-heading text-display-sm font-bold">{title}</h3>
+            <p className="mt-1 text-sm text-body">2023년 7월 10일 - 7월 17일</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -69,7 +69,7 @@ export function VoiceScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <section className="mt-6 flex flex-col gap-2">
         <Eyebrow>AI 질문</Eyebrow>
-        <h1 className="font-heading text-display-md font-semibold">
+        <h1 className="font-heading text-display-md font-bold">
           이 사진은 여행 중 언제, 어디에서 찍은 사진인가요?
         </h1>
       </section>
@@ -88,7 +88,7 @@ export function VoiceScreen({ go, notify }: { go: Go; notify: Notify }) {
               />
             ))}
           </div>
-          <time className="font-heading text-display-lg font-semibold tabular-nums">
+          <time className="font-heading text-display-lg font-bold tabular-nums">
             {mm}:{ss}
           </time>
           <p className="text-sm text-body">

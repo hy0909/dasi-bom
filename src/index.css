@@ -141,7 +141,7 @@
 @layer utilities {
   .font-display {
     font-family: var(--font-heading);
-    font-weight: 600;
+    font-weight: 700;
   }
   .visually-hidden {
     position: absolute;
