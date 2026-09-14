@@ -21,7 +21,7 @@ export function QuestionCard({
           </span>
           <p className="text-sm font-medium text-canvas-soft/75">{eyebrow}</p>
         </div>
-        <h1 className="font-heading text-display-md font-medium text-canvas">{question}</h1>
+        <h1 className="font-heading text-display-md font-semibold text-canvas">{question}</h1>
         {children}
       </CardContent>
     </Card>

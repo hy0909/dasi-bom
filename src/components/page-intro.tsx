@@ -16,7 +16,7 @@ export function PageIntro({
   return (
     <div className={cn("mt-6 flex flex-col gap-3", className)}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h1 className="font-heading text-display-lg font-medium">{title}</h1>
+      <h1 className="font-heading text-display-lg font-semibold">{title}</h1>
       {description && (
         <p className="text-base leading-relaxed text-body">{description}</p>
       )}

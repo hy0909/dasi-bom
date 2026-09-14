@@ -41,7 +41,7 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <section className="mt-6 flex flex-col gap-3">
         <Eyebrow>시작하기</Eyebrow>
-        <h1 className="font-heading text-display-xl font-medium">
+        <h1 className="font-heading text-display-xl font-semibold">
           가족의 기억을
           <br />
           함께 모아요

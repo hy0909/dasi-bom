@@ -59,7 +59,7 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           ))}
         </div>
         <Eyebrow>함께 기록하면 더 선명해져요</Eyebrow>
-        <h1 className="font-heading text-display-lg font-medium">
+        <h1 className="font-heading text-display-lg font-semibold">
           가족의 목소리로
           <br />빈 이야기를 채워주세요
         </h1>

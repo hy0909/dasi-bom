@@ -28,7 +28,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
 
       <div className="mt-7 flex flex-col gap-3">
         <Eyebrow>안녕하세요, {session?.name ?? "하연"}님</Eyebrow>
-        <h1 className="font-heading text-display-xl font-medium">
+        <h1 className="font-heading text-display-xl font-semibold">
           함께 기억하고 싶은
           <br />
           순간이 있나요?

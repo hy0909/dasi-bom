@@ -40,7 +40,7 @@ export function GuestWelcome({ go }: { go: Go }) {
 
       <section className="mt-6 flex flex-col gap-3">
         <Eyebrow>가족 앨범 초대</Eyebrow>
-        <h1 className="font-heading text-display-xl font-medium">
+        <h1 className="font-heading text-display-xl font-semibold">
           2023년
           <br />
           유럽여행
@@ -209,7 +209,7 @@ export function GuestDone({ go }: { go: Go }) {
         <Check className="size-8" strokeWidth={3} />
       </span>
       <Eyebrow>{name}님의 이야기</Eyebrow>
-      <h1 className="font-heading text-display-lg font-medium">
+      <h1 className="font-heading text-display-lg font-semibold">
         소중한 기억을
         <br />
         남겨주셔서 고마워요
@@ -222,11 +222,11 @@ export function GuestDone({ go }: { go: Go }) {
         <CardContent className="grid grid-cols-2 divide-x divide-border">
           <div className="flex flex-col gap-1">
             <small className="text-xs font-semibold text-body">답변한 사진</small>
-            <strong className="font-heading text-display-md font-medium">3장</strong>
+            <strong className="font-heading text-display-md font-semibold">3장</strong>
           </div>
           <div className="flex flex-col gap-1 pl-4">
             <small className="text-xs font-semibold text-body">텍스트 답변</small>
-            <strong className="font-heading text-display-md font-medium">2개</strong>
+            <strong className="font-heading text-display-md font-semibold">2개</strong>
           </div>
         </CardContent>
       </Card>

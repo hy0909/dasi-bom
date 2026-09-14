@@ -36,7 +36,7 @@ export function DetailScreen({ go, title, notify }: { go: Go; title: string; not
         <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
           <p className="text-sm font-medium text-canvas-soft/80">2023. 07. 10 — 07. 17</p>
-          <h1 className="font-heading text-display-xl font-medium">
+          <h1 className="font-heading text-display-xl font-semibold">
             {first}
             {rest.length > 0 && (
               <>
