@@ -1,5 +1,4 @@
-import { Bell, LayoutGrid, Plus, User, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Bell, LayoutGrid, User, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Go, Screen } from "@/types";
 
@@ -11,27 +10,15 @@ const items: { key: Screen; label: string; icon: typeof Bell; count?: number }[]
 ];
 
 export function BottomNav({ go, active = "home" }: { go: Go; active?: Screen }) {
-  const [a, b, c, d] = items;
   return (
     <nav
       aria-label="주요 메뉴"
       className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-border bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
     >
-      <div className="grid h-[68px] grid-cols-5 items-center px-2">
-        <NavItem item={a} active={active === a.key} go={go} />
-        <NavItem item={b} active={active === b.key} go={go} />
-        <div className="flex justify-center">
-          <Button
-            size="icon-lg"
-            onClick={() => go("create")}
-            aria-label="새 앨범 만들기"
-            className="-translate-y-4 shadow-float"
-          >
-            <Plus className="size-6" strokeWidth={2.5} />
-          </Button>
-        </div>
-        <NavItem item={c} active={active === c.key} go={go} />
-        <NavItem item={d} active={active === d.key} go={go} />
+      <div className="grid h-[68px] grid-cols-4 items-center px-2">
+        {items.map((item) => (
+          <NavItem key={item.key} item={item} active={active === item.key} go={go} />
+        ))}
       </div>
     </nav>
   );

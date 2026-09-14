@@ -1,4 +1,7 @@
 export type Screen =
+  | "login"
+  | "signupTerms"
+  | "signupProfile"
   | "home"
   | "create"
   | "detail"

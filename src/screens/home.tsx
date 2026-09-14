@@ -12,19 +12,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
+import { Fab } from "@/components/fab";
 import { Eyebrow } from "@/components/eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { photos } from "@/data/photos";
+import { useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function HomeScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
   const [recent, setRecent] = useState(true);
+  const session = useSession();
   return (
     <>
       <Topbar go={go} />
 
       <div className="mt-7 flex flex-col gap-3">
-        <Eyebrow>안녕하세요, 하연님</Eyebrow>
+        <Eyebrow>안녕하세요, {session?.name ?? "하연"}님</Eyebrow>
         <h1 className="font-heading text-display-xl font-medium">
           함께 기억하고 싶은
           <br />
@@ -85,6 +88,9 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
         </p>
       </div>
 
+      <Fab aboveNav onClick={() => go("create")} aria-label="새 앨범 만들기">
+        <Plus className="size-6" strokeWidth={2.5} />
+      </Fab>
       <BottomNav go={go} active="home" />
     </>
   );

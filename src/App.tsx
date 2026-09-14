@@ -15,19 +15,28 @@ import { UploadScreen } from "@/screens/upload";
 import { GuestWelcome, GuestInfo, GuestAnswer, GuestDone } from "@/screens/guest";
 import { NoticesScreen } from "@/screens/notices";
 import { ProfileScreen } from "@/screens/profile";
+import { LoginScreen } from "@/screens/login";
+import { SignupTerms, SignupProfile } from "@/screens/signup";
+import { getSession } from "@/lib/auth";
 
 function notify(text: string) {
   toast(text);
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("login");
   const [title, setTitle] = useState("2023년 유럽여행");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    // 초대 링크는 로그인보다 우선한다 — 게스트는 가입 없이 참여한다.
     if (params.get("invite") === "EU23") setScreen("guest");
+    else {
+      const session = getSession();
+      // 가입을 중간에 멈춘 계정이면 약관 단계부터 이어서 진행한다.
+      if (session) setScreen(session.onboarded ? "home" : "signupTerms");
+    }
     setReady(true);
   }, []);
 
@@ -56,9 +65,12 @@ export default function App() {
   return (
     <AppShell>
       <PhoneCanvas
-        className={roomy ? "pb-[calc(112px+env(safe-area-inset-bottom))]" : "pb-12"}
+        className={roomy ? "pb-[calc(148px+env(safe-area-inset-bottom))]" : "pb-12"}
         data-screen={screen}
       >
+        {screen === "login" && <LoginScreen go={go} notify={notify} />}
+        {screen === "signupTerms" && <SignupTerms go={go} notify={notify} />}
+        {screen === "signupProfile" && <SignupProfile go={go} notify={notify} />}
         {screen === "home" && <HomeScreen go={go} title={title} notify={notify} />}
         {screen === "create" && <CreateScreen go={go} onCreate={setTitle} />}
         {screen === "detail" && <DetailScreen go={go} title={title} notify={notify} />}

@@ -6,26 +6,45 @@ import { Separator } from "@/components/ui/separator";
 import { Topbar } from "@/components/topbar";
 import { ListRow } from "@/components/list-row";
 import { InitialsAvatar } from "@/components/initials-avatar";
+import { ProviderIcon } from "@/components/provider-icons";
+import { deleteAccount, initialOf, providerMeta, signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [alert, setAlert] = useState(true);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const session = useSession();
+
   return (
     <>
       <Topbar back={() => go("home")} title="내 설정" />
 
       <Card size="sm" className="mt-2">
         <CardContent className="flex items-center gap-4">
-          <InitialsAvatar name="하" tone={0} size="lg" />
+          <InitialsAvatar
+            name={initialOf(session?.name)}
+            tone={session?.tone ?? 0}
+            size="lg"
+          />
           <div className="min-w-0 flex-1">
-            <b className="block text-[17px] font-semibold">하연</b>
-            <small className="block truncate text-sm text-body-mid">hayun@example.com</small>
+            <b className="block text-[17px] font-semibold">{session?.name ?? "게스트"}</b>
+            <small className="flex items-center gap-1.5 text-[13px] text-body-mid">
+              {session && <ProviderIcon provider={session.provider} className="size-3.5" />}
+              <span className="truncate">{session?.email ?? "로그인이 필요해요"}</span>
+            </small>
           </div>
           <Button variant="outline" size="sm" onClick={() => notify("프로필 수정 화면을 준비했어요")}>
             수정
           </Button>
         </CardContent>
       </Card>
+
+      {session && (
+        <p className="mt-3 text-xs text-body-mid">
+          {providerMeta[session.provider].label} 계정으로 로그인했어요 ·{" "}
+          {new Date(session.createdAt).toLocaleDateString("ko-KR")} 가입
+        </p>
+      )}
 
       <Card variant="outline" size="sm" className="mt-4 py-1">
         <CardContent className="flex flex-col px-3">
@@ -45,12 +64,34 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
             className="text-body"
             onClick={() => {
               localStorage.removeItem("dasiBomGuest");
+              signOut();
               notify("로그아웃 처리됐어요");
-              go("home");
+              go("login");
             }}
           />
         </CardContent>
       </Card>
+
+      {/* 탈퇴는 확인 모달 대신 두 번 누르기로 막는다 — 프로토타입에 다이얼로그 프리미티브가 없다. */}
+      <div className="mt-6 flex justify-center">
+        <Button
+          variant="link"
+          size="sm"
+          className="text-body-mid"
+          onClick={() => {
+            if (!confirmLeave) {
+              setConfirmLeave(true);
+              return notify("한 번 더 누르면 계정과 가입 정보가 지워져요");
+            }
+            localStorage.removeItem("dasiBomGuest");
+            deleteAccount();
+            notify("회원 탈퇴가 완료됐어요");
+            go("login");
+          }}
+        >
+          {confirmLeave ? "정말 탈퇴할게요" : "회원 탈퇴"}
+        </Button>
+      </div>
     </>
   );
 }
