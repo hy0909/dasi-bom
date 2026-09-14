@@ -1,0 +1,299 @@
+import { useState } from "react";
+import { Check, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
+import { Topbar } from "@/components/topbar";
+import { SectionHeading } from "@/components/section-heading";
+import { photos } from "@/data/photos";
+import { cn } from "@/lib/utils";
+import type { Go, Notify } from "@/types";
+
+type Tab = "사진" | "목소리" | "이야기" | "연대표";
+
+export function DetailScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
+  const [tab, setTab] = useState<Tab>("사진");
+  const [sorted, setSorted] = useState(false);
+  const [first, ...rest] = title.split(" ");
+
+  return (
+    <>
+      <Topbar
+        back={() => go("home")}
+        action={
+          <Button variant="ghost" size="sm" className="-mr-2" onClick={() => go("invite")}>
+            <UserPlus className="size-4" />
+            가족 초대
+          </Button>
+        }
+      />
+
+      {/* hero — 사진 위 ink 그라데이션, display-lg 헤드라인 */}
+      <section className="relative mt-1 aspect-[4/4.4] overflow-hidden rounded-xl bg-ink">
+        <img src={photos[0].src} alt="에펠탑을 바라보는 여행 풍경" className="size-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
+          <p className="text-sm font-medium text-canvas-soft/80">2023. 07. 10 — 07. 17</p>
+          <h1 className="font-heading text-display-xl font-medium">
+            {first}
+            {rest.length > 0 && (
+              <>
+                <br />
+                {rest.join(" ")}
+              </>
+            )}
+          </h1>
+          <AvatarGroup className="mt-1 *:data-[slot=avatar]:ring-ink/60">
+            {["하", "엄", "아"].map((n, i) => (
+              <Avatar key={n} className="size-8">
+                <AvatarFallback className={cn(i === 0 ? "bg-primary text-canvas" : "bg-canvas text-ink")}>
+                  {n}
+                </AvatarFallback>
+              </Avatar>
+            ))}
+            <AvatarGroupCount className="bg-ink-soft text-canvas ring-ink/60">+1</AvatarGroupCount>
+          </AvatarGroup>
+        </div>
+      </section>
+
+      {/* summary — card-content */}
+      <Card size="sm" className="mt-4">
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <Ring value={70} />
+            <p className="min-w-0 flex-1 text-sm leading-snug text-body">
+              <b className="block text-[15px] font-semibold text-ink">조금만 더 이야기해주세요</b>
+              사진 1장의 답변을 기다리고 있어요.
+            </p>
+          </div>
+          <Button variant="secondary" className="w-full" onClick={() => go("interview")}>
+            이어서 이야기 남기기
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="mt-6 gap-5 pb-20">
+        <TabsList variant="line" className="w-full border-b border-border">
+          {(["사진", "목소리", "이야기", "연대표"] as Tab[]).map((item) => (
+            <TabsTrigger key={item} value={item} className="text-[15px]">
+              {item}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="사진">
+          <PhotoTab
+            go={go}
+            sorted={sorted}
+            onSort={() => {
+              setSorted(!sorted);
+              notify(sorted ? "촬영일 순으로 정렬했어요" : "진행 상태 순으로 정렬했어요");
+            }}
+          />
+        </TabsContent>
+        <TabsContent value="목소리">
+          <VoiceTab notify={notify} />
+        </TabsContent>
+        <TabsContent value="이야기">
+          <StoryTab go={go} />
+        </TabsContent>
+        <TabsContent value="연대표">
+          <TimelineTab go={go} />
+        </TabsContent>
+      </Tabs>
+
+      <div className="pointer-events-none fixed bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-20 -translate-x-1/2">
+        <Button size="lg" className="pointer-events-auto shadow-float" onClick={() => go("upload")}>
+          <Plus className="size-5" strokeWidth={2.5} />
+          사진 추가
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function Ring({ value }: { value: number }) {
+  const r = 22;
+  const c = 2 * Math.PI * r;
+  return (
+    <span className="relative grid size-14 shrink-0 place-items-center">
+      <svg viewBox="0 0 52 52" className="absolute inset-0 size-full -rotate-90">
+        <circle cx="26" cy="26" r={r} fill="none" stroke="var(--mute)" strokeOpacity={0.45} strokeWidth="4" />
+        <circle
+          cx="26"
+          cy="26"
+          r={r}
+          fill="none"
+          stroke="var(--primary)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - value / 100)}
+        />
+      </svg>
+      <span className="text-sm font-bold tabular-nums">
+        {value}
+        <small className="text-[10px] font-semibold">%</small>
+      </span>
+    </span>
+  );
+}
+
+function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () => void }) {
+  const list = sorted ? [...photos].reverse() : photos;
+  return (
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        title={<span className="text-lg">사진 3장</span>}
+        description="사진을 눌러 이야기를 이어가세요"
+        action={
+          <Button variant="ghost" size="sm" className="-mr-2" onClick={onSort}>
+            {sorted ? "진행 상태순" : "촬영일순"}
+            <ChevronDown className="size-4" />
+          </Button>
+        }
+      />
+      <div className="grid grid-cols-2 gap-3">
+        {list.map((photo) => {
+          const index = photos.indexOf(photo);
+          return (
+            <button
+              type="button"
+              key={photo.title}
+              onClick={() => go(index === 0 ? "story" : "interview")}
+              className="group/tile flex flex-col gap-2 rounded-lg text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+            >
+              <span className="relative block aspect-square overflow-hidden rounded-lg bg-muted">
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
+                />
+                <span className="absolute top-2 right-2">
+                  {index === 0 ? (
+                    <Badge variant="ink" aria-label="이야기 완성" className="size-6 px-0">
+                      <Check className="size-3.5!" strokeWidth={3} />
+                    </Badge>
+                  ) : index === 1 ? (
+                    <Badge variant="primary">질문 2개</Badge>
+                  ) : (
+                    <Badge variant="glass">정리 중</Badge>
+                  )}
+                </span>
+              </span>
+              <span className="px-0.5">
+                <b className="block truncate text-sm font-semibold">{photo.title}</b>
+                <small className="block text-xs text-body-mid">{photo.status}</small>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function VoiceTab({ notify }: { notify: Notify }) {
+  const [playing, setPlaying] = useState<number | null>(null);
+  function toggle(i: number, name: string) {
+    const next = playing === i ? null : i;
+    setPlaying(next);
+    notify(next === null ? "재생을 멈췄어요" : `${name}의 목소리를 재생합니다`);
+  }
+  return (
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        title={<span className="text-lg">가족의 목소리 4개</span>}
+        description="그날의 온도가 담긴 이야기"
+      />
+      <div className="flex flex-col divide-y divide-border">
+        {["엄마", "아버지", "나"].map((name, i) => (
+          <article key={name} className="flex items-center gap-3 py-3">
+            <Button
+              variant={playing === i ? "default" : "secondary"}
+              size="icon"
+              className="rounded-full"
+              onClick={() => toggle(i, name)}
+              aria-label={`${name} 목소리 ${playing === i ? "일시정지" : "재생"}`}
+            >
+              {playing === i ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
+            </Button>
+            <div className="min-w-0 flex-1">
+              <b className="block text-[15px] font-semibold">{name}의 목소리</b>
+              <span className="block truncate text-[13px] text-body-mid">{photos[i].title}</span>
+            </div>
+            <time className="text-sm tabular-nums text-body">0:{24 + i * 13}</time>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StoryTab({ go }: { go: Go }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        title={<span className="text-lg">완성된 이야기 2편</span>}
+        description="AI가 가족의 답변을 정리했어요"
+      />
+      <Card
+        size="sm"
+        role="button"
+        tabIndex={0}
+        onClick={() => go("story")}
+        onKeyDown={(e) => e.key === "Enter" && go("story")}
+        className="cursor-pointer transition-colors hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+      >
+        <CardContent className="flex gap-4">
+          <img src={photos[0].src} alt="에펠탑" className="size-20 shrink-0 rounded-lg object-cover" />
+          <span className="min-w-0">
+            <small className="block text-xs text-body-mid">2023. 07. 10 · 파리</small>
+            <b className="mt-0.5 block text-[15px] font-semibold">파리에 도착한 첫날</b>
+            <p className="mt-1 line-clamp-2 text-sm leading-snug text-body">
+              긴 이동 끝에 도착한 가족들은 함께 저녁을 먹으며 여행의 시작을 기념했습니다.
+            </p>
+          </span>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function TimelineTab({ go }: { go: Go }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <SectionHeading
+        title={<span className="text-lg">우리 여행 연대표</span>}
+        description="이야기가 시간순으로 정리됐어요"
+      />
+      <ol className="relative ml-[58px] flex flex-col border-l border-border">
+        {photos.map((photo, i) => (
+          <li key={photo.title} className="relative">
+            <button
+              type="button"
+              onClick={() => go(i === 0 ? "story" : "interview")}
+              className="flex w-full items-center gap-3 rounded-md py-3 pl-5 text-left outline-none hover:bg-muted/70 focus-visible:ring-3 focus-visible:ring-ring/40"
+            >
+              <time className="absolute -left-[58px] w-[46px] text-right text-xs font-semibold tabular-nums text-body">
+                {photo.date.replace("2023. ", "")}
+              </time>
+              <span
+                className={cn(
+                  "absolute -left-[5px] size-[9px] rounded-full ring-2 ring-canvas",
+                  i === 0 ? "bg-primary" : "bg-mute",
+                )}
+              />
+              <img src={photo.src} alt="" className="size-12 shrink-0 rounded-md object-cover" />
+              <span className="min-w-0">
+                <b className="block truncate text-[15px] font-semibold">{photo.title}</b>
+                <small className="block text-xs text-body-mid">{photo.place}</small>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
