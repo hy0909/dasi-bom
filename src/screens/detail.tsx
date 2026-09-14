@@ -148,7 +148,7 @@ function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () 
         title={<span className="text-lg">사진 3장</span>}
         description="사진을 눌러 이야기를 이어가세요"
         action={
-          <Button variant="ghost" size="sm" className="-mr-2" onClick={onSort}>
+          <Button variant="quiet" size="sm" className="-mr-2" onClick={onSort}>
             {sorted ? "진행 상태순" : "촬영일순"}
             <ChevronDown className="size-4" />
           </Button>

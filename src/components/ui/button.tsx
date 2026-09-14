@@ -22,6 +22,9 @@ const buttonVariants = cva(
           "border-foreground bg-background text-foreground hover:bg-muted aria-expanded:bg-muted",
         ghost:
           "text-foreground hover:bg-muted aria-expanded:bg-muted font-bold",
+        /** 정렬·필터처럼 보조적인 토글 — 배경에 가까운 연한 뉴트럴 */
+        quiet:
+          "text-body-mid font-semibold hover:bg-muted hover:text-body aria-expanded:bg-muted",
         soft: "bg-muted text-foreground hover:bg-accent",
         destructive: "bg-destructive/10 text-destructive hover:bg-destructive/20",
         link: "text-foreground underline underline-offset-4 hover:text-primary",
