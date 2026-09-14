@@ -5,8 +5,9 @@ import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { StickyBar } from "@/components/sticky-bar";
-import { InitialsAvatar } from "@/components/initials-avatar";
-import { deleteAccount, initialOf, updateProfile, useSession } from "@/lib/auth";
+import { CharacterAvatar, characterAt } from "@/components/character-avatar";
+import { CharacterPicker } from "@/components/character-picker";
+import { deleteAccount, updateProfile, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function ProfileEditScreen({
@@ -20,16 +21,20 @@ export function ProfileEditScreen({
 }) {
   const session = useSession();
   const [name, setName] = useState(session?.name ?? "");
+  const [character, setCharacter] = useState(session?.tone ?? 0);
+  const [picking, setPicking] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
 
   const trimmed = name.trim();
-  const changed = trimmed.length > 0 && trimmed !== session?.name;
+  // 저장 버튼을 누르기 전에는 아무것도 반영하지 않는다 — 모달에서 고른 캐릭터도 마찬가지.
+  const changed =
+    trimmed.length > 0 && (trimmed !== session?.name || character !== (session?.tone ?? 0));
 
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!changed) return;
-    updateProfile({ name: trimmed });
-    notify("닉네임을 저장했어요");
+    updateProfile({ name: trimmed, tone: character });
+    notify("프로필을 저장했어요");
     back();
   }
 
@@ -37,19 +42,34 @@ export function ProfileEditScreen({
     <>
       <Topbar back={back} title="프로필 수정" />
       <PageIntro
-        title="가족에게 보일 이름"
-        description="앨범과 알림에 이 이름으로 표시돼요."
+        title="가족에게 어떻게 보일까요?"
+        description="앨범과 알림에 이 캐릭터와 이름으로 표시돼요."
       />
 
       <form className="mt-8 flex flex-col gap-6 pb-20" onSubmit={submit}>
         <div className="flex items-center gap-4">
-          <InitialsAvatar name={initialOf(trimmed || session?.name)} tone={session?.tone ?? 0} size="lg" />
-          <p className="text-sm text-body">
-            이름의 첫 글자가 프로필 이미지로 쓰여요.
-            <br />
-            사진은 나중에 올릴 수 있어요.
-          </p>
+          <CharacterAvatar index={character} size="xl" />
+          <div className="min-w-0">
+            <b className="block text-[15px] font-semibold">{characterAt(character).label}</b>
+            <p className="mt-0.5 text-sm text-body">프로필 캐릭터</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={() => setPicking(true)}
+            >
+              캐릭터 변경
+            </Button>
+          </div>
         </div>
+
+        <CharacterPicker
+          open={picking}
+          onOpenChange={setPicking}
+          value={character}
+          onConfirm={setCharacter}
+        />
 
         <Field label="닉네임" htmlFor="nickname" required>
           <Input

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,12 +9,11 @@ import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { StepProgress } from "@/components/step-progress";
-import { avatarTones } from "@/components/initials-avatar";
+import { CHARACTERS, CharacterAvatar } from "@/components/character-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
 import { cn } from "@/lib/utils";
 import {
   completeSignup,
-  initialOf,
   providerMeta,
   signOut,
   updateProfile,
@@ -59,7 +57,6 @@ export function SignupTerms({ go, notify }: { go: Go; notify: Notify }) {
       <StepProgress step={1} total={2} />
 
       <PageIntro
-        eyebrow="01 · 약관 동의"
         title={
           <>
             시작하기 전에
@@ -179,26 +176,23 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
       />
 
       <div className="mt-8 flex flex-col items-center gap-4">
-        <Avatar className="size-20">
-          <AvatarFallback className={cn(avatarTones[tone], "text-[28px] font-semibold")}>
-            {initialOf(name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex items-center gap-3" role="radiogroup" aria-label="프로필 색">
-          {avatarTones.map((toneClass, i) => (
+        <CharacterAvatar index={tone} size="xl" />
+        <div className="flex items-center gap-3" role="radiogroup" aria-label="프로필 캐릭터">
+          {CHARACTERS.map((character, i) => (
             <button
-              key={toneClass}
+              key={character.id}
               type="button"
               role="radio"
               aria-checked={tone === i}
-              aria-label={`프로필 색 ${i + 1}`}
+              aria-label={character.label}
               onClick={() => setTone(i)}
               className={cn(
-                "size-8 rounded-full border border-border transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                toneClass,
+                "rounded-full transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
                 tone === i && "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-canvas",
               )}
-            />
+            >
+              <CharacterAvatar index={i} />
+            </button>
           ))}
         </div>
       </div>

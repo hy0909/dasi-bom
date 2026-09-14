@@ -5,9 +5,9 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
-import { InitialsAvatar } from "@/components/initials-avatar";
+import { CharacterAvatar } from "@/components/character-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
-import { initialOf, providerMeta, signOut, useSession } from "@/lib/auth";
+import { providerMeta, signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
@@ -21,11 +21,7 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex items-center gap-4">
-          <InitialsAvatar
-            name={initialOf(session?.name)}
-            tone={session?.tone ?? 0}
-            size="lg"
-          />
+          <CharacterAvatar index={session?.tone} size="lg" />
           <div className="min-w-0 flex-1">
             <b className="block text-[17px] font-semibold">{session?.name ?? "게스트"}</b>
             <small className="flex items-center gap-1.5 text-[13px] text-body-mid">

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { InitialsAvatar } from "@/components/initials-avatar";
+import { CharacterAvatar } from "@/components/character-avatar";
 import { Wordmark } from "@/components/wordmark";
-import { initialOf, useSession } from "@/lib/auth";
+import { useSession } from "@/lib/auth";
 import type { Go } from "@/types";
 
 export function Topbar({
@@ -54,11 +54,7 @@ export function Topbar({
             aria-label="프로필 열기"
             className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
           >
-            <InitialsAvatar
-              name={initialOf(session?.name)}
-              tone={session?.tone ?? 0}
-              className="size-9"
-            />
+            <CharacterAvatar index={session?.tone} className="size-9" />
           </button>
         ) : (
           <span className="size-9" />
