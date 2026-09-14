@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, AudioLines, ChevronDown, Ellipsis, Images, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, AudioLines, ChevronDown, Ellipsis, Image, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -143,7 +143,7 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
           </span>
           <span className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">
-              <Images className="size-4 text-body-mid" aria-hidden />
+              <Image className="size-4 text-body-mid" aria-hidden />
               <span className="sr-only">사진</span>3
             </span>
             <span className="flex items-center gap-1.5">

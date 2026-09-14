@@ -18,6 +18,7 @@ export function Topbar({
   go?: Go;
 }) {
   const session = useSession();
+
   return (
     <header className="relative z-10 flex h-14 items-center justify-between">
       {back ? (

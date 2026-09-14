@@ -3,9 +3,7 @@ import { Copy, MessageSquare, Share2, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
-import { Eyebrow } from "@/components/eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { InitialsAvatar } from "@/components/initials-avatar";
 import { ListRow } from "@/components/list-row";
@@ -21,15 +19,7 @@ const participants: [string, string, string, "완료" | "참여 중" | "초대�
 
 const statusVariant = { 완료: "ink", "참여 중": "primary", 초대됨: "default" } as const;
 
-export function InviteScreen({
-  go,
-  back,
-  notify,
-}: {
-  go: Go;
-  back: () => void;
-  notify: Notify;
-}) {
+export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [link, setLink] = useState("초대 링크 준비 중…");
   useEffect(() => setLink(`${window.location.origin}${window.location.pathname}?invite=EU23`), []);
 
@@ -53,9 +43,8 @@ export function InviteScreen({
 
   return (
     <>
-      <Topbar back={back} title="가족 초대하기" />
-
-      <section className="mt-6 flex flex-col gap-3">
+      {/* 탭 최상위 화면이라 상단 바가 없다 — 돌아갈 상위 화면도, 필요한 액션도 없다. */}
+      <section className="mt-8 flex flex-col gap-3">
         <div className="mb-2 flex -space-x-4">
           {photos.map((p, i) => (
             <img
@@ -67,7 +56,6 @@ export function InviteScreen({
             />
           ))}
         </div>
-        <Eyebrow>함께 기록하면 더 선명해져요</Eyebrow>
         <h1 className="font-heading text-display-lg font-bold">
           가족의 목소리로
           <br />빈 이야기를 채워주세요
@@ -111,7 +99,7 @@ export function InviteScreen({
           title={<span className="text-lg">함께하는 가족 3명</span>}
           description="답변이 도착하면 알려드릴게요"
         />
-        <div className="flex flex-col divide-y divide-border">
+        <div className="flex flex-col">
           {participants.map(([initial, name, count, status], i) => (
             <ListRow
               key={name}

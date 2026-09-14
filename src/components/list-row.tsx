@@ -22,7 +22,7 @@ export function ListRow({
     <button
       type="button"
       className={cn(
-        "flex w-full items-center gap-3 rounded-md px-1 py-3 text-left transition-colors outline-none hover:bg-muted/70 focus-visible:ring-3 focus-visible:ring-ring/40",
+        "flex w-full items-center gap-3 px-1 py-3 text-left transition-colors outline-none hover:bg-muted/70 focus-visible:ring-3 focus-visible:ring-ring/40",
         className,
       )}
       {...props}
