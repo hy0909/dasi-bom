@@ -13,21 +13,17 @@ import {
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
-import { Eyebrow } from "@/components/eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { photos } from "@/data/photos";
-import { useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function HomeScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
   const [recent, setRecent] = useState(true);
-  const session = useSession();
   return (
     <>
       <Topbar go={go} />
 
-      <div className="mt-7 flex flex-col gap-3">
-        <Eyebrow>안녕하세요, {session?.name ?? "하연"}님</Eyebrow>
+      <div className="mt-7">
         <h1 className="font-heading text-display-xl font-semibold">
           함께 기억하고 싶은
           <br />
@@ -35,25 +31,25 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
         </h1>
       </div>
 
-      {/* card-feature-dark — 새 앨범 CTA */}
+      {/* 새 앨범 CTA — canvas 표면 + 소프트 섀도, 오렌지는 아이콘에만 */}
       <Card
-        variant="dark"
+        variant="plain"
         size="sm"
         role="button"
         tabIndex={0}
         onClick={() => go("create")}
         onKeyDown={(e) => e.key === "Enter" && go("create")}
-        className="mt-7 cursor-pointer transition-colors hover:bg-ink-soft focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+        className="mt-7 cursor-pointer transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex items-center gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas">
             <Plus className="size-6" strokeWidth={2.5} />
           </span>
           <span className="min-w-0 flex-1">
-            <b className="block text-[17px] font-semibold text-canvas">새 앨범 만들기</b>
-            <small className="block text-sm text-canvas-soft/70">사진 한 장에서 시작해보세요</small>
+            <b className="block text-[17px] font-semibold text-ink">새 앨범 만들기</b>
+            <small className="block text-sm text-body">사진 한 장에서 시작해보세요</small>
           </span>
-          <ArrowRight className="size-5 text-canvas-soft/80" />
+          <ArrowRight className="size-5 text-ink" />
         </CardContent>
       </Card>
 
