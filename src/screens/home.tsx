@@ -82,7 +82,7 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
           <Sparkles className="size-4" />
         </span>
         <p className="text-sm leading-relaxed text-body">
-          <b className="block font-semibold text-ink">오늘의 기록 팁</b>
+          <b className="block font-semibold text-ink">기록 Tip</b>
           사진 속 표정보다 그날의 기분을 먼저 물어보세요.
         </p>
       </div>
@@ -95,8 +95,16 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
   );
 }
 
+/** 겹쳐 보여줄 프로필 최대 개수 — 6번째부터는 '+N명'으로 접는다. */
+const MAX_FACES = 5;
+
 function RecordCard({ album, go, notify }: { album: Album; go: Go; notify: Notify }) {
   const session = useSession();
+  const members = [
+    { key: "me", character: session?.tone ?? 0 },
+    ...participants.map((p) => ({ key: p.name, character: p.character })),
+  ];
+  const overflow = members.length - MAX_FACES;
   return (
     <Card
       className="mt-4 cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
@@ -146,25 +154,25 @@ function RecordCard({ album, go, notify }: { album: Album; go: Go; notify: Notif
         {/* 날짜 블록과 한 칸 더 띄운다 */}
         <div className="mt-1">
           <div className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-3">
-              {/* 함께하는 사람 — 소유자 + 초대된 가족 */}
+            {/* 함께하는 사람 — 소유자 + 초대된 가족. 5개까지만 보이고 나머지는 수로 접는다. */}
+            <span className="flex items-center gap-2">
               <span className="flex -space-x-2">
-                <CharacterAvatar index={session?.tone} className="size-7 ring-2 ring-card" />
-                {participants.map((p) => (
+                {members.slice(0, MAX_FACES).map((m) => (
                   <CharacterAvatar
-                    key={p.name}
-                    index={p.character}
+                    key={m.key}
+                    index={m.character}
                     className="size-7 ring-2 ring-card"
                   />
                 ))}
-                <span className="sr-only">
-                  나를 포함해 {participants.length + 1}명이 함께해요
-                </span>
               </span>
-              <span className="flex items-center gap-1.5 text-sm text-body">
-                <Image className="size-4 text-body-mid" aria-hidden />
-                <span className="sr-only">사진</span>3
-              </span>
+              {overflow > 0 && (
+                <span className="text-sm font-semibold text-body">+{overflow}명</span>
+              )}
+              <span className="sr-only">나를 포함해 {members.length}명이 함께해요</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-sm text-body">
+              <Image className="size-4 text-body-mid" aria-hidden />
+              <span className="sr-only">사진</span>3
             </span>
           </div>
         </div>
