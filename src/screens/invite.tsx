@@ -30,7 +30,7 @@ export function InviteScreen({
 
   async function copy() {
     await copyText(link);
-    notify("실제 가족 참여 링크를 복사했어요");
+    notify("참여 링크를 복사했어요");
   }
   async function share() {
     if (navigator.share) {
@@ -74,7 +74,7 @@ export function InviteScreen({
       {/* 초대 링크 — pricing-card 크롬 */}
       <Card variant="outline" size="sm" className="mt-6">
         <CardContent className="flex flex-col gap-3">
-          <small className="text-xs font-semibold text-body">가족 참여 링크</small>
+          <small className="text-xs font-semibold text-body">참여 링크</small>
           <div className="flex items-center gap-3">
             <span className="min-w-0 flex-1 truncate text-sm font-medium">{link.replace("https://", "")}</span>
             <Button variant="secondary" size="sm" onClick={copy}>
