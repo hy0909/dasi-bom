@@ -91,16 +91,19 @@ export const CHARACTERS: Character[] = [
   },
 ];
 
-/** 배경색 8종 — 채도·명도를 비슷하게 맞춘 파스텔. 어떤 색을 골라도 잉크 선이 읽힌다. */
+/**
+ * 배경색 8종 — 채도·명도를 서로 맞춘 중간 톤.
+ * 밝은 얼굴색(#f7ede4)과 대비가 생기도록 파스텔보다 한 단계 낮춘 명도를 쓴다.
+ */
 export const AVATAR_COLORS = [
-  { id: "peach", label: "살구", value: "#f7e2d4" },
-  { id: "butter", label: "버터", value: "#f7e9c8" },
-  { id: "sage", label: "세이지", value: "#e4ecdd" },
-  { id: "sky", label: "하늘", value: "#dbe8f0" },
-  { id: "lilac", label: "라일락", value: "#e8e1f0" },
-  { id: "rose", label: "로즈", value: "#f6dee0" },
-  { id: "mint", label: "민트", value: "#daece6" },
-  { id: "sand", label: "모래", value: "#ebe5da" },
+  { id: "peach", label: "살구", value: "#eec3a9" },
+  { id: "butter", label: "버터", value: "#eed79a" },
+  { id: "sage", label: "세이지", value: "#c7d8bc" },
+  { id: "sky", label: "하늘", value: "#b7d0e0" },
+  { id: "lilac", label: "라일락", value: "#cec1e0" },
+  { id: "rose", label: "로즈", value: "#eebec2" },
+  { id: "mint", label: "민트", value: "#b5d7cc" },
+  { id: "sand", label: "모래", value: "#d5cab5" },
 ];
 
 export function characterAt(index?: number | null) {

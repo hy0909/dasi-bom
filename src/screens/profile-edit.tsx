@@ -126,7 +126,7 @@ export function ProfileEditScreen({
               go("login");
             }}
           >
-            {confirmLeave ? "정말 탈퇴할게요" : "회원 탈퇴하기"}
+            {confirmLeave ? "정말 탈퇴할게요" : "회원 탈퇴"}
           </Button>
         </div>
 
