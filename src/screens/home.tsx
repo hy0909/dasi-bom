@@ -16,7 +16,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { type Album, formatAlbumStart } from "@/data/album";
 import { sampleAlbums } from "@/data/albums";
-import { participants } from "@/data/family";
+import { participantsOf } from "@/data/family";
 import { photos } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
@@ -85,7 +85,10 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
           photoCount={photos.length}
           members={[
             { character: session?.tone ?? 0, color: session?.color ?? 0 },
-            ...participants.map((p) => ({ character: p.character, color: p.color })),
+            ...participantsOf(album.inviteCode).map((p) => ({
+              character: p.character,
+              color: p.color,
+            })),
           ]}
           onOpen={() => go("detail")}
           menu={

@@ -18,6 +18,8 @@ import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
 import { AlbumEditScreen } from "@/screens/album-edit";
 import { defaultAlbum } from "@/data/album";
+import { sampleAlbums } from "@/data/albums";
+import { photos } from "@/data/photos";
 import { LoginScreen } from "@/screens/login";
 import { SignupTerms, SignupProfile } from "@/screens/signup";
 import { getSession } from "@/lib/auth";
@@ -39,7 +41,9 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     // 초대 링크는 로그인보다 우선한다 — 게스트는 가입 없이 참여한다.
-    if (params.get("invite") === "EU23") setScreen("guest");
+    const code = params.get("invite");
+    const knownCodes = [defaultAlbum.inviteCode, ...sampleAlbums.map((a) => a.inviteCode)];
+    if (code && knownCodes.includes(code)) setScreen("guest");
     else {
       const session = getSession();
       // 가입을 중간에 멈춘 계정이면 약관 단계부터 이어서 진행한다.
@@ -84,6 +88,17 @@ export default function App() {
   }
 
   // 하단 탭이나 플로팅 버튼이 뜨는 화면은 그만큼 아래 여백이 필요하다.
+  // 초대 화면이 다루는 앨범 목록 — 내 앨범이 맨 앞
+  const inviteAlbums = [
+    { id: album.id, title: album.title, inviteCode: album.inviteCode, cover: photos[0].src },
+    ...sampleAlbums.map((a) => ({
+      id: a.id,
+      title: a.title,
+      inviteCode: a.inviteCode,
+      cover: a.cover,
+    })),
+  ];
+
   const roomy = TAB_SCREENS.includes(screen) || screen === "detail";
 
   return (
@@ -107,6 +122,8 @@ export default function App() {
           // 탭으로 들어오면 방문 기록이 비어 있다 — 그때는 뒤로가기를 두지 않는다.
           <InviteScreen
             go={go}
+            albums={inviteAlbums}
+            lockedAlbumId={history.at(-1) === "detail" ? album.id : undefined}
             back={history.length > 0 ? goBack : undefined}
             notify={notify}
           />

@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { type Album, formatAlbumPeriod } from "@/data/album";
-import { participants } from "@/data/family";
+import { participantsOf } from "@/data/family";
 import { formatShortDate, photos } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
             </h1>
             <span className="mt-1 flex -space-x-2">
               <CharacterAvatar index={session?.tone} color={session?.color} className="size-8 ring-2 ring-ink/50" />
-              {participants.map((p) => (
+              {participantsOf(album.inviteCode).map((p) => (
                 <CharacterAvatar
                   key={p.name}
                   index={p.character}
@@ -56,7 +56,9 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
                   className="size-8 ring-2 ring-ink/50"
                 />
               ))}
-              <span className="sr-only">나를 포함해 {participants.length + 1}명이 함께해요</span>
+              <span className="sr-only">
+                나를 포함해 {participantsOf(album.inviteCode).length + 1}명이 함께해요
+              </span>
             </span>
           </div>
         </div>

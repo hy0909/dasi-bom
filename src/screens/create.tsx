@@ -37,7 +37,16 @@ export function CreateScreen({
     e.preventDefault();
     if (!title.trim()) return;
     setReady(true);
-    onCreate({ title: title.trim(), startDate, endDate, description: description.trim() });
+    // 앨범마다 참여 링크가 다르다 — 만들 때 코드를 한 번 발급한다.
+    const code = Math.random().toString(36).slice(2, 6).toUpperCase();
+    onCreate({
+      id: code.toLowerCase(),
+      inviteCode: code,
+      title: title.trim(),
+      startDate,
+      endDate,
+      description: description.trim(),
+    });
     setTimeout(() => go("detail"), 500);
   }
 
@@ -66,19 +75,22 @@ export function CreateScreen({
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="시작일" htmlFor="start">
+        {/* 날짜 입력은 기기 로케일에 따라 내용 폭이 달라진다 — 칸을 좁히지 말고 늘어나게 둔다 */}
+        <div className="grid grid-cols-2 gap-2">
+          <Field className="min-w-0" label="시작일" htmlFor="start">
             <Input
               id="start"
               type="date"
+              className="w-full min-w-0 px-3 text-sm"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
           </Field>
-          <Field label="종료일" htmlFor="end">
+          <Field className="min-w-0" label="종료일" htmlFor="end">
             <Input
               id="end"
               type="date"
+              className="w-full min-w-0 px-3 text-sm"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />

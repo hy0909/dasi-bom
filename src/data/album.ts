@@ -2,6 +2,9 @@
 export type AlbumStatus = "기록 중" | "완료";
 
 export type Album = {
+  id: string;
+  /** 앨범마다 다른 초대 코드 — 참여 링크와 참여자 목록이 이 값에 묶인다. */
+  inviteCode: string;
   title: string;
   /** yyyy-mm-dd — 입력 필드 값 그대로 */
   startDate: string;
@@ -11,6 +14,8 @@ export type Album = {
 };
 
 export const defaultAlbum: Album = {
+  id: "eu23",
+  inviteCode: "EU23",
   title: "2023년 유럽여행",
   startDate: "2023-07-10",
   endDate: "2023-07-17",

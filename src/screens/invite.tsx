@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Copy, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,26 +7,48 @@ import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { participants } from "@/data/family";
-import { photos } from "@/data/photos";
+import { participantsOf } from "@/data/family";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
 const statusVariant = { "참여 중": "primary", 초대됨: "default" } as const;
 
+/** 초대 화면이 다루는 앨범 한 벌 — 링크와 참여자가 이 단위로 묶인다. */
+export type InviteAlbum = {
+  id: string;
+  title: string;
+  inviteCode: string;
+  cover: string;
+};
+
 export function InviteScreen({
   go,
+  albums,
+  lockedAlbumId,
   back,
   notify,
 }: {
   go: Go;
-  /** 앨범 상세처럼 상위 화면에서 들어온 경우에만 전달된다. */
+  /** 초대할 수 있는 앨범 목록 */
+  albums: InviteAlbum[];
+  /** 앨범 상세에서 들어온 경우 — 그 앨범으로 고정한다. */
+  lockedAlbumId?: string;
+  /** 상위 화면에서 들어온 경우에만 전달된다. */
   back?: () => void;
   notify: Notify;
 }) {
-  const [link, setLink] = useState("초대 링크 준비 중…");
-  useEffect(() => setLink(`${window.location.origin}${window.location.pathname}?invite=EU23`), []);
+  const [selectedId, setSelectedId] = useState(lockedAlbumId ?? albums[0]?.id);
+  const album = useMemo(
+    () => albums.find((a) => a.id === selectedId) ?? albums[0],
+    [albums, selectedId],
+  );
+  const participants = participantsOf(album.inviteCode);
+
+  const [link, setLink] = useState("참여 링크 준비 중…");
+  useEffect(() => {
+    setLink(`${window.location.origin}${window.location.pathname}?invite=${album.inviteCode}`);
+  }, [album.inviteCode]);
 
   async function copy() {
     await copyText(link);
@@ -36,7 +58,7 @@ export function InviteScreen({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "2023년 유럽여행에 초대해요",
+          title: `${album.title}에 초대해요`,
           text: "사진을 보고 떠오르는 기억을 들려주세요.",
           url: link,
         });
@@ -52,17 +74,6 @@ export function InviteScreen({
       {back && <Topbar back={back} title="초대" />}
 
       <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
-        <div className="mb-2 flex -space-x-4">
-          {photos.map((p, i) => (
-            <img
-              key={p.title}
-              src={p.src}
-              alt=""
-              className="size-16 rounded-lg object-cover ring-[3px] ring-canvas"
-              style={{ transform: `rotate(${(i - 1) * 4}deg)`, zIndex: 3 - i }}
-            />
-          ))}
-        </div>
         <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
         <p className="text-base leading-relaxed text-body">
           링크를 통해 회원가입없이
@@ -71,12 +82,47 @@ export function InviteScreen({
         </p>
       </section>
 
-      {/* 초대 링크 — pricing-card 크롬 */}
-      <Card variant="outline" size="sm" className="mt-6">
+      {/* 초대는 앨범 단위 — 어느 앨범으로 부를지 먼저 고른다. */}
+      {!lockedAlbumId && albums.length > 1 && (
+        <section className="mt-6 flex flex-col gap-2">
+          <span className="text-xs font-semibold text-body">초대할 앨범</span>
+          <div
+            className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5"
+            role="radiogroup"
+            aria-label="초대할 앨범"
+          >
+            {albums.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="radio"
+                aria-checked={item.id === album.id}
+                onClick={() => setSelectedId(item.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 rounded-lg border py-1.5 pr-3 pl-1.5 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
+                  item.id === album.id
+                    ? "border-ink bg-ink text-canvas"
+                    : "border-border text-body hover:bg-muted",
+                )}
+              >
+                <img src={item.cover} alt="" className="size-7 rounded-md object-cover" />
+                {item.title}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 참여 링크 — 앨범마다 코드가 다르다 */}
+      <Card variant="outline" size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-3">
-          <small className="text-xs font-semibold text-body">참여 링크</small>
+          <small className="text-xs font-semibold text-body">
+            ‘{album.title}’ 참여 링크
+          </small>
           <div className="flex items-center gap-3">
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">{link.replace("https://", "")}</span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">
+              {link.replace("https://", "")}
+            </span>
             <Button variant="secondary" size="sm" onClick={copy}>
               <Copy className="size-3.5" />
               복사
@@ -98,6 +144,9 @@ export function InviteScreen({
           description="답변이 도착하면 알려드릴게요"
         />
         <div className="flex flex-col">
+          {participants.length === 0 && (
+            <p className="py-6 text-sm text-body-mid">아직 초대한 가족이 없어요.</p>
+          )}
           {/* 행 자체를 버튼으로 두지 않는다 — '다시 초대'가 행 안의 버튼이라 중첩이 된다. */}
           {participants.map(({ character, color, name, note, status }) => (
             <div key={name} className="flex w-full items-center gap-3 px-1 py-3">
@@ -127,4 +176,3 @@ export function InviteScreen({
     </>
   );
 }
-

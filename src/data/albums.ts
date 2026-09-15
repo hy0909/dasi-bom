@@ -1,7 +1,6 @@
 import type { Album } from "@/data/album";
 
 export type AlbumCardData = Album & {
-  id: string;
   cover: string;
   coverAlt: string;
   photoCount: number;
@@ -16,6 +15,7 @@ export type AlbumCardData = Album & {
 export const sampleAlbums: AlbumCardData[] = [
   {
     id: "jeju",
+    inviteCode: "JEJU",
     title: "제주 가족여행",
     startDate: "2024-05-03",
     endDate: "2024-05-06",
@@ -33,6 +33,7 @@ export const sampleAlbums: AlbumCardData[] = [
   },
   {
     id: "summer",
+    inviteCode: "SUMMER",
     title: "할머니와 보낸 여름",
     startDate: "2024-08-02",
     endDate: "2024-08-11",
@@ -49,6 +50,7 @@ export const sampleAlbums: AlbumCardData[] = [
   },
   {
     id: "seaside",
+    inviteCode: "SEA",
     title: "바닷가 산책",
     startDate: "2024-09-21",
     endDate: "2024-09-21",
