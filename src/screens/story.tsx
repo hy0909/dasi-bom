@@ -8,18 +8,41 @@ import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/topbar";
 import { MediaFrame } from "@/components/media-frame";
 import { Eyebrow } from "@/components/eyebrow";
-import { formatDate, formatTime, photos } from "@/data/photos";
+import type { AlbumCardData } from "@/data/albums";
+import { formatDate, formatDuration, formatTime, photosOf } from "@/data/photos";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
 const styles = ["따뜻하게", "담백하게", "회고록처럼"];
 
-export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function StoryScreen({
+  go,
+  album,
+  notify,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  notify: Notify;
+}) {
   const [editing, setEditing] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [style, setStyle] = useState(styles[0]);
   const [index, setIndex] = useState(0);
-  const photo = photos[index];
+
+  // 글이 완성된 사진만 넘겨 본다 — 아직 없으면 앨범의 첫 사진을 보여준다.
+  const all = photosOf(album.id);
+  const photos = all.some((p) => p.story) ? all.filter((p) => p.story) : all;
+  const photo = photos[Math.min(index, Math.max(photos.length - 1, 0))];
+  const voice = photo?.voices?.[0];
+
+  if (!photo) {
+    return (
+      <>
+        <Topbar back={() => go("detail")} title="사진 기록" />
+        <p className="mt-10 text-center text-sm text-body-mid">아직 기록이 없어요.</p>
+      </>
+    );
+  }
 
   return (
     <>
@@ -92,17 +115,10 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
         </div>
 
         {editing ? (
-          <Textarea
-            className="min-h-44"
-            defaultValue="긴 이동 끝에 파리에 도착한 가족들은 첫날 저녁을 함께 먹으며 여행의 시작을 기념했습니다. 모두 피곤했지만, 창밖으로 에펠탑이 보이던 순간만큼은 말없이 한참을 바라보았습니다."
-          />
+          <Textarea key={photo.title} className="min-h-44" defaultValue={photo.story ?? ""} />
         ) : (
           <p className="text-[17px] leading-[1.7] text-body">
-            긴 이동 끝에 파리에 도착한 가족들은 첫날 저녁을 함께 먹으며 여행의 시작을 기념했습니다.
-            <br />
-            <br />
-            모두 피곤했지만, 창밖으로 에펠탑이 보이던 순간만큼은 말없이 한참을 바라보았습니다. 엄마는
-            그때의 우리 표정이 아직도 생생하다고 말합니다.
+            {photo.story ?? "아직 글이 없어요. 가족의 답변이 모이면 이 자리에 정리해드려요."}
           </p>
         )}
 
@@ -127,7 +143,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
           tabIndex={0}
           onClick={() => {
             setPlaying(!playing);
-            notify(playing ? "재생을 멈췄어요" : "엄마의 목소리를 재생합니다");
+            notify(playing ? "재생을 멈췄어요" : `${voice?.name ?? "가족"}의 목소리를 재생합니다`);
           }}
           onKeyDown={(e) => e.key === "Enter" && setPlaying(!playing)}
           className="cursor-pointer transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
@@ -142,8 +158,10 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
               {playing ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
             </span>
             <span className="min-w-0 flex-1">
-              <b className="block text-[15px] font-semibold">엄마의 목소리</b>
-              <small className="block text-xs text-body-mid">0:32 · 원본 음성</small>
+              <b className="block text-[15px] font-semibold">{voice?.name ?? "가족"}의 목소리</b>
+              <small className="block text-xs text-body-mid">
+                {voice ? `${formatDuration(voice.seconds)} · 원본 음성` : "아직 목소리가 없어요"}
+              </small>
             </span>
             <Ellipsis className="size-5 text-body-mid" />
           </CardContent>

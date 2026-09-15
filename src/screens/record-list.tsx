@@ -1,10 +1,20 @@
 import { ChevronRight } from "lucide-react";
 import { Topbar } from "@/components/topbar";
-import { formatDate, formatTime, photos } from "@/data/photos";
+import type { AlbumCardData } from "@/data/albums";
+import { formatDate, formatTime, photosOf } from "@/data/photos";
 import type { Go } from "@/types";
 
 /** 아직 기록이 끝나지 않은 사진만 모아 바로 이어서 기록하도록 돕는 화면. */
-export function RecordListScreen({ go, back }: { go: Go; back: () => void }) {
+export function RecordListScreen({
+  go,
+  album,
+  back,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  back: () => void;
+}) {
+  const photos = photosOf(album.id);
   const pending = photos.filter((photo) => photo.status === "기록 중");
 
   return (

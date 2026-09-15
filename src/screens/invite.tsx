@@ -7,6 +7,7 @@ import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
+import type { AlbumCardData } from "@/data/albums";
 import { participantsOf } from "@/data/family";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
@@ -14,31 +15,26 @@ import type { Go, Notify } from "@/types";
 
 const statusVariant = { "참여 중": "primarySoft", 초대됨: "default" } as const;
 
-/** 초대 화면이 다루는 앨범 한 벌 — 링크와 참여자가 이 단위로 묶인다. */
-export type InviteAlbum = {
-  id: string;
-  title: string;
-  inviteCode: string;
-  cover: string;
-};
-
 export function InviteScreen({
   go,
   albums,
-  lockedAlbumId,
+  initialAlbumId,
+  locked = false,
   back,
   notify,
 }: {
   go: Go;
   /** 초대할 수 있는 앨범 목록 */
-  albums: InviteAlbum[];
+  albums: AlbumCardData[];
+  /** 처음 골라 둘 앨범 — 방금 보고 있던 앨범이다. */
+  initialAlbumId?: string;
   /** 앨범 상세에서 들어온 경우 — 그 앨범으로 고정한다. */
-  lockedAlbumId?: string;
+  locked?: boolean;
   /** 상위 화면에서 들어온 경우에만 전달된다. */
   back?: () => void;
   notify: Notify;
 }) {
-  const [selectedId, setSelectedId] = useState(lockedAlbumId ?? albums[0]?.id);
+  const [selectedId, setSelectedId] = useState(initialAlbumId ?? albums[0]?.id);
   const album = useMemo(
     () => albums.find((a) => a.id === selectedId) ?? albums[0],
     [albums, selectedId],
@@ -83,7 +79,7 @@ export function InviteScreen({
       </section>
 
       {/* 초대는 앨범 단위 — 어느 앨범으로 부를지 먼저 고른다. */}
-      {!lockedAlbumId && albums.length > 1 && (
+      {!locked && albums.length > 1 && (
         <section className="mt-6 flex flex-col gap-2">
           <span className="text-xs font-semibold text-body">초대할 앨범</span>
           <div

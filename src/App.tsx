@@ -18,9 +18,7 @@ import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
 import { AlbumEditScreen } from "@/screens/album-edit";
 import { RecordListScreen } from "@/screens/record-list";
-import { defaultAlbum } from "@/data/album";
-import { sampleAlbums } from "@/data/albums";
-import { photos } from "@/data/photos";
+import { initialAlbums, type AlbumCardData } from "@/data/albums";
 import { LoginScreen } from "@/screens/login";
 import { SignupTerms, SignupProfile } from "@/screens/signup";
 import { getSession } from "@/lib/auth";
@@ -36,14 +34,16 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   /** 뒤로가기용 방문 기록. 화면마다 돌아갈 곳을 하드코딩하면 진입 경로가 둘 이상일 때 어긋난다. */
   const [history, setHistory] = useState<Screen[]>([]);
-  const [album, setAlbum] = useState(defaultAlbum);
+  const [albums, setAlbums] = useState<AlbumCardData[]>(initialAlbums);
+  /** 지금 열어 둔 앨범 — 상세·정보 수정·기록 목록이 모두 이 앨범을 본다. */
+  const [openId, setOpenId] = useState(initialAlbums[0].id);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     // 초대 링크는 로그인보다 우선한다 — 게스트는 가입 없이 참여한다.
     const code = params.get("invite");
-    const knownCodes = [defaultAlbum.inviteCode, ...sampleAlbums.map((a) => a.inviteCode)];
+    const knownCodes = initialAlbums.map((a) => a.inviteCode);
     if (code && knownCodes.includes(code)) setScreen("guest");
     else {
       const session = getSession();
@@ -62,6 +62,12 @@ export default function App() {
       setScreen(next);
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /** 앨범을 하나 지목하고 그 앨범의 화면으로 간다. */
+  const openAlbum = (id: string, next: Screen) => {
+    setOpenId(id);
+    go(next);
   };
 
   /** 실제로 거쳐온 화면으로 돌아간다. 기록이 없으면 홈으로. */
@@ -89,16 +95,7 @@ export default function App() {
   }
 
   // 하단 탭이나 플로팅 버튼이 뜨는 화면은 그만큼 아래 여백이 필요하다.
-  // 초대 화면이 다루는 앨범 목록 — 내 앨범이 맨 앞
-  const inviteAlbums = [
-    { id: album.id, title: album.title, inviteCode: album.inviteCode, cover: photos[0].src },
-    ...sampleAlbums.map((a) => ({
-      id: a.id,
-      title: a.title,
-      inviteCode: a.inviteCode,
-      cover: a.cover,
-    })),
-  ];
+  const current = albums.find((a) => a.id === openId) ?? albums[0];
 
   const roomy = TAB_SCREENS.includes(screen) || screen === "detail";
 
@@ -111,20 +108,35 @@ export default function App() {
         {screen === "login" && <LoginScreen go={go} notify={notify} />}
         {screen === "signupTerms" && <SignupTerms go={go} notify={notify} />}
         {screen === "signupProfile" && <SignupProfile go={go} notify={notify} />}
-        {screen === "home" && <HomeScreen go={go} album={album} notify={notify} />}
-        {screen === "create" && (
-          <CreateScreen go={go} onCreate={(next) => setAlbum({ ...defaultAlbum, ...next })} />
+        {screen === "home" && (
+          <HomeScreen
+            go={go}
+            albums={albums}
+            onOpenAlbum={openAlbum}
+            notify={notify}
+          />
         )}
-        {screen === "detail" && <DetailScreen go={go} album={album} notify={notify} />}
-        {screen === "interview" && <InterviewScreen go={go} notify={notify} />}
-        {screen === "voice" && <VoiceScreen go={go} notify={notify} />}
-        {screen === "story" && <StoryScreen go={go} notify={notify} />}
+        {screen === "create" && (
+          <CreateScreen
+            go={go}
+            onCreate={(next) => {
+              // 새 앨범은 목록 맨 앞에 두고, 만든 직후 그 앨범을 연다.
+              setAlbums((list) => [next, ...list]);
+              setOpenId(next.id);
+            }}
+          />
+        )}
+        {screen === "detail" && <DetailScreen go={go} album={current} notify={notify} />}
+        {screen === "interview" && <InterviewScreen go={go} album={current} notify={notify} />}
+        {screen === "voice" && <VoiceScreen go={go} album={current} notify={notify} />}
+        {screen === "story" && <StoryScreen go={go} album={current} notify={notify} />}
         {screen === "invite" && (
           // 탭으로 들어오면 방문 기록이 비어 있다 — 그때는 뒤로가기를 두지 않는다.
           <InviteScreen
             go={go}
-            albums={inviteAlbums}
-            lockedAlbumId={history.at(-1) === "detail" ? album.id : undefined}
+            albums={albums}
+            initialAlbumId={current.id}
+            locked={history.at(-1) === "detail"}
             back={history.length > 0 ? goBack : undefined}
             notify={notify}
           />
@@ -133,9 +145,16 @@ export default function App() {
         {screen === "notices" && <NoticesScreen go={go} />}
         {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
         {screen === "albumEdit" && (
-          <AlbumEditScreen album={album} onSave={setAlbum} back={goBack} notify={notify} />
+          <AlbumEditScreen
+            album={current}
+            onSave={(next) =>
+              setAlbums((list) => list.map((a) => (a.id === next.id ? { ...a, ...next } : a)))
+            }
+            back={goBack}
+            notify={notify}
+          />
         )}
-        {screen === "recordList" && <RecordListScreen go={go} back={goBack} />}
+        {screen === "recordList" && <RecordListScreen go={go} album={current} back={goBack} />}
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />
         )}

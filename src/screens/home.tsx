@@ -14,16 +14,29 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { type Album, formatAlbumStart } from "@/data/album";
-import { sampleAlbums } from "@/data/albums";
+import { formatAlbumStart } from "@/data/album";
+import type { AlbumCardData } from "@/data/albums";
 import { participantsOf } from "@/data/family";
-import { photos } from "@/data/photos";
+import { photosOf } from "@/data/photos";
 import { useSession } from "@/lib/auth";
-import type { Go, Notify } from "@/types";
+import type { Go, Notify, Screen } from "@/types";
 
-export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify: Notify }) {
+export function HomeScreen({
+  go,
+  albums,
+  onOpenAlbum,
+  notify,
+}: {
+  go: Go;
+  albums: AlbumCardData[];
+  /** 앨범을 지목해 그 앨범의 화면으로 간다 — 카드마다 다른 앨범이 열려야 한다. */
+  onOpenAlbum: (id: string, screen: Screen) => void;
+  notify: Notify;
+}) {
   const [recent, setRecent] = useState(true);
   const session = useSession();
+  // 정렬은 목록의 앞뒤만 뒤집는다 — 데이터에 수정 시각이 따로 없다.
+  const list = recent ? albums : [...albums].reverse();
   return (
     <>
       <Topbar go={go} />
@@ -78,54 +91,48 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
       />
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <AlbumCard
-          album={album}
-          cover={photos[0].src}
-          coverAlt="해질 녘 에펠탑을 함께 바라보는 가족"
-          photoCount={photos.length}
-          members={[
-            { character: session?.tone ?? 0, color: session?.color ?? 0 },
-            ...participantsOf(album.inviteCode).map((p) => ({
-              character: p.character,
-              color: p.color,
-            })),
-          ]}
-          onOpen={() => go("detail")}
-          menu={
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon-xs"
-                  className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
-                  aria-label="앨범 더보기"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Ellipsis className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onSelect={() => go("albumEdit")}>정보 수정</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => go("invite")}>공유</DropdownMenuItem>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onSelect={() => notify("삭제는 확인 후 진행돼요")}
-                >
-                  삭제
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          }
-        />
-        {sampleAlbums.map((item) => (
+        {list.map((item) => (
           <AlbumCard
             key={item.id}
             album={item}
-            cover={item.cover}
-            coverAlt={item.coverAlt}
-            photoCount={item.photoCount}
-            members={item.members}
-            onOpen={() => go("detail")}
+            photoCount={photosOf(item.id).length}
+            members={[
+              { character: session?.tone ?? 0, color: session?.color ?? 0 },
+              ...participantsOf(item.inviteCode).map((p) => ({
+                character: p.character,
+                color: p.color,
+              })),
+            ]}
+            onOpen={() => onOpenAlbum(item.id, "detail")}
+            menu={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon-xs"
+                    className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
+                    aria-label={`${item.title} 더보기`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Ellipsis className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "albumEdit")}>
+                    정보 수정
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "invite")}>
+                    공유
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onSelect={() => notify("삭제는 확인 후 진행돼요")}
+                  >
+                    삭제
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
           />
         ))}
       </div>
@@ -153,16 +160,12 @@ const MAX_FACES = 3;
 
 function AlbumCard({
   album,
-  cover,
-  coverAlt,
   photoCount,
   members,
   onOpen,
   menu,
 }: {
-  album: Album;
-  cover: string;
-  coverAlt: string;
+  album: AlbumCardData;
   photoCount: number;
   members: { character: number; color: number }[];
   onOpen: () => void;
@@ -179,7 +182,7 @@ function AlbumCard({
       className="cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
     >
       <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
-        <img src={cover} alt={coverAlt} className="size-full object-cover" />
+        <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
         <Badge
           variant={album.status === "완료" ? "ink" : "glass"}
           className="absolute top-2 left-2"

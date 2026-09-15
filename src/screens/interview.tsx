@@ -7,7 +7,8 @@ import { Topbar } from "@/components/topbar";
 import { StepProgress } from "@/components/step-progress";
 import { MediaFrame } from "@/components/media-frame";
 import { QuestionCard } from "@/components/question-card";
-import { formatDate, formatTime, photos } from "@/data/photos";
+import type { AlbumCardData } from "@/data/albums";
+import { formatDate, formatTime, photosOf } from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 const questions = [
@@ -16,12 +17,32 @@ const questions = [
   "이 순간을 한 문장으로 남긴다면요?",
 ];
 
-export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function InterviewScreen({
+  go,
+  album,
+  notify,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  notify: Notify;
+}) {
   const [question, setQuestion] = useState(0);
   const [textMode, setTextMode] = useState(false);
   const [answer, setAnswer] = useState("");
   // 답변을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
-  const photo = photos[1];
+  const albumPhotos = photosOf(album.id);
+  const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
+
+  if (!photo) {
+    return (
+      <>
+        <Topbar back={() => go("detail")} title="사진 기록 남기기" />
+        <p className="mt-10 text-center text-sm text-body-mid">
+          아직 기록할 사진이 없어요. 사진을 먼저 추가해주세요.
+        </p>
+      </>
+    );
+  }
 
   function submit() {
     if (!answer.trim()) return;
@@ -52,7 +73,7 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
       <MediaFrame
         className="mt-5"
         src={photo.src}
-        alt="조명 아래에서 다 함께한 저녁 식사"
+        alt={photo.alt ?? photo.title}
         caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`}
       />
 

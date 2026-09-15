@@ -5,11 +5,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Topbar } from "@/components/topbar";
 import { MediaFrame } from "@/components/media-frame";
 import { Eyebrow } from "@/components/eyebrow";
-import { photos } from "@/data/photos";
+import type { AlbumCardData } from "@/data/albums";
+import { photosOf } from "@/data/photos";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
-export function VoiceScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function VoiceScreen({
+  go,
+  album,
+  notify,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  notify: Notify;
+}) {
+  const albumPhotos = photosOf(album.id);
+  const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -65,7 +76,7 @@ export function VoiceScreen({ go, notify }: { go: Go; notify: Notify }) {
   return (
     <>
       <Topbar back={() => go("interview")} title="목소리로 답하기" />
-      <MediaFrame className="mt-2" ratio="aspect-[16/9]" src={photos[1].src} alt="조명 아래에서 다 함께한 저녁 식사" />
+      <MediaFrame className="mt-2" ratio="aspect-[16/9]" src={photo?.src} alt={photo?.alt ?? photo?.title ?? ""} />
 
       <section className="mt-6 flex flex-col gap-2">
         <Eyebrow>AI 질문</Eyebrow>

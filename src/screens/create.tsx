@@ -8,16 +8,24 @@ import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { type Album, defaultAlbum } from "@/data/album";
+import { defaultAlbum } from "@/data/album";
+import type { AlbumCardData } from "@/data/albums";
 import type { Go } from "@/types";
 import { toast } from "sonner";
+
+/** 대표 사진을 고르지 않은 앨범이 쓰는 빈 커버 */
+const PLACEHOLDER_COVER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="%23ece7e3"/></svg>`,
+  );
 
 export function CreateScreen({
   go,
   onCreate,
 }: {
   go: Go;
-  onCreate: (album: Omit<Album, "status">) => void;
+  onCreate: (album: AlbumCardData) => void;
 }) {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(defaultAlbum.startDate);
@@ -47,6 +55,10 @@ export function CreateScreen({
       startDate,
       endDate,
       description: description.trim(),
+      status: "기록 중",
+      // 대표 사진을 고르지 않았으면 첫 사진을 올릴 때까지 회색 자리로 둔다.
+      cover: cover ?? PLACEHOLDER_COVER,
+      coverAlt: cover ? `${title.trim()} 대표 사진` : "아직 대표 사진이 없는 앨범",
     });
     setTimeout(() => go("detail"), 500);
   }
@@ -78,10 +90,10 @@ export function CreateScreen({
 
         <div className="flex flex-col gap-4">
           <Field label="시작일" htmlFor="start">
-            <DateField id="start" value={startDate} onChange={setStartDate} />
+            <DateField id="start" label="시작일" value={startDate} onChange={setStartDate} />
           </Field>
           <Field label="종료일" htmlFor="end">
-            <DateField id="end" value={endDate} onChange={setEndDate} />
+            <DateField id="end" label="종료일" value={endDate} onChange={setEndDate} />
           </Field>
         </div>
 

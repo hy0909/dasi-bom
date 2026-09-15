@@ -56,6 +56,7 @@ export function AlbumEditScreen({
           <Field label="시작일" htmlFor="album-start">
             <DateField
               id="album-start"
+              label="시작일"
               value={draft.startDate}
               onChange={(startDate) => setDraft({ ...draft, startDate })}
             />
@@ -63,6 +64,7 @@ export function AlbumEditScreen({
           <Field label="종료일" htmlFor="album-end">
             <DateField
               id="album-end"
+              label="종료일"
               value={draft.endDate}
               onChange={(endDate) => setDraft({ ...draft, endDate })}
             />
