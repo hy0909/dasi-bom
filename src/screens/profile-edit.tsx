@@ -22,18 +22,22 @@ export function ProfileEditScreen({
   const session = useSession();
   const [name, setName] = useState(session?.name ?? "");
   const [character, setCharacter] = useState(session?.tone ?? 0);
+  const [color, setColor] = useState(session?.color ?? 0);
   const [picking, setPicking] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
 
   const trimmed = name.trim();
   // 저장 버튼을 누르기 전에는 아무것도 반영하지 않는다 — 모달에서 고른 캐릭터도 마찬가지.
   const changed =
-    trimmed.length > 0 && (trimmed !== session?.name || character !== (session?.tone ?? 0));
+    trimmed.length > 0 &&
+    (trimmed !== session?.name ||
+      character !== (session?.tone ?? 0) ||
+      color !== (session?.color ?? 0));
 
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!changed) return;
-    updateProfile({ name: trimmed, tone: character });
+    updateProfile({ name: trimmed, tone: character, color });
     notify("프로필을 저장했어요");
     back();
   }
@@ -44,7 +48,7 @@ export function ProfileEditScreen({
 
       <form className="mt-6 flex flex-col gap-6 pb-20" onSubmit={submit}>
         <div className="flex items-center gap-4">
-          <CharacterAvatar index={character} size="xl" />
+          <CharacterAvatar index={character} color={color} size="xl" />
           <div className="min-w-0">
             <b className="block text-[15px] font-semibold">
               {characterAt(character).label} 프로필 이미지
@@ -56,7 +60,7 @@ export function ProfileEditScreen({
               className="mt-2"
               onClick={() => setPicking(true)}
             >
-              캐릭터 변경
+              프로필 변경
             </Button>
           </div>
         </div>
@@ -64,8 +68,12 @@ export function ProfileEditScreen({
         <CharacterPicker
           open={picking}
           onOpenChange={setPicking}
-          value={character}
-          onConfirm={setCharacter}
+          character={character}
+          color={color}
+          onConfirm={(next) => {
+            setCharacter(next.character);
+            setColor(next.color);
+          }}
         />
 
         <Field label="닉네임" htmlFor="nickname" required>

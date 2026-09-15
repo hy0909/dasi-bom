@@ -83,7 +83,10 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
           cover={photos[0].src}
           coverAlt="해질 녘 에펠탑을 함께 바라보는 가족"
           photoCount={photos.length}
-          members={[session?.tone ?? 0, ...participants.map((p) => p.character)]}
+          members={[
+            { character: session?.tone ?? 0, color: session?.color ?? 0 },
+            ...participants.map((p) => ({ character: p.character, color: p.color })),
+          ]}
           onOpen={() => go("detail")}
           menu={
             <DropdownMenu>
@@ -158,7 +161,7 @@ function AlbumCard({
   cover: string;
   coverAlt: string;
   photoCount: number;
-  members: number[];
+  members: { character: number; color: number }[];
   onOpen: () => void;
   menu?: React.ReactNode;
 }) {
@@ -192,10 +195,11 @@ function AlbumCard({
         <div className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-1.5">
             <span className="flex -space-x-1.5">
-              {members.slice(0, MAX_FACES).map((character, i) => (
+              {members.slice(0, MAX_FACES).map((m, i) => (
                 <CharacterAvatar
                   key={i}
-                  index={character}
+                  index={m.character}
+                  color={m.color}
                   className="size-6 ring-2 ring-card"
                 />
               ))}

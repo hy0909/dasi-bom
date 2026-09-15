@@ -54,7 +54,7 @@ export function Topbar({
             aria-label="프로필 열기"
             className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
           >
-            <CharacterAvatar index={session?.tone} className="size-9" />
+            <CharacterAvatar index={session?.tone} color={session?.color} className="size-9" />
           </button>
         ) : (
           <span className="size-9" />

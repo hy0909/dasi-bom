@@ -21,7 +21,7 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex items-center gap-4">
-          <CharacterAvatar index={session?.tone} size="lg" />
+          <CharacterAvatar index={session?.tone} color={session?.color} size="lg" />
           <div className="min-w-0 flex-1">
             <b className="block text-[17px] font-semibold">{session?.name ?? "게스트"}</b>
             <small className="flex items-center gap-1.5 text-[13px] text-body-mid">

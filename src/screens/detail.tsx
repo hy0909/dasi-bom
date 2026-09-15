@@ -47,11 +47,12 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
               )}
             </h1>
             <span className="mt-1 flex -space-x-2">
-              <CharacterAvatar index={session?.tone} className="size-8 ring-2 ring-ink/50" />
+              <CharacterAvatar index={session?.tone} color={session?.color} className="size-8 ring-2 ring-ink/50" />
               {participants.map((p) => (
                 <CharacterAvatar
                   key={p.name}
                   index={p.character}
+                  color={p.color}
                   className="size-8 ring-2 ring-ink/50"
                 />
               ))}

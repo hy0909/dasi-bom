@@ -12,7 +12,7 @@ export function NoticesScreen({ go }: { go: Go }) {
       <section className="mt-6 flex flex-col">
         <ListRow
           onClick={() => go("detail")}
-          leading={<CharacterAvatar index={2} size="lg" />}
+          leading={<CharacterAvatar index={0} color={5} size="lg" />}
           title="엄마가 새 목소리를 남겼어요"
           description="‘파리에 도착한 첫날’ · 방금 전"
           trailing={<span className="size-2 rounded-full bg-primary" aria-label="새 알림" />}

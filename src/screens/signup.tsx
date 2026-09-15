@@ -9,7 +9,7 @@ import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { StepProgress } from "@/components/step-progress";
-import { CHARACTERS, CharacterAvatar } from "@/components/character-avatar";
+import { AVATAR_COLORS, CHARACTERS, CharacterAvatar } from "@/components/character-avatar";
 import { ProviderIcon } from "@/components/provider-icons";
 import { cn } from "@/lib/utils";
 import {
@@ -157,6 +157,7 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
   const session = useSession();
   const [name, setName] = useState(session?.name ?? "");
   const [tone, setTone] = useState(session?.tone ?? 0);
+  const [color, setColor] = useState(session?.color ?? 0);
 
   return (
     <>
@@ -175,8 +176,9 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
         description="앨범과 초대 화면에 표시될 이름이에요. 나중에 바꿀 수 있어요."
       />
 
-      <div className="mt-8 flex flex-col items-center gap-4">
-        <CharacterAvatar index={tone} size="xl" />
+      <div className="mt-8 flex flex-col items-center gap-5">
+        <CharacterAvatar index={tone} color={color} size="xl" />
+
         <div className="flex items-center gap-3" role="radiogroup" aria-label="프로필 캐릭터">
           {CHARACTERS.map((character, i) => (
             <button
@@ -191,8 +193,26 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
                 tone === i && "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-canvas",
               )}
             >
-              <CharacterAvatar index={i} />
+              <CharacterAvatar index={i} color={color} />
             </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2" role="radiogroup" aria-label="프로필 배경색">
+          {AVATAR_COLORS.map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              role="radio"
+              aria-checked={color === i}
+              aria-label={item.label}
+              onClick={() => setColor(i)}
+              className={cn(
+                "size-7 rounded-full border transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
+                color === i ? "border-ink scale-110" : "border-border hover:scale-105",
+              )}
+              style={{ backgroundColor: item.value }}
+            />
           ))}
         </div>
       </div>
@@ -203,7 +223,7 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
           e.preventDefault();
           const trimmed = name.trim();
           if (!trimmed) return;
-          completeSignup({ name: trimmed, tone });
+          completeSignup({ name: trimmed, tone, color });
           notify(`반가워요, ${trimmed}님. 첫 앨범을 만들어볼까요?`);
           go("home");
         }}

@@ -99,9 +99,9 @@ export function InviteScreen({
         />
         <div className="flex flex-col">
           {/* 행 자체를 버튼으로 두지 않는다 — '다시 초대'가 행 안의 버튼이라 중첩이 된다. */}
-          {participants.map(({ character, name, note, status }) => (
+          {participants.map(({ character, color, name, note, status }) => (
             <div key={name} className="flex w-full items-center gap-3 px-1 py-3">
-              <CharacterAvatar index={character} size="lg" />
+              <CharacterAvatar index={character} color={color} size="lg" />
               <span className="min-w-0 flex-1">
                 <b className="block truncate text-[15px] font-semibold">{name}</b>
                 <small className="block truncate text-[13px] text-body-mid">{note}</small>

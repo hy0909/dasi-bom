@@ -15,6 +15,8 @@ export type Account = {
   name: string;
   /** 프로필 캐릭터 인덱스 (CHARACTERS) */
   tone: number;
+  /** 프로필 배경색 인덱스 (AVATAR_COLORS) */
+  color: number;
   /** 선택 약관(소식 받기) 동의 여부 */
   marketing: boolean;
   /** 약관 동의 + 프로필 설정까지 끝났는가 */
@@ -37,6 +39,11 @@ const MOCK_DELAY = 700;
 
 type Accounts = Partial<Record<AuthProvider, Account>>;
 
+/** color 가 없던 시절에 저장된 세션도 그대로 읽히도록 기본값을 채운다. */
+function withDefaults(account: Account | null): Account | null {
+  return account ? { ...account, color: account.color ?? 0 } : null;
+}
+
 function read<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key);
@@ -55,7 +62,7 @@ function write(key: string, value: unknown) {
   }
 }
 
-let session: Account | null = read<Account>(SESSION_KEY);
+let session: Account | null = withDefaults(read<Account>(SESSION_KEY));
 const listeners = new Set<() => void>();
 
 /** 세션을 갱신하고 가입 이력(ACCOUNTS_KEY)까지 동기화한다. */
@@ -108,6 +115,7 @@ function mockAuthorize(provider: AuthProvider): Promise<Account> {
           email: providerMeta[provider].email,
           name: providerMeta[provider].name,
           tone: 0,
+          color: 0,
           marketing: false,
           onboarded: false,
           createdAt: new Date().toISOString(),
@@ -124,12 +132,14 @@ export async function signIn(provider: AuthProvider): Promise<SignInResult> {
 }
 
 /** 가입 온보딩(약관 → 프로필) 완료 처리. */
-export function completeSignup(patch: Pick<Account, "name" | "tone">) {
+export function completeSignup(patch: Pick<Account, "name" | "tone" | "color">) {
   if (!session) return;
   publish({ ...session, ...patch, onboarded: true });
 }
 
-export function updateProfile(patch: Partial<Pick<Account, "name" | "tone" | "marketing">>) {
+export function updateProfile(
+  patch: Partial<Pick<Account, "name" | "tone" | "color" | "marketing">>,
+) {
   if (!session) return;
   publish({ ...session, ...patch });
 }

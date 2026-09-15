@@ -5,8 +5,8 @@ export type AlbumCardData = Album & {
   cover: string;
   coverAlt: string;
   photoCount: number;
-  /** 함께하는 사람들의 캐릭터 인덱스 */
-  members: number[];
+  /** 함께하는 사람들의 캐릭터·배경색 */
+  members: { character: number; color: number }[];
 };
 
 /**
@@ -25,7 +25,11 @@ export const sampleAlbums: AlbumCardData[] = [
       "https://images.unsplash.com/photo-1621352973597-a53f65a96336?auto=format&fit=crop&w=800&q=80",
     coverAlt: "제주 바닷가 난간에서 바다를 바라보는 뒷모습",
     photoCount: 12,
-    members: [2, 1, 3],
+    members: [
+      { character: 0, color: 5 },
+      { character: 1, color: 3 },
+      { character: 3, color: 1 },
+    ],
   },
   {
     id: "summer",
@@ -38,7 +42,10 @@ export const sampleAlbums: AlbumCardData[] = [
       "https://images.unsplash.com/photo-1539093180677-52c07443275b?auto=format&fit=crop&w=800&q=80",
     coverAlt: "숲에서 아이들과 함께 있는 할머니의 뒷모습",
     photoCount: 8,
-    members: [0, 4],
+    members: [
+      { character: 0, color: 2 },
+      { character: 2, color: 6 },
+    ],
   },
   {
     id: "seaside",
@@ -51,6 +58,11 @@ export const sampleAlbums: AlbumCardData[] = [
       "https://images.unsplash.com/photo-1685326480610-90023e19220d?auto=format&fit=crop&w=800&q=80",
     coverAlt: "바닷가를 나란히 걷는 어른과 아이의 뒷모습",
     photoCount: 5,
-    members: [3, 2, 1, 0],
+    members: [
+      { character: 3, color: 4 },
+      { character: 0, color: 0 },
+      { character: 1, color: 7 },
+      { character: 2, color: 6 },
+    ],
   },
 ];
