@@ -224,7 +224,7 @@ export function GuestAnswer({
   return (
     <>
       <Topbar back={() => go("guestInfo")} title="기록 남기기" />
-      <StepProgress step={saved + 1} total={albumPhotos.length} />
+      <StepProgress step={saved + 1} total={albumPhotos.length} label="사진" />
 
       <MediaFrame className="mt-5" src={photo.src} alt={photo.alt ?? photo.title} caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`} />
 

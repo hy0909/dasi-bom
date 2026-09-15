@@ -68,7 +68,7 @@ export function InterviewScreen({
           </Button>
         }
       />
-      <StepProgress step={question + 1} total={3} />
+      <StepProgress step={question + 1} total={3} label="질문" />
 
       <MediaFrame
         className="mt-5"
