@@ -1,3 +1,5 @@
+export type PhotoStatus = "기록 중" | "기록 완료";
+
 export type Photo = {
   src: string;
   title: string;
@@ -6,7 +8,8 @@ export type Photo = {
   place: string;
   /** 사진 위에 짧게 붙일 장소 이름 */
   shortPlace: string;
-  status: string;
+  /** 사진 한 장의 기록 상태 — 앨범 상태와 같은 두 가지만 쓴다 */
+  status: PhotoStatus;
 };
 
 export const photos: Photo[] = [
@@ -16,7 +19,7 @@ export const photos: Photo[] = [
     takenAt: "2023-07-10T20:12:00",
     place: "Paris, France",
     shortPlace: "파리",
-    status: "기록 완성",
+    status: "기록 완료",
   },
   {
     src: "https://images.unsplash.com/photo-1747409729637-646f000b9bf9?auto=format&fit=crop&w=1200&q=85",
@@ -24,7 +27,7 @@ export const photos: Photo[] = [
     takenAt: "2023-07-11T19:40:00",
     place: "Paris, France",
     shortPlace: "파리",
-    status: "답변 기다리는 중",
+    status: "기록 중",
   },
   {
     src: "https://images.unsplash.com/photo-1777466966234-ed84dd087a94?auto=format&fit=crop&w=1200&q=85",
@@ -32,7 +35,7 @@ export const photos: Photo[] = [
     takenAt: "2023-07-17T09:23:00",
     place: "Rome, Italy",
     shortPlace: "로마",
-    status: "AI 정리 중",
+    status: "기록 중",
   },
 ];
 

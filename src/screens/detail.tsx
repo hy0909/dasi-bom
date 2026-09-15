@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Check, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
+import { ArrowLeft, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -178,21 +178,15 @@ function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () 
                   alt={photo.title}
                   className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
                 />
-                <span className="absolute top-2 right-2">
-                  {index === 0 ? (
-                    <Badge variant="ink" aria-label="기록 완성" className="size-6 px-0">
-                      <Check className="size-3.5!" strokeWidth={3} />
-                    </Badge>
-                  ) : index === 1 ? (
-                    <Badge variant="primary">질문 2개</Badge>
-                  ) : (
-                    <Badge variant="glass">정리 중</Badge>
-                  )}
-                </span>
+                {/* 완료한 사진은 표시하지 않는다 — 아직 채울 사진만 눈에 띄면 된다 */}
+                {photo.status === "기록 중" && (
+                  <Badge variant="glass" className="absolute top-2 right-2">
+                    기록 중
+                  </Badge>
+                )}
               </span>
               <span className="px-0.5">
                 <b className="block truncate text-sm font-semibold">{photo.title}</b>
-                <small className="block text-xs text-body-mid">{photo.status}</small>
               </span>
             </button>
           );
