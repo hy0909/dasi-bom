@@ -1,0 +1,249 @@
+{
+  "page": "게스트 참여",
+  "feature": "초대 링크로 기록",
+  "title": "[게스트 참여] 초대 링크로 기록 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "?invite= 링크 진입",
+      "col": 0,
+      "row": 0,
+      "role": "게스트",
+      "details": [
+        "비회원 또는 가입 중단 세션",
+        "아는 코드만 (시드 4개)",
+        "회원이면 부팅 분기에서 합류"
+      ]
+    },
+    {
+      "id": "valid",
+      "type": "decision",
+      "label": "링크 유효?",
+      "col": 1,
+      "row": 0,
+      "details": [
+        "발급 + 7일 > 지금"
+      ]
+    },
+    {
+      "id": "expired",
+      "type": "end",
+      "label": "만료 안내",
+      "col": 1,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "\"링크가 만료됐어요\"",
+        "[닫기] → 홈"
+      ]
+    },
+    {
+      "id": "welcome",
+      "type": "screen",
+      "label": "[초대 랜딩]",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "캡션 \"하연님이 초대했어요\"",
+        "초대자 이름은 고정 문구",
+        "앨범 제목 · 3단계 안내",
+        "[지금은 참여하지 않을게요] → 홈"
+      ]
+    },
+    {
+      "id": "info",
+      "type": "screen",
+      "label": "[참여자 정보]",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "닉네임* · 가족 관계* · 동의*",
+        "관계: 어머니·아버지·형제·자매·친척",
+        "뒤로가기 → 랜딩"
+      ]
+    },
+    {
+      "id": "all3",
+      "type": "decision",
+      "label": "셋 모두 입력?",
+      "col": 4,
+      "row": 0,
+      "details": [
+        "필수 항목만 검사: 셋 모두",
+        "닉네임은 공백만 넣어도 통과",
+        "닉네임만 localStorage 저장"
+      ]
+    },
+    {
+      "id": "err",
+      "type": "end",
+      "label": "안내 토스트",
+      "col": 4,
+      "row": 1,
+      "case": "error",
+      "owner": "FE",
+      "details": [
+        "\"이름·관계·동의를 모두 확인해주세요\"",
+        "화면 유지"
+      ]
+    },
+    {
+      "id": "answer",
+      "type": "screen",
+      "label": "사진 n / N 기록",
+      "col": 5,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "N = 그 앨범의 사진 수",
+        "질문 3개 고정, 순환",
+        "글 500자만 (목소리 없음)",
+        "[이 사진은 건너뛸게요] → 다음",
+        "사진 0장이면 안내만",
+        "뒤로가기 → 참여자 정보"
+      ]
+    },
+    {
+      "id": "hastext",
+      "type": "decision",
+      "label": "글 입력됨?",
+      "col": 6,
+      "row": 0
+    },
+    {
+      "id": "dis",
+      "type": "end",
+      "label": "제출 비활성",
+      "col": 6,
+      "row": 1,
+      "case": "exception"
+    },
+    {
+      "id": "lastpic",
+      "type": "decision",
+      "label": "마지막 사진?",
+      "col": 7,
+      "row": 0
+    },
+    {
+      "id": "next",
+      "type": "end",
+      "label": "다음 사진으로",
+      "col": 7,
+      "row": 1,
+      "details": [
+        "입력 비움",
+        "토스트: 기록을 저장했어요",
+        "저장은 안 됨"
+      ]
+    },
+    {
+      "id": "done",
+      "type": "end",
+      "label": "[참여 완료]",
+      "col": 8,
+      "row": 0,
+      "details": [
+        "\"3장 / 2개\"는 고정값",
+        "[기록 다시 보기] → 첫 사진",
+        "[참여 마치기] → 홈 (세션 없이)"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "알아둘 것",
+      "col": 2,
+      "row": 1,
+      "details": [
+        "게스트의 답은 어디에도 저장되지 않는다. 남는 것은 닉네임(dasiBomGuest)만.",
+        "홈으로 나가는 길은 모두 세션 검사가 없어 비회원도 홈(시드 앨범)에 도달한다.",
+        "서버 연동: 게스트 등록, 답 저장, 완료 요약, 초대자 이름."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "valid"
+    },
+    {
+      "from": "valid",
+      "to": "welcome",
+      "label": "YES"
+    },
+    {
+      "from": "valid",
+      "to": "expired",
+      "label": "NO"
+    },
+    {
+      "from": "welcome",
+      "to": "info",
+      "label": "[이 앨범에 참여하기]"
+    },
+    {
+      "from": "info",
+      "to": "all3",
+      "label": "[참여 시작하기]"
+    },
+    {
+      "from": "all3",
+      "to": "answer",
+      "label": "YES"
+    },
+    {
+      "from": "all3",
+      "to": "err",
+      "label": "NO"
+    },
+    {
+      "from": "answer",
+      "to": "hastext",
+      "label": "제출"
+    },
+    {
+      "from": "hastext",
+      "to": "lastpic",
+      "label": "YES"
+    },
+    {
+      "from": "hastext",
+      "to": "dis",
+      "label": "NO"
+    },
+    {
+      "from": "lastpic",
+      "to": "done",
+      "label": "YES"
+    },
+    {
+      "from": "lastpic",
+      "to": "next",
+      "label": "NO"
+    }
+  ]
+}

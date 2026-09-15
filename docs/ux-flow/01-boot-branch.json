@@ -1,0 +1,244 @@
+{
+  "page": "앱 진입",
+  "feature": "부팅 분기",
+  "title": "[앱 진입] 부팅 분기 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "앱 로드",
+      "col": 0,
+      "row": 0,
+      "details": [
+        "부팅 화면 (ready=false)",
+        "주소의 ?invite= 를 한 번 읽음",
+        "세션(dasiBomAuth) 읽음"
+      ]
+    },
+    {
+      "id": "known",
+      "type": "decision",
+      "label": "아는 초대 코드?",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "시드 4개만 인식",
+        "EU23·JEJU·SUMMER·SEA"
+      ]
+    },
+    {
+      "id": "valid",
+      "type": "decision",
+      "label": "링크 유효?",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "발급 시각 + 7일 > 지금",
+        "브라우저 시각 기준"
+      ]
+    },
+    {
+      "id": "member",
+      "type": "decision",
+      "label": "가입 마친 회원?",
+      "col": 3,
+      "row": 0,
+      "details": [
+        "세션 onboarded = true"
+      ]
+    },
+    {
+      "id": "join",
+      "type": "action",
+      "label": "앨범에 합류",
+      "col": 4,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "구성원에 나 추가",
+        "같은 이름이면 건너뜀",
+        "내 앨범에 member로",
+        "주소에서 코드 제거"
+      ]
+    },
+    {
+      "id": "detail",
+      "type": "end",
+      "label": "[앨범 상세]",
+      "col": 5,
+      "row": 0,
+      "details": [
+        "합류한 앨범이 열림"
+      ]
+    },
+    {
+      "id": "expired",
+      "type": "end",
+      "label": "만료 안내",
+      "col": 3,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "게스트 랜딩의 만료 모드",
+        "회원·비회원 모두 차단",
+        "[닫기] → 홈"
+      ]
+    },
+    {
+      "id": "guest",
+      "type": "end",
+      "label": "[게스트 랜딩]",
+      "col": 4,
+      "row": 1,
+      "case": "exception",
+      "role": "게스트",
+      "details": [
+        "비회원 · 가입 중단 세션",
+        "가입 없이 글로 기록"
+      ]
+    },
+    {
+      "id": "session",
+      "type": "decision",
+      "label": "세션 있음?",
+      "col": 2,
+      "row": 1,
+      "details": [
+        "dasiBomAuth 세션 유무"
+      ]
+    },
+    {
+      "id": "onboarded",
+      "type": "decision",
+      "label": "가입 완료?",
+      "col": 3,
+      "row": 2,
+      "details": [
+        "onboarded = true"
+      ]
+    },
+    {
+      "id": "home",
+      "type": "end",
+      "label": "[홈]",
+      "col": 4,
+      "row": 2
+    },
+    {
+      "id": "login",
+      "type": "end",
+      "label": "[로그인]",
+      "col": 3,
+      "row": 3,
+      "details": [
+        "세션 없음"
+      ]
+    },
+    {
+      "id": "terms",
+      "type": "end",
+      "label": "[약관 동의] 1/2",
+      "col": 4,
+      "row": 3,
+      "case": "exception",
+      "details": [
+        "가입을 중간에 멈춘 계정",
+        "약관부터 다시"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "알아둘 것",
+      "col": 1,
+      "row": 1,
+      "details": [
+        "모르는 코드는 무시하고 평소처럼 켜진다. 코드는 주소에 남는다.",
+        "새로 발급한 코드와 새 앨범의 코드는 새로고침 뒤 인식되지 않는다 (시드 상수만 조회).",
+        "만료 계산은 서버가 아니라 브라우저 시각이다."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "known"
+    },
+    {
+      "from": "known",
+      "to": "valid",
+      "label": "YES"
+    },
+    {
+      "from": "known",
+      "to": "session",
+      "label": "NO"
+    },
+    {
+      "from": "valid",
+      "to": "member",
+      "label": "YES"
+    },
+    {
+      "from": "valid",
+      "to": "expired",
+      "label": "NO"
+    },
+    {
+      "from": "member",
+      "to": "join",
+      "label": "YES"
+    },
+    {
+      "from": "member",
+      "to": "guest",
+      "label": "NO"
+    },
+    {
+      "from": "join",
+      "to": "detail"
+    },
+    {
+      "from": "session",
+      "to": "onboarded",
+      "label": "YES"
+    },
+    {
+      "from": "session",
+      "to": "login",
+      "label": "NO"
+    },
+    {
+      "from": "onboarded",
+      "to": "home",
+      "label": "YES"
+    },
+    {
+      "from": "onboarded",
+      "to": "terms",
+      "label": "NO"
+    }
+  ]
+}

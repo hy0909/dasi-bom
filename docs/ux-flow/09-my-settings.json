@@ -1,0 +1,209 @@
+{
+  "page": "내 설정",
+  "feature": "프로필 수정 · 로그아웃 · 탈퇴",
+  "title": "[내 설정] 프로필 수정 · 로그아웃 · 탈퇴 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[나] 탭 - [내 설정]",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "계정 카드 (캐릭터 · 이름 · 이메일)",
+        "가족 기록 알림 스위치",
+        "이용약관 → 토스트만"
+      ]
+    },
+    {
+      "id": "edit",
+      "type": "screen",
+      "label": "[프로필 수정]",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "닉네임 20자",
+        "[프로필 변경] → 모달 4종·8색",
+        "모달 확정은 임시값",
+        "연결된 계정은 변경 불가",
+        "뒤로가기 → 내 설정 (변경 버림)"
+      ]
+    },
+    {
+      "id": "cansave",
+      "type": "decision",
+      "label": "저장 가능?",
+      "col": 2,
+      "row": 0,
+      "details": [
+        "이름 · 캐릭터 · 색 중 변경 있음",
+        "이름이 비어 있지 않음"
+      ]
+    },
+    {
+      "id": "save",
+      "type": "action",
+      "label": "세션 갱신",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "세션 · 가입 이력 갱신",
+        "토스트: 프로필을 저장했어요"
+      ]
+    },
+    {
+      "id": "back",
+      "type": "end",
+      "label": "[내 설정]로 복귀",
+      "col": 4,
+      "row": 0
+    },
+    {
+      "id": "dis",
+      "type": "end",
+      "label": "[저장하기] 비활성",
+      "col": 3,
+      "row": 1,
+      "case": "exception"
+    },
+    {
+      "id": "logout",
+      "type": "action",
+      "label": "[로그아웃]",
+      "col": 1,
+      "row": 1,
+      "owner": "FE",
+      "details": [
+        "세션 · 게스트 닉네임 삭제",
+        "가입 이력은 남음",
+        "토스트: 로그아웃 처리됐어요"
+      ]
+    },
+    {
+      "id": "login1",
+      "type": "end",
+      "label": "[로그인]",
+      "col": 2,
+      "row": 1,
+      "details": [
+        "다시 로그인하면 바로 홈"
+      ]
+    },
+    {
+      "id": "leave1",
+      "type": "action",
+      "label": "[회원 탈퇴] 1차",
+      "col": 2,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "토스트: 한 번 더 누르면 지워져요",
+        "버튼 → \"정말 탈퇴할게요\""
+      ]
+    },
+    {
+      "id": "leave2",
+      "type": "action",
+      "label": "[정말 탈퇴할게요]",
+      "col": 3,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "가입 이력 · 세션 · 닉네임 삭제",
+        "토스트: 회원 탈퇴가 완료됐어요"
+      ]
+    },
+    {
+      "id": "login2",
+      "type": "end",
+      "label": "[로그인]",
+      "col": 4,
+      "row": 2,
+      "details": [
+        "다음 로그인은 신규 가입"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "알아둘 것",
+      "col": 0,
+      "row": 1,
+      "details": [
+        "가족 기록 알림 스위치 값은 저장되지 않는다. 화면을 벗어나면 켜짐으로 돌아온다.",
+        "서버 연동: 프로필 수정, 세션 만료, 계정 삭제 정책."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "edit",
+      "label": "[수정]"
+    },
+    {
+      "from": "start",
+      "to": "logout",
+      "label": "[로그아웃]"
+    },
+    {
+      "from": "edit",
+      "to": "cansave",
+      "label": "[저장하기]"
+    },
+    {
+      "from": "edit",
+      "to": "leave1",
+      "label": "[회원 탈퇴]"
+    },
+    {
+      "from": "cansave",
+      "to": "save",
+      "label": "YES"
+    },
+    {
+      "from": "cansave",
+      "to": "dis",
+      "label": "NO"
+    },
+    {
+      "from": "save",
+      "to": "back"
+    },
+    {
+      "from": "logout",
+      "to": "login1"
+    },
+    {
+      "from": "leave1",
+      "to": "leave2"
+    },
+    {
+      "from": "leave2",
+      "to": "login2"
+    }
+  ]
+}

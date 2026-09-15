@@ -1,0 +1,228 @@
+{
+  "page": "초대",
+  "feature": "참여 링크 공유",
+  "title": "[초대] 참여 링크 공유 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[초대] 진입",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "하단 탭 · 홈 ··· 공유",
+        "상세 [초대] · 앨범 생성 직후",
+        "경로별 차이는 아래 메모"
+      ]
+    },
+    {
+      "id": "hasalbum",
+      "type": "decision",
+      "label": "참여 앨범 있음?",
+      "col": 1,
+      "row": 0,
+      "details": [
+        "내 앨범 1개 이상"
+      ]
+    },
+    {
+      "id": "noalbum",
+      "type": "end",
+      "label": "[새 앨범 만들기] 안내",
+      "col": 1,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "\"아직 참여 중인 앨범이 없어요\"",
+        "[새 앨범 만들기] → 만들기 폼"
+      ]
+    },
+    {
+      "id": "locked",
+      "type": "decision",
+      "label": "앨범 고정?",
+      "col": 2,
+      "row": 0,
+      "details": [
+        "상세 · 생성 직후에서 진입"
+      ]
+    },
+    {
+      "id": "picker",
+      "type": "action",
+      "label": "앨범 선택기",
+      "col": 3,
+      "row": 1,
+      "owner": "FE",
+      "details": [
+        "세로 라디오 리스트",
+        "앨범 2개 이상일 때만",
+        "기본값 = 마지막으로 연 앨범",
+        "커버 · 제목 · 시작일 · 사진 수"
+      ]
+    },
+    {
+      "id": "card",
+      "type": "screen",
+      "label": "참여 링크 카드",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "‘{앨범}’ 참여 링크",
+        "주소?invite=코드",
+        "만료일 · 남은 일수"
+      ]
+    },
+    {
+      "id": "valid",
+      "type": "decision",
+      "label": "링크 유효?",
+      "col": 4,
+      "row": 0,
+      "details": [
+        "발급 + 7일 > 지금",
+        "브라우저 시각"
+      ]
+    },
+    {
+      "id": "share",
+      "type": "action",
+      "label": "[복사] / [공유하기]",
+      "col": 5,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "복사: 클립보드 → 폴백 복사",
+        "토스트: 참여 링크를 복사했어요",
+        "공유: OS 공유 시트 → 없으면 복사",
+        "공유 시트 취소 → 아무 일 없음"
+      ]
+    },
+    {
+      "id": "reissue",
+      "type": "action",
+      "label": "[링크 새로 만들기]",
+      "col": 5,
+      "row": 1,
+      "case": "exception",
+      "owner": "FE",
+      "details": [
+        "뱃지 \"만료됨\", [복사] 비활성",
+        "코드 · 발급 시각 교체",
+        "구성원은 그대로",
+        "토스트: 새 참여 링크를 만들었어요"
+      ]
+    },
+    {
+      "id": "members",
+      "type": "end",
+      "label": "구성원 목록",
+      "col": 6,
+      "row": 0,
+      "details": [
+        "\"함께하는 가족 n명\" (나 제외)",
+        "참여 중 / 초대됨 뱃지",
+        "[다시 초대] → 토스트만",
+        "\"기록 n개\"는 고정값"
+      ]
+    },
+    {
+      "id": "note_entry",
+      "type": "note",
+      "label": "진입 경로 4가지",
+      "col": 0,
+      "row": 1,
+      "details": [
+        "(a) 하단 탭: 선택기, 하단 탭 있음, 뒤로가기 없음",
+        "(b) 홈 ··· 공유: (a)와 같음. 그 앨범 미리 선택",
+        "(c) 상세 [초대]: 앨범 고정, 상단 뒤로가기, 하단 탭 없음, 화면 꽉 채움",
+        "(d) 생성 직후: 앨범 고정, ✕ → 홈, [앨범에 사진 추가] → 사진 추가하기"
+      ]
+    },
+    {
+      "id": "note_server",
+      "type": "note",
+      "label": "알아둘 것",
+      "col": 4,
+      "row": 1,
+      "details": [
+        "새로 발급한 코드는 새로고침 뒤 인식되지 않는다 (부팅은 시드 상수만 조회).",
+        "서버 연동: 링크 · 만료 시각 조회, 재발급, 구성원 · 기록 수, 재초대 발송. 만료 판정은 서버 시각으로."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "hasalbum"
+    },
+    {
+      "from": "hasalbum",
+      "to": "locked",
+      "label": "YES"
+    },
+    {
+      "from": "hasalbum",
+      "to": "noalbum",
+      "label": "NO"
+    },
+    {
+      "from": "locked",
+      "to": "card",
+      "label": "YES"
+    },
+    {
+      "from": "locked",
+      "to": "picker",
+      "label": "NO"
+    },
+    {
+      "from": "picker",
+      "to": "card"
+    },
+    {
+      "from": "card",
+      "to": "valid"
+    },
+    {
+      "from": "valid",
+      "to": "share",
+      "label": "YES"
+    },
+    {
+      "from": "valid",
+      "to": "reissue",
+      "label": "NO"
+    },
+    {
+      "from": "reissue",
+      "to": "share"
+    },
+    {
+      "from": "share",
+      "to": "members"
+    }
+  ]
+}

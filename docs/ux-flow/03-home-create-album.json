@@ -1,0 +1,306 @@
+{
+  "page": "홈",
+  "feature": "새 앨범 만들기",
+  "title": "[홈] 새 앨범 만들기 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[홈] - [새 앨범 만들기]",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "카드 [새 앨범 만들기]",
+        "우측 하단 ＋ 도 같은 곳"
+      ]
+    },
+    {
+      "id": "form",
+      "type": "screen",
+      "label": "[새 앨범 만들기] 폼",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "제목 · 기간 · 설명 · 대표 사진",
+        "뒤로가기 → 홈"
+      ]
+    },
+    {
+      "id": "f_title",
+      "type": "action",
+      "label": "앨범 제목*",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "공백만 입력은 미입력"
+      ]
+    },
+    {
+      "id": "f_date",
+      "type": "action",
+      "label": "시작일 · 종료일 (선택)",
+      "col": 2,
+      "row": 1,
+      "owner": "FE",
+      "details": [
+        "달력 모달",
+        "기본값 2023-07-10 ~ 17",
+        "입력 여부 검사 없음"
+      ]
+    },
+    {
+      "id": "f_desc",
+      "type": "action",
+      "label": "짧은 설명 (선택)",
+      "col": 2,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "입력 여부 검사 없음"
+      ]
+    },
+    {
+      "id": "f_cover",
+      "type": "action",
+      "label": "대표 사진 (선택)",
+      "col": 2,
+      "row": 3,
+      "owner": "FE",
+      "details": [
+        "파일 input 1장",
+        "\"최대 10MB\"는 문구만",
+        "입력 여부 검사 없음"
+      ]
+    },
+    {
+      "id": "d_title",
+      "type": "decision",
+      "label": "제목 입력됨?",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "필수 항목만 검사: 제목"
+      ]
+    },
+    {
+      "id": "disabled",
+      "type": "end",
+      "label": "[앨범 만들기] 비활성",
+      "col": 3,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "입력하면 즉시 활성"
+      ]
+    },
+    {
+      "id": "d_img",
+      "type": "decision",
+      "label": "이미지 파일?",
+      "col": 3,
+      "row": 3,
+      "owner": "FE",
+      "details": [
+        "file.type 이 image/*"
+      ]
+    },
+    {
+      "id": "preview",
+      "type": "end",
+      "label": "미리보기 표시",
+      "col": 4,
+      "row": 3,
+      "details": [
+        "data URL로 커버 보관",
+        "버튼 → 대표 사진 변경"
+      ]
+    },
+    {
+      "id": "img_err",
+      "type": "end",
+      "label": "이미지만 선택 토스트",
+      "col": 3,
+      "row": 4,
+      "case": "error",
+      "owner": "FE",
+      "details": [
+        "\"이미지 파일만 선택해주세요\"",
+        "파일 무시"
+      ]
+    },
+    {
+      "id": "submit",
+      "type": "action",
+      "label": "[앨범 만들기] 탭",
+      "col": 4,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "\"앨범을 만들고 있어요…\"",
+        "0.5초 대기 (버튼 비활성)",
+        "초대 코드 4자 발급",
+        "id = 코드 소문자"
+      ]
+    },
+    {
+      "id": "create",
+      "type": "api",
+      "label": "앨범 생성 (미정)",
+      "col": 5,
+      "row": 0,
+      "owner": "BE",
+      "details": [
+        "POST /albums (미정)",
+        "지금은 프론트 메모리 저장",
+        "응답: id · 초대 코드 · 발급 시각",
+        "커버 없으면 회색 자리"
+      ]
+    },
+    {
+      "id": "created",
+      "type": "screen",
+      "label": "[앨범을 만들었어요]",
+      "col": 6,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "초대 화면의 생성 직후 모드",
+        "뒤로가기 · 하단 탭 없음",
+        "[복사] [공유하기]",
+        "방문 기록 = [홈]"
+      ]
+    },
+    {
+      "id": "upload",
+      "type": "end",
+      "label": "[앨범에 사진 추가]",
+      "col": 7,
+      "row": 0,
+      "details": [
+        "→ [사진 추가하기]",
+        "빈 앨범을 바로 채운다"
+      ]
+    },
+    {
+      "id": "close",
+      "type": "end",
+      "label": "우측 상단 ✕ 닫기",
+      "col": 7,
+      "row": 1,
+      "details": [
+        "→ [홈] (앨범 탭)",
+        "방문 기록 비움",
+        "초대는 초대 탭에서 이어감"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "프로토타입 범위",
+      "col": 5,
+      "row": 1,
+      "details": [
+        "서버 없음. 앨범은 React 상태에 있어 새로고침하면 시드 4개로 돌아간다.",
+        "초대 코드는 Math.random 4자. 중복 검사 없음.",
+        "내 앨범에는 owner 로 들어간다."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "form"
+    },
+    {
+      "from": "form",
+      "to": "f_title",
+      "label": "병렬"
+    },
+    {
+      "from": "form",
+      "to": "f_date",
+      "label": "병렬"
+    },
+    {
+      "from": "form",
+      "to": "f_desc",
+      "label": "병렬"
+    },
+    {
+      "from": "form",
+      "to": "f_cover",
+      "label": "병렬"
+    },
+    {
+      "from": "f_title",
+      "to": "d_title"
+    },
+    {
+      "from": "d_title",
+      "to": "submit",
+      "label": "YES"
+    },
+    {
+      "from": "d_title",
+      "to": "disabled",
+      "label": "NO"
+    },
+    {
+      "from": "f_cover",
+      "to": "d_img",
+      "label": "파일 선택"
+    },
+    {
+      "from": "d_img",
+      "to": "preview",
+      "label": "YES"
+    },
+    {
+      "from": "d_img",
+      "to": "img_err",
+      "label": "NO"
+    },
+    {
+      "from": "submit",
+      "to": "create"
+    },
+    {
+      "from": "create",
+      "to": "created"
+    },
+    {
+      "from": "created",
+      "to": "upload",
+      "label": "[앨범에 사진 추가]"
+    },
+    {
+      "from": "created",
+      "to": "close",
+      "label": "✕"
+    }
+  ]
+}

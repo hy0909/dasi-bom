@@ -1,0 +1,266 @@
+{
+  "page": "로그인",
+  "feature": "소셜 로그인·가입",
+  "title": "[로그인] 소셜 로그인·가입 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[로그인] 화면",
+      "col": 0,
+      "row": 0,
+      "role": "비로그인",
+      "details": [
+        "[구글로 시작하기]",
+        "[카카오로 시작하기]",
+        "[초대 링크로 참여하기]"
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "api",
+      "label": "목업 인증",
+      "col": 1,
+      "row": 0,
+      "owner": "FE·BE",
+      "details": [
+        "POST /auth/{provider}",
+        "경로 미정. 지금은 목업 함수",
+        "두 버튼 비활성, 0.7초 대기",
+        "가입 이력에서 계정 조회",
+        "없으면 새 계정 생성",
+        "세션·이력 localStorage 기록"
+      ]
+    },
+    {
+      "id": "isnew",
+      "type": "decision",
+      "label": "신규 계정?",
+      "col": 2,
+      "row": 0,
+      "details": [
+        "가입 이력에 onboarded 없음"
+      ]
+    },
+    {
+      "id": "terms",
+      "type": "screen",
+      "label": "[약관 동의] 1/2",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "토스트: 계정을 연결했어요",
+        "필수 3 · 선택 1",
+        "[약관에 모두 동의합니다] 일괄",
+        "[보기] → 토스트만",
+        "[다음에 가입할게요] → 로그인"
+      ]
+    },
+    {
+      "id": "req3",
+      "type": "decision",
+      "label": "필수 3개 체크?",
+      "col": 4,
+      "row": 0,
+      "details": [
+        "만 14세 · 이용약관 · 개인정보",
+        "선택(새 소식)은 검사 안 함"
+      ]
+    },
+    {
+      "id": "profile",
+      "type": "screen",
+      "label": "[프로필 설정] 2/2",
+      "col": 5,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "선택 동의 값 저장(marketing)",
+        "캐릭터 4 · 배경색 8",
+        "이름 12자, 공급자 이름 미리 채움",
+        "뒤로가기 → 약관 (체크 초기화)"
+      ]
+    },
+    {
+      "id": "hasname",
+      "type": "decision",
+      "label": "이름 입력됨?",
+      "col": 6,
+      "row": 0,
+      "details": [
+        "공백만이면 미입력"
+      ]
+    },
+    {
+      "id": "save",
+      "type": "action",
+      "label": "가입 완료 저장",
+      "col": 7,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "이름 · 캐릭터 · 색 저장",
+        "onboarded = true",
+        "토스트: 반가워요, {이름}님"
+      ]
+    },
+    {
+      "id": "home",
+      "type": "end",
+      "label": "[홈]",
+      "col": 8,
+      "row": 0
+    },
+    {
+      "id": "guest",
+      "type": "end",
+      "label": "[게스트 랜딩]",
+      "col": 1,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "로그인 없이 진입",
+        "앨범 = 마지막으로 연 앨범"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "목업 인증",
+      "col": 1,
+      "row": 2,
+      "details": [
+        "실연동 시 src/lib/auth.ts 의 mockAuthorize() 한 곳만 교체.",
+        "실패 경로(취소 · 팝업 차단 · 네트워크)는 목업이라 없다.",
+        "구글과 카카오는 별개 계정이다."
+      ]
+    },
+    {
+      "id": "welcome",
+      "type": "action",
+      "label": "환영 토스트",
+      "col": 3,
+      "row": 1,
+      "owner": "FE",
+      "details": [
+        "\"{이름}님, 다시 만나 반가워요\""
+      ]
+    },
+    {
+      "id": "home2",
+      "type": "end",
+      "label": "[홈]",
+      "col": 3,
+      "row": 2,
+      "details": [
+        "기존 회원"
+      ]
+    },
+    {
+      "id": "dis1",
+      "type": "end",
+      "label": "계속하기 비활성",
+      "col": 4,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "[동의하고 계속하기] disabled",
+        "체크하면 즉시 활성"
+      ]
+    },
+    {
+      "id": "dis2",
+      "type": "end",
+      "label": "시작하기 비활성",
+      "col": 6,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "[다시, 봄 시작하기] disabled"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "auth",
+      "label": "공급자 버튼"
+    },
+    {
+      "from": "start",
+      "to": "guest",
+      "label": "[초대 링크로 참여하기]"
+    },
+    {
+      "from": "auth",
+      "to": "isnew"
+    },
+    {
+      "from": "isnew",
+      "to": "terms",
+      "label": "YES"
+    },
+    {
+      "from": "isnew",
+      "to": "welcome",
+      "label": "NO"
+    },
+    {
+      "from": "welcome",
+      "to": "home2"
+    },
+    {
+      "from": "terms",
+      "to": "req3"
+    },
+    {
+      "from": "req3",
+      "to": "profile",
+      "label": "YES"
+    },
+    {
+      "from": "req3",
+      "to": "dis1",
+      "label": "NO"
+    },
+    {
+      "from": "profile",
+      "to": "hasname"
+    },
+    {
+      "from": "hasname",
+      "to": "save",
+      "label": "YES"
+    },
+    {
+      "from": "hasname",
+      "to": "dis2",
+      "label": "NO"
+    },
+    {
+      "from": "save",
+      "to": "home"
+    }
+  ]
+}

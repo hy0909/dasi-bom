@@ -1,0 +1,226 @@
+{
+  "page": "사진 추가하기",
+  "feature": "업로드 → 기록 시작",
+  "title": "[사진 추가하기] 업로드 → 기록 시작 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[앨범 상세] [사진 추가]",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "생성 직후 [앨범에 사진 추가]도 여기",
+        "대상 = 열어 둔 앨범"
+      ]
+    },
+    {
+      "id": "screen",
+      "type": "screen",
+      "label": "[사진 추가하기]",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "뒤로가기 → 상세 (고른 사진 버림)"
+      ]
+    },
+    {
+      "id": "desktop",
+      "type": "decision",
+      "label": "데스크톱 크로미움?",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "pointer: coarse 아님",
+        "showOpenFilePicker 있음"
+      ]
+    },
+    {
+      "id": "picker",
+      "type": "action",
+      "label": "폴더 선택창 열기",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "File System Access API",
+        "다운로드 폴더부터, 여러 장",
+        "창을 닫으면 아무 일 없음"
+      ]
+    },
+    {
+      "id": "input",
+      "type": "action",
+      "label": "파일 input 열기",
+      "col": 3,
+      "row": 1,
+      "owner": "FE",
+      "details": [
+        "image/* 여러 장",
+        "폰: \"폰에 저장된 사진 불러오기\"",
+        "창을 닫으면 아무 일 없음"
+      ]
+    },
+    {
+      "id": "convert",
+      "type": "action",
+      "label": "사진으로 변환",
+      "col": 4,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "이미지(image/*)만 통과",
+        "제목 = 파일명",
+        "촬영 시각 = 파일 수정 시각",
+        "장소 = \"위치 없음\"",
+        "상태 = 기록 중 · blob URL",
+        "EXIF 안 읽음"
+      ]
+    },
+    {
+      "id": "grid",
+      "type": "screen",
+      "label": "미리보기 그리드",
+      "col": 5,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "촬영 시각순 정렬",
+        "타일 [×] 제거",
+        "\"업로드 준비\" 뱃지"
+      ]
+    },
+    {
+      "id": "any",
+      "type": "decision",
+      "label": "고른 사진 있음?",
+      "col": 6,
+      "row": 0,
+      "details": [
+        "1장 이상"
+      ]
+    },
+    {
+      "id": "dis",
+      "type": "end",
+      "label": "버튼 비활성",
+      "col": 6,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "\"사진을 먼저 골라주세요\""
+      ]
+    },
+    {
+      "id": "add",
+      "type": "action",
+      "label": "추가하고 기록 시작",
+      "col": 7,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "[사진 n장 추가하고 기록 시작]",
+        "사진 스토어에 실제 추가 (메모리)",
+        "기존 + 신규 촬영순 재정렬",
+        "토스트: 촬영 시간순으로 정리했어요"
+      ]
+    },
+    {
+      "id": "interview",
+      "type": "end",
+      "label": "[사진 기록 남기기]",
+      "col": 8,
+      "row": 0,
+      "details": [
+        "첫 '기록 중' 사진부터",
+        "기존 기록 중 사진이 더 오래되면",
+        "그 사진부터 시작"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "서버 연동 지점",
+      "col": 7,
+      "row": 1,
+      "details": [
+        "파일 업로드 → 서버가 EXIF 촬영 시각 · 위치 추출 → 사진 레코드 생성.",
+        "응답 URL로 blob URL 을 교체한다.",
+        "지금은 새로고침하면 올린 사진이 사라진다."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "screen"
+    },
+    {
+      "from": "screen",
+      "to": "desktop"
+    },
+    {
+      "from": "desktop",
+      "to": "picker",
+      "label": "데스크톱"
+    },
+    {
+      "from": "desktop",
+      "to": "input",
+      "label": "폰 · 그 외"
+    },
+    {
+      "from": "picker",
+      "to": "convert"
+    },
+    {
+      "from": "input",
+      "to": "convert"
+    },
+    {
+      "from": "convert",
+      "to": "grid"
+    },
+    {
+      "from": "grid",
+      "to": "any"
+    },
+    {
+      "from": "any",
+      "to": "add",
+      "label": "YES"
+    },
+    {
+      "from": "any",
+      "to": "dis",
+      "label": "NO"
+    },
+    {
+      "from": "add",
+      "to": "interview"
+    }
+  ]
+}

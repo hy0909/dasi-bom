@@ -1,0 +1,239 @@
+{
+  "page": "앨범 상세",
+  "feature": "보기·이동 규칙",
+  "title": "[앨범 상세] 보기·이동 규칙 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[홈] 앨범 카드 탭",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "openId = 그 앨범",
+        "알림 항목 · 링크 합류도 여기로"
+      ]
+    },
+    {
+      "id": "detail",
+      "type": "screen",
+      "label": "[앨범 상세]",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "커버 · 기간 · 제목 · 이름 줄",
+        "요약: 사진 n · 목소리 n",
+        "[앨범 정보] → 정보 수정 (누구나)",
+        "상단 [초대] → 초대 (앨범 고정)",
+        "하단 [사진 추가] → 사진 추가하기",
+        "뒤로가기 → 홈 (고정)"
+      ]
+    },
+    {
+      "id": "tab_rec",
+      "type": "screen",
+      "label": "탭 [기록]",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "하위 탭 사진·목소리·글·연대표",
+        "사진 · 글: 상태 필터",
+        "목소리 ▶ = 아이콘 + 토스트",
+        "목소리 연필 → 목소리로 답하기"
+      ]
+    },
+    {
+      "id": "tile",
+      "type": "action",
+      "label": "사진 타일 탭",
+      "col": 3,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "연대표 항목도 같은 규칙",
+        "글 탭: [글 수정]/[기록 이어가기]"
+      ]
+    },
+    {
+      "id": "done",
+      "type": "decision",
+      "label": "기록 완료 사진?",
+      "col": 4,
+      "row": 0,
+      "details": [
+        "photo.status === 기록 완료"
+      ]
+    },
+    {
+      "id": "story",
+      "type": "end",
+      "label": "[사진 기록 (글)]",
+      "col": 5,
+      "row": 0,
+      "details": [
+        "글 있는 첫 사진부터",
+        "누른 사진은 전달 안 됨"
+      ]
+    },
+    {
+      "id": "interview",
+      "type": "end",
+      "label": "[사진 기록 남기기]",
+      "col": 5,
+      "row": 1,
+      "details": [
+        "첫 '기록 중' 사진",
+        "누른 사진은 전달 안 됨"
+      ]
+    },
+    {
+      "id": "tab_album",
+      "type": "end",
+      "label": "탭 [앨범] 읽기",
+      "col": 2,
+      "row": 1,
+      "details": [
+        "설명 → 사진 촬영 시각순",
+        "사진마다 글 · 목소리",
+        "글 없으면 [기록 이어가기]",
+        "사진 0장이면 안내"
+      ]
+    },
+    {
+      "id": "members",
+      "type": "end",
+      "label": "구성원 명단 모달",
+      "col": 2,
+      "row": 2,
+      "details": [
+        "\"함께하는 가족 n명\" (나 포함)",
+        "첫 줄 나: 만든 사람 / 초대로 참여",
+        "구성원 상태 뱃지",
+        "재초대 버튼 없음"
+      ]
+    },
+    {
+      "id": "pending",
+      "type": "decision",
+      "label": "기록 중 사진 남음?",
+      "col": 2,
+      "row": 3,
+      "details": [
+        "요약 카드 버튼 노출 조건"
+      ]
+    },
+    {
+      "id": "reclist",
+      "type": "end",
+      "label": "[기록할 사진] 목록",
+      "col": 3,
+      "row": 3,
+      "details": [
+        "기록 중 사진만",
+        "\"n장 중 m장 남았어요\"",
+        "행 탭 → 사진 기록 남기기",
+        "뒤로가기 → 상세"
+      ]
+    },
+    {
+      "id": "hidden",
+      "type": "end",
+      "label": "버튼 숨김",
+      "col": 3,
+      "row": 4,
+      "case": "exception",
+      "details": [
+        "[이어서 기록 남기기] 없음"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "선택 사진 미전달",
+      "col": 1,
+      "row": 1,
+      "details": [
+        "앱 상태에 앨범 id만 있고 사진 id가 없다.",
+        "어느 사진을 눌러도 기록 · 목소리는 첫 '기록 중' 사진, 글은 글 있는 첫 사진을 연다.",
+        "서버 연동 전 FE 라우팅 상태 추가가 필요하다."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "detail"
+    },
+    {
+      "from": "detail",
+      "to": "tab_rec",
+      "label": "탭 [기록]"
+    },
+    {
+      "from": "detail",
+      "to": "tab_album",
+      "label": "탭 [앨범]"
+    },
+    {
+      "from": "detail",
+      "to": "members",
+      "label": "이름 줄"
+    },
+    {
+      "from": "detail",
+      "to": "pending",
+      "label": "요약 카드"
+    },
+    {
+      "from": "tab_rec",
+      "to": "tile"
+    },
+    {
+      "from": "tile",
+      "to": "done"
+    },
+    {
+      "from": "done",
+      "to": "story",
+      "label": "YES"
+    },
+    {
+      "from": "done",
+      "to": "interview",
+      "label": "NO"
+    },
+    {
+      "from": "pending",
+      "to": "reclist",
+      "label": "YES"
+    },
+    {
+      "from": "pending",
+      "to": "hidden",
+      "label": "NO"
+    }
+  ]
+}

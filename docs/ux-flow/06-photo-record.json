@@ -1,0 +1,273 @@
+{
+  "page": "사진 기록 남기기",
+  "feature": "질문 답하기",
+  "title": "[사진 기록 남기기] 질문 답하기 플로우",
+  "docLinks": [
+    {
+      "label": "UX-FLOW.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/UX-FLOW.md"
+    },
+    {
+      "label": "기능명세서.md",
+      "url": "https://github.com/hy0909/dasi-bom/blob/main/docs/기능명세서.md"
+    }
+  ],
+  "figmaLinks": [
+    {
+      "label": "배포본",
+      "url": "https://hy0909.github.io/dasi-bom/"
+    },
+    {
+      "label": "원본 프로토타입",
+      "url": "https://dasi-bom-memory-prototype.pongg005.chatgpt.site/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "label": "[사진 기록 남기기] 진입",
+      "col": 0,
+      "row": 0,
+      "role": "회원",
+      "details": [
+        "상세 · 기록할 사진 · 업로드에서",
+        "대상 = 첫 '기록 중' 사진",
+        "사진 0장이면 안내만"
+      ]
+    },
+    {
+      "id": "q",
+      "type": "screen",
+      "label": "질문 n / 3",
+      "col": 1,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "질문 3개 고정 (사진과 무관)",
+        "2 · 3번째: '이전 기록' 고정 인용",
+        "[이 질문은 건너뛸게요] → 다음 질문",
+        "마지막 질문 건너뛰기 → 상세",
+        "[나가기] / 뒤로가기 → 상세"
+      ]
+    },
+    {
+      "id": "text",
+      "type": "action",
+      "label": "[글로 답하기]",
+      "col": 2,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "textarea 500자",
+        "\"n / 500\" 카운터"
+      ]
+    },
+    {
+      "id": "hastext",
+      "type": "decision",
+      "label": "글 입력됨?",
+      "col": 3,
+      "row": 0,
+      "details": [
+        "공백만이면 미입력"
+      ]
+    },
+    {
+      "id": "last",
+      "type": "decision",
+      "label": "마지막 질문?",
+      "col": 4,
+      "row": 0,
+      "details": [
+        "question === 2"
+      ]
+    },
+    {
+      "id": "toast",
+      "type": "action",
+      "label": "완성 토스트",
+      "col": 5,
+      "row": 0,
+      "owner": "FE",
+      "details": [
+        "\"사진 기록이 완성됐어요\"",
+        "답 저장 안 됨",
+        "사진 상태 안 바뀜"
+      ]
+    },
+    {
+      "id": "story",
+      "type": "end",
+      "label": "[사진 기록 (글)]",
+      "col": 6,
+      "row": 0,
+      "details": [
+        "글 있는 첫 사진 표시",
+        "방금 기록한 사진이 아님"
+      ]
+    },
+    {
+      "id": "dis",
+      "type": "end",
+      "label": "제출 비활성",
+      "col": 3,
+      "row": 1,
+      "case": "exception",
+      "details": [
+        "[기록 남기기] disabled"
+      ]
+    },
+    {
+      "id": "next",
+      "type": "end",
+      "label": "다음 질문으로",
+      "col": 4,
+      "row": 1,
+      "details": [
+        "입력 비움, 선택 모드로",
+        "토스트: 기록을 저장하고 다음 질문을…",
+        "저장은 안 됨"
+      ]
+    },
+    {
+      "id": "voice",
+      "type": "action",
+      "label": "[목소리로 답하기]",
+      "col": 2,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "→ [목소리로 답하기] 화면",
+        "질문 문구는 1번 고정",
+        "[글로 답하기] → 질문 화면"
+      ]
+    },
+    {
+      "id": "mic",
+      "type": "decision",
+      "label": "마이크 허용?",
+      "col": 3,
+      "row": 2,
+      "details": [
+        "마이크 권한 + MediaRecorder"
+      ]
+    },
+    {
+      "id": "rec",
+      "type": "action",
+      "label": "녹음 · 정지 · 미리듣기",
+      "col": 4,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "실제 녹음, 타이머",
+        "\"최대 5분\" 문구만 (자동 정지 없음)",
+        "<audio> 로 실제 재생",
+        "[다시 녹음] → 폐기"
+      ]
+    },
+    {
+      "id": "keep",
+      "type": "action",
+      "label": "[이 목소리 남기기]",
+      "col": 5,
+      "row": 2,
+      "owner": "FE",
+      "details": [
+        "토스트: 목소리를 안전하게 저장했어요",
+        "파일은 버려짐 (업로드 없음)"
+      ]
+    },
+    {
+      "id": "micerr",
+      "type": "end",
+      "label": "권한 안내 토스트",
+      "col": 3,
+      "row": 3,
+      "case": "error",
+      "owner": "FE",
+      "details": [
+        "\"마이크 권한을 허용하거나…\"",
+        "대기 상태 유지"
+      ]
+    },
+    {
+      "id": "note",
+      "type": "note",
+      "label": "서버 연동 지점",
+      "col": 1,
+      "row": 1,
+      "details": [
+        "사진별 질문 생성, 답 저장, 마지막 답에서 사진 상태 변경 · 글 생성, 오디오 업로드.",
+        "선택한 사진 id 를 FE 라우팅 상태로 먼저 넘겨야 한다."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "q"
+    },
+    {
+      "from": "q",
+      "to": "text",
+      "label": "[글로 답하기]"
+    },
+    {
+      "from": "q",
+      "to": "voice",
+      "label": "[목소리로 답하기]"
+    },
+    {
+      "from": "text",
+      "to": "hastext"
+    },
+    {
+      "from": "hastext",
+      "to": "last",
+      "label": "YES"
+    },
+    {
+      "from": "hastext",
+      "to": "dis",
+      "label": "NO"
+    },
+    {
+      "from": "last",
+      "to": "toast",
+      "label": "YES"
+    },
+    {
+      "from": "last",
+      "to": "next",
+      "label": "NO"
+    },
+    {
+      "from": "toast",
+      "to": "story"
+    },
+    {
+      "from": "voice",
+      "to": "mic"
+    },
+    {
+      "from": "mic",
+      "to": "rec",
+      "label": "YES"
+    },
+    {
+      "from": "mic",
+      "to": "micerr",
+      "label": "NO"
+    },
+    {
+      "from": "rec",
+      "to": "keep"
+    },
+    {
+      "from": "keep",
+      "to": "story"
+    }
+  ]
+}
