@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
+import { ArrowLeft, AudioLines, ChevronDown, Image, Pause, Play, Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,6 +20,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
   const [sorted, setSorted] = useState(false);
   const [first, ...rest] = album.title.split(" ");
   const session = useSession();
+  const pending = photos.filter((p) => p.status === "기록 중").length;
 
   return (
     <>
@@ -86,23 +87,37 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
         </header>
       </section>
 
-      {/* summary — card-content */}
+      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 남은 일 */}
       <Card size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
-            <Badge variant={album.status === "완료" ? "ink" : "primary"}>{album.status}</Badge>
-            <p className="min-w-0 flex-1 text-sm text-body">
-              {album.status === "완료"
-                ? "가족의 기록이 모두 담겼어요."
-                : "사진 1장의 답변을 기다리고 있어요."}
-            </p>
+            <Badge variant={album.status === "완료" ? "ink" : "primarySoft"}>{album.status}</Badge>
+            <span className="flex min-w-0 flex-1 items-center gap-3 text-sm text-body">
+              <span className="flex items-center gap-1.5">
+                <Image className="size-4 text-body-mid" aria-hidden />
+                <span className="sr-only">사진</span>
+                {photos.length}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <AudioLines className="size-4 text-body-mid" aria-hidden />
+                <span className="sr-only">목소리</span>
+                {voices.length}
+              </span>
+            </span>
             <Button variant="outline" size="sm" onClick={() => go("albumEdit")}>
               앨범 정보
             </Button>
           </div>
-          {album.status === "기록 중" && (
-            <Button variant="secondary" className="w-full" onClick={() => go("interview")}>
-              이어서 기록 남기기
+          {pending > 0 && (
+            <Button
+              variant="secondary"
+              className="h-auto w-full flex-col items-start gap-0.5 py-3"
+              onClick={() => go("recordList")}
+            >
+              <span className="text-[15px] font-semibold">이어서 기록 남기기</span>
+              <span className="text-xs font-medium text-canvas-soft/70">
+                전체 {photos.length}장 · 기록 완료 {photos.length - pending}장 · 기록 중 {pending}장
+              </span>
             </Button>
           )}
         </CardContent>

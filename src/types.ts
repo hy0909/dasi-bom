@@ -6,6 +6,7 @@ export type Screen =
   | "create"
   | "detail"
   | "albumEdit"
+  | "recordList"
   | "interview"
   | "voice"
   | "story"

@@ -17,6 +17,7 @@ import { NoticesScreen } from "@/screens/notices";
 import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
 import { AlbumEditScreen } from "@/screens/album-edit";
+import { RecordListScreen } from "@/screens/record-list";
 import { defaultAlbum } from "@/data/album";
 import { sampleAlbums } from "@/data/albums";
 import { photos } from "@/data/photos";
@@ -134,6 +135,7 @@ export default function App() {
         {screen === "albumEdit" && (
           <AlbumEditScreen album={album} onSave={setAlbum} back={goBack} notify={notify} />
         )}
+        {screen === "recordList" && <RecordListScreen go={go} back={goBack} />}
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />
         )}
