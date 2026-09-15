@@ -63,10 +63,7 @@ export function InviteScreen({
             />
           ))}
         </div>
-        <h1 className="font-heading text-display-lg font-bold">
-          가족의 목소리로
-          <br />빈 기록을 채워주세요
-        </h1>
+        <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
         <p className="text-base leading-relaxed text-body">
           링크를 통해 회원가입없이
           <br />
