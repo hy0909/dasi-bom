@@ -14,7 +14,10 @@ import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
+import { CharacterAvatar } from "@/components/character-avatar";
+import { participants } from "@/data/family";
 import { photos } from "@/data/photos";
+import { useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
 export function HomeScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
@@ -93,6 +96,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
 }
 
 function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Notify }) {
+  const session = useSession();
   return (
     <Card
       className="mt-4 cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
@@ -136,15 +140,34 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <Progress value={70} />
-        <div className="flex items-center justify-between text-sm text-body">
-          <span>
-            <b className="font-semibold text-ink">70%</b> 완성
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Image className="size-4 text-body-mid" aria-hidden />
-            <span className="sr-only">사진</span>3
-          </span>
+        {/* 날짜 블록과 한 칸 더 띄운다 */}
+        <div className="mt-1 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-3">
+              {/* 함께하는 사람 — 소유자 + 초대된 가족 */}
+              <span className="flex -space-x-2">
+                <CharacterAvatar index={session?.tone} className="size-7 ring-2 ring-card" />
+                {participants.map((p) => (
+                  <CharacterAvatar
+                    key={p.name}
+                    index={p.character}
+                    className="size-7 ring-2 ring-card"
+                  />
+                ))}
+                <span className="sr-only">
+                  나를 포함해 {participants.length + 1}명이 함께해요
+                </span>
+              </span>
+              <span className="flex items-center gap-1.5 text-sm text-body">
+                <Image className="size-4 text-body-mid" aria-hidden />
+                <span className="sr-only">사진</span>3
+              </span>
+            </span>
+            <span className="text-sm text-body">
+              <b className="font-semibold text-ink">70%</b> 완성
+            </span>
+          </div>
+          <Progress value={70} />
         </div>
       </CardContent>
     </Card>

@@ -6,24 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { participants } from "@/data/family";
 import { photos } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import type { Go, Notify } from "@/types";
-
-type ParticipantStatus = "참여 중" | "초대됨" | "다시 초대";
-
-type Participant = {
-  character: number;
-  name: string;
-  note: string;
-  status: ParticipantStatus;
-};
-
-const participants: Participant[] = [
-  { character: 2, name: "엄마", note: "답변 4개", status: "참여 중" },
-  { character: 1, name: "아버지", note: "아직 답변 없음", status: "초대됨" },
-  { character: 4, name: "동생 민준", note: "초대가 전달되지 않았어요", status: "다시 초대" },
-];
 
 const statusVariant = { "참여 중": "primary", 초대됨: "default" } as const;
 
@@ -98,7 +84,7 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
 
       <section className="mt-9 flex flex-col gap-2">
         <SectionHeading
-          title={<span className="text-lg">함께하는 가족 3명</span>}
+          title={<span className="text-lg">함께하는 가족 {participants.length}명</span>}
           description="답변이 도착하면 알려드릴게요"
         />
         <div className="flex flex-col">
