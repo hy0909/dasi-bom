@@ -18,7 +18,10 @@ import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
 import { AlbumEditScreen } from "@/screens/album-edit";
 import { RecordListScreen } from "@/screens/record-list";
+import { isInviteExpired, newInviteCode } from "@/data/album";
 import { initialAlbums, type AlbumCardData } from "@/data/albums";
+import { joinAlbum } from "@/data/family";
+import { joinMyAlbum, useMyAlbums } from "@/data/membership";
 import { LoginScreen } from "@/screens/login";
 import { SignupTerms, SignupProfile } from "@/screens/signup";
 import { getSession } from "@/lib/auth";
@@ -30,6 +33,13 @@ function notify(text: string) {
 /** 하단 탭으로 오가는 최상위 화면 — 탭끼리 이동할 때는 뒤로가기 기록을 쌓지 않는다. */
 const TAB_SCREENS: Screen[] = ["home", "invite", "notices", "profile"];
 
+/**
+ * 첫 로드에 들어온 초대 코드.
+ * 합류한 뒤에는 주소에서 코드를 지우므로, 주소를 다시 읽으면 값이 사라진다.
+ * 한 번만 읽어 두고 그 값을 쓴다.
+ */
+const inviteCodeAtLoad = new URLSearchParams(window.location.search).get("invite");
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   /** 뒤로가기용 방문 기록. 화면마다 돌아갈 곳을 하드코딩하면 진입 경로가 둘 이상일 때 어긋난다. */
@@ -37,23 +47,55 @@ export default function App() {
   const [albums, setAlbums] = useState<AlbumCardData[]>(initialAlbums);
   /** 지금 열어 둔 앨범 — 상세·정보 수정·기록 목록이 모두 이 앨범을 본다. */
   const [openId, setOpenId] = useState(initialAlbums[0].id);
+  /** 방금 앨범을 만든 직후인가 — 초대 화면이 만들기 흐름의 마지막 단계로 바뀐다. */
+  const [justCreated, setJustCreated] = useState(false);
+  /** 초대 링크를 타고 들어온 앨범 — 비회원 참여 화면이 이 앨범을 본다. */
+  const [invitedId, setInvitedId] = useState<string | null>(null);
+  /** 링크가 이미 만료됐는가 — 회원이든 아니든 참여할 수 없다. */
+  const [inviteExpired, setInviteExpired] = useState(false);
   const [ready, setReady] = useState(false);
+  /** 내가 참여 중인 앨범 — 내가 만들었든 링크를 타고 들어왔든 여기에 담긴다. */
+  const membership = useMyAlbums();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    // 초대 링크는 로그인보다 우선한다 — 게스트는 가입 없이 참여한다.
-    const code = params.get("invite");
-    const knownCodes = initialAlbums.map((a) => a.inviteCode);
-    if (code && knownCodes.includes(code)) setScreen("guest");
-    else {
-      const session = getSession();
+    // 초대 링크는 로그인보다 우선한다.
+    const invited = inviteCodeAtLoad
+      ? initialAlbums.find((a) => a.inviteCode === inviteCodeAtLoad)
+      : undefined;
+    const session = getSession();
+
+    if (invited) {
+      setInvitedId(invited.id);
+      setOpenId(invited.id);
+      if (isInviteExpired(invited)) {
+        // 만료된 링크는 회원·비회원 모두 막고, 초대한 사람에게 새 링크를 받게 안내한다.
+        setInviteExpired(true);
+        setScreen("guest");
+      } else if (session?.onboarded) {
+        // 회원이 링크를 타고 오면 그 앨범 그룹에 바로 합류한다.
+        joinAlbum(invited.id, {
+          name: session.name,
+          character: session.tone,
+          color: session.color,
+        });
+        // 남이 만든 앨범이어도 합류한 순간부터 내 앨범 목록에 들어온다.
+        joinMyAlbum(invited.id, { role: "member" });
+        window.history.replaceState({}, "", window.location.pathname);
+        setScreen("detail");
+      } else {
+        // 회원이 아니면 가입 없이 참여하는 비회원 흐름으로 간다.
+        setScreen("guest");
+      }
+    } else if (session) {
       // 가입을 중간에 멈춘 계정이면 약관 단계부터 이어서 진행한다.
-      if (session) setScreen(session.onboarded ? "home" : "signupTerms");
+      setScreen(session.onboarded ? "home" : "signupTerms");
     }
     setReady(true);
   }, []);
 
   const go: Go = (next) => {
+    // 초대 화면을 벗어나면 앨범 만들기 흐름은 끝난다.
+    if (next !== "invite") setJustCreated(false);
     if (next !== screen) {
       setHistory((past) =>
         // 탭 사이 이동은 기록하지 않는다 — 탭은 서로의 상위 화면이 아니다.
@@ -64,14 +106,33 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  /** 방문 기록을 갈아끼우며 이동한다 — 앨범을 만든 뒤처럼 되돌아갈 수 없는 흐름에 쓴다. */
+  const jump = (next: Screen, past: Screen[]) => {
+    setHistory(past);
+    setScreen(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   /** 앨범을 하나 지목하고 그 앨범의 화면으로 간다. */
   const openAlbum = (id: string, next: Screen) => {
     setOpenId(id);
     go(next);
   };
 
+  /** 만료된 초대 링크를 새 코드로 다시 발급한다 — 참여자는 앨범 id 로 묶여 그대로 남는다. */
+  const reissueInvite = (albumId: string) => {
+    setAlbums((list) =>
+      list.map((a) =>
+        a.id === albumId
+          ? { ...a, inviteCode: newInviteCode(), inviteIssuedAt: new Date().toISOString() }
+          : a,
+      ),
+    );
+  };
+
   /** 실제로 거쳐온 화면으로 돌아간다. 기록이 없으면 홈으로. */
   const goBack = () => {
+    setJustCreated(false);
     setHistory((past) => {
       setScreen(past.at(-1) ?? "home");
       return past.slice(0, -1);
@@ -97,6 +158,12 @@ export default function App() {
   // 하단 탭이나 플로팅 버튼이 뜨는 화면은 그만큼 아래 여백이 필요하다.
   const current = albums.find((a) => a.id === openId) ?? albums[0];
 
+  // 초대 링크로 들어온 앨범 — 비회원 참여 화면이 이 앨범의 사진과 제목을 보여준다.
+  const invited = albums.find((a) => a.id === invitedId) ?? current;
+
+  // 홈과 초대 화면이 보는 목록 — 앱이 아는 앨범이 아니라 내가 참여 중인 앨범이다.
+  const myAlbums = albums.filter((a) => membership[a.id]);
+
   const roomy = TAB_SCREENS.includes(screen) || screen === "detail";
 
   return (
@@ -111,7 +178,7 @@ export default function App() {
         {screen === "home" && (
           <HomeScreen
             go={go}
-            albums={albums}
+            albums={myAlbums}
             onOpenAlbum={openAlbum}
             notify={notify}
           />
@@ -120,9 +187,14 @@ export default function App() {
           <CreateScreen
             go={go}
             onCreate={(next) => {
-              // 새 앨범은 목록 맨 앞에 두고, 만든 직후 그 앨범을 연다.
+              // 새 앨범은 목록 맨 앞에 두고, 곧바로 초대 화면으로 이어 준다.
               setAlbums((list) => [next, ...list]);
+              // 내가 만든 앨범 — 만든 사람으로 내 목록에 들어간다.
+              joinMyAlbum(next.id, { role: "owner" });
               setOpenId(next.id);
+              setJustCreated(true);
+              // 만들기 화면으로는 돌아가지 않는다 — 여기서 뒤로 가면 홈이다.
+              jump("invite", ["home"]);
             }}
           />
         )}
@@ -134,10 +206,12 @@ export default function App() {
           // 탭으로 들어오면 방문 기록이 비어 있다 — 그때는 뒤로가기를 두지 않는다.
           <InviteScreen
             go={go}
-            albums={albums}
+            albums={myAlbums}
             initialAlbumId={current.id}
-            locked={history.at(-1) === "detail"}
-            back={history.length > 0 ? goBack : undefined}
+            locked={justCreated || history.at(-1) === "detail"}
+            justCreated={justCreated}
+            onReissue={reissueInvite}
+            back={!justCreated && history.length > 0 ? goBack : undefined}
             notify={notify}
           />
         )}
@@ -158,9 +232,9 @@ export default function App() {
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />
         )}
-        {screen === "guest" && <GuestWelcome go={go} />}
+        {screen === "guest" && <GuestWelcome go={go} album={invited} expired={inviteExpired} />}
         {screen === "guestInfo" && <GuestInfo go={go} notify={notify} />}
-        {screen === "guestAnswer" && <GuestAnswer go={go} notify={notify} />}
+        {screen === "guestAnswer" && <GuestAnswer go={go} album={invited} notify={notify} />}
         {screen === "guestDone" && <GuestDone go={go} />}
       </PhoneCanvas>
       <Toaster />

@@ -6,11 +6,8 @@ import { Topbar } from "@/components/topbar";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { cn } from "@/lib/utils";
-import type { Album, AlbumStatus } from "@/data/album";
+import type { Album } from "@/data/album";
 import type { Notify } from "@/types";
-
-const statuses: AlbumStatus[] = ["기록 중", "완료"];
 
 export function AlbumEditScreen({
   album,
@@ -41,6 +38,12 @@ export function AlbumEditScreen({
     <>
       <Topbar back={back} title="앨범 정보" />
 
+      {/* 앨범 정보는 만든 사람만의 것이 아니다 — 참여 중인 가족이면 누구나 고친다. */}
+      <p className="mt-4 rounded-lg bg-muted p-3 text-sm leading-relaxed text-body">
+        참여 중인 가족은 누구나 앨범 정보를 고칠 수 있어요. 바꾼 내용은 함께 보는 모두에게 바로
+        보여요.
+      </p>
+
       <form className="mt-6 flex flex-col gap-6 pb-20" onSubmit={submit}>
         <Field label="앨범 제목" htmlFor="album-title" required>
           <Input
@@ -52,19 +55,22 @@ export function AlbumEditScreen({
           />
         </Field>
 
-        <div className="flex flex-col gap-4">
-          <Field label="시작일" htmlFor="album-start">
+        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다. */}
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="시작일" htmlFor="album-start" className="min-w-0">
             <DateField
               id="album-start"
               label="시작일"
+              compact
               value={draft.startDate}
               onChange={(startDate) => setDraft({ ...draft, startDate })}
             />
           </Field>
-          <Field label="종료일" htmlFor="album-end">
+          <Field label="종료일" htmlFor="album-end" className="min-w-0">
             <DateField
               id="album-end"
               label="종료일"
+              compact
               value={draft.endDate}
               onChange={(endDate) => setDraft({ ...draft, endDate })}
             />
@@ -80,34 +86,6 @@ export function AlbumEditScreen({
             placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
           />
         </Field>
-
-        {/* 상태는 앨범을 만든 사람만 바꾼다 — 가족의 답변과 무관하게 직접 고르는 값 */}
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-semibold">앨범 상태</span>
-          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="앨범 상태">
-            {statuses.map((status) => (
-              <button
-                key={status}
-                type="button"
-                role="radio"
-                aria-checked={draft.status === status}
-                onClick={() => setDraft({ ...draft, status })}
-                className={cn(
-                  "rounded-lg border px-4 py-3 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                  draft.status === status
-                    ? "border-ink bg-ink text-canvas"
-                    : "border-border text-body hover:bg-muted",
-                )}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-body-mid">
-            완료로 바꾸면 가족에게 더 이상 답변을 요청하지 않아요. 언제든 다시 기록 중으로 되돌릴 수
-            있어요.
-          </p>
-        </div>
 
         <StickyBar>
           <Button size="lg" className="w-full" disabled={!changed}>

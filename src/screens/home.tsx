@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, Ellipsis, Image, Plus, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -16,7 +16,8 @@ import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { formatAlbumStart } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { participantsOf } from "@/data/family";
+import { useAlbumParticipants } from "@/data/family";
+import { type Membership, useMyAlbums } from "@/data/membership";
 import { photosOf } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import type { Go, Notify, Screen } from "@/types";
@@ -35,6 +36,8 @@ export function HomeScreen({
 }) {
   const [recent, setRecent] = useState(true);
   const session = useSession();
+  const participants = useAlbumParticipants();
+  const membership = useMyAlbums();
   // 정렬은 목록의 앞뒤만 뒤집는다 — 데이터에 수정 시각이 따로 없다.
   const list = recent ? albums : [...albums].reverse();
   return (
@@ -75,67 +78,86 @@ export function HomeScreen({
         className="mt-9"
         title="내 앨범"
         action={
-          <Button
-            variant="quiet"
-            size="sm"
-            className="-mr-2"
-            onClick={() => {
-              setRecent(!recent);
-              notify(recent ? "오래된 앨범부터 정렬했어요" : "최근 수정한 앨범부터 정렬했어요");
-            }}
-          >
-            {recent ? "최근 수정순" : "오래된 순"}
-            <ChevronDown className="size-4" />
-          </Button>
+          list.length > 1 && (
+            <Button
+              variant="quiet"
+              size="sm"
+              className="-mr-2"
+              onClick={() => {
+                setRecent(!recent);
+                notify(recent ? "오래된 앨범부터 정렬했어요" : "최근 수정한 앨범부터 정렬했어요");
+              }}
+            >
+              {recent ? "최근 수정순" : "오래된 순"}
+              <ChevronDown className="size-4" />
+            </Button>
+          )
         }
       />
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        {list.map((item) => (
-          <AlbumCard
-            key={item.id}
-            album={item}
-            photoCount={photosOf(item.id).length}
-            members={[
-              { character: session?.tone ?? 0, color: session?.color ?? 0 },
-              ...participantsOf(item.inviteCode).map((p) => ({
-                character: p.character,
-                color: p.color,
-              })),
-            ]}
-            onOpen={() => onOpenAlbum(item.id, "detail")}
-            menu={
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    size="icon-xs"
-                    className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
-                    aria-label={`${item.title} 더보기`}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Ellipsis className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "albumEdit")}>
-                    정보 수정
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "invite")}>
-                    공유
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onSelect={() => notify("삭제는 확인 후 진행돼요")}
-                  >
-                    삭제
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            }
-          />
-        ))}
-      </div>
+      {list.length === 0 ? (
+        <Card variant="outline" size="sm" className="mt-4">
+          <CardContent className="flex flex-col items-center gap-2 py-8 text-center">
+            <span className="mb-1 flex size-12 items-center justify-center rounded-full bg-muted text-body">
+              <Image className="size-5" />
+            </span>
+            <b className="text-[15px] font-semibold text-ink">아직 참여 중인 앨범이 없어요</b>
+            <small className="text-sm leading-relaxed text-body">
+              새 앨범을 만들거나,
+              <br />
+              가족이 보낸 참여 링크로 들어와보세요.
+            </small>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {list.map((item) => (
+            <AlbumCard
+              key={item.id}
+              album={item}
+              membership={membership[item.id]}
+              photoCount={photosOf(item.id).length}
+              members={[
+                { character: session?.tone ?? 0, color: session?.color ?? 0 },
+                // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 두 번 세지 않는다.
+                ...(participants[item.id] ?? [])
+                  .filter((p) => p.name !== session?.name)
+                  .map((p) => ({ character: p.character, color: p.color })),
+              ]}
+              onOpen={() => onOpenAlbum(item.id, "detail")}
+              menu={
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon-xs"
+                      className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
+                      aria-label={`${item.title} 더보기`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Ellipsis className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "albumEdit")}>
+                      정보 수정
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "invite")}>
+                      공유
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={() => notify("삭제는 확인 후 진행돼요")}
+                    >
+                      삭제
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              }
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 flex items-start gap-3 rounded-lg bg-muted p-4">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink">
@@ -160,12 +182,15 @@ const MAX_FACES = 3;
 
 function AlbumCard({
   album,
+  membership,
   photoCount,
   members,
   onOpen,
   menu,
 }: {
   album: AlbumCardData;
+  /** 내가 이 앨범에 들어온 경위 — 초대받은 앨범이면 카드에 표시한다. */
+  membership?: Membership;
   photoCount: number;
   members: { character: number; color: number }[];
   onOpen: () => void;
@@ -183,12 +208,14 @@ function AlbumCard({
     >
       <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
         <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
-        <Badge
-          variant={album.status === "완료" ? "ink" : "glass"}
-          className="absolute top-2 left-2"
-        >
-          {album.status}
-        </Badge>
+        {/* 내가 만든 앨범과 링크를 타고 참여한 앨범이 한 목록에 섞인다 — 후자만 표시한다. */}
+        {membership?.role === "member" && (
+          <Badge variant="glass" className="absolute top-2 left-2 max-w-[calc(100%-56px)]">
+            <span className="truncate">
+              {membership.invitedBy ? `${membership.invitedBy}의 앨범` : "초대받은 앨범"}
+            </span>
+          </Badge>
+        )}
         {menu}
       </div>
       <CardContent className="flex flex-col gap-2">

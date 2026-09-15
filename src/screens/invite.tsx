@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, RotateCcw, Share2 } from "lucide-react";
+import { Check, Copy, Plus, RefreshCw, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,44 +7,92 @@ import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
+import {
+  INVITE_DAYS,
+  formatAlbumPeriod,
+  formatKoreanDate,
+  inviteDaysLeft,
+  inviteExpiresAt,
+  isInviteExpired,
+} from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { participantsOf } from "@/data/family";
+import { useAlbumParticipants } from "@/data/family";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
 const statusVariant = { "참여 중": "primarySoft", 초대됨: "default" } as const;
 
-export function InviteScreen({
-  go,
-  albums,
-  initialAlbumId,
-  locked = false,
-  back,
-  notify,
-}: {
+type InviteProps = {
   go: Go;
-  /** 초대할 수 있는 앨범 목록 */
+  /** 초대할 수 있는 앨범 — 내가 참여 중인 앨범만 들어온다. */
   albums: AlbumCardData[];
+  /** 만료된 링크를 새 코드로 다시 발급한다. */
+  onReissue: (albumId: string) => void;
   /** 처음 골라 둘 앨범 — 방금 보고 있던 앨범이다. */
   initialAlbumId?: string;
   /** 앨범 상세에서 들어온 경우 — 그 앨범으로 고정한다. */
   locked?: boolean;
+  /** 앨범을 막 만들고 넘어온 경우 — 만들기 흐름의 마지막 단계로 보여준다. */
+  justCreated?: boolean;
   /** 상위 화면에서 들어온 경우에만 전달된다. */
   back?: () => void;
   notify: Notify;
-}) {
+};
+
+export function InviteScreen(props: InviteProps) {
+  // 참여 중인 앨범이 없으면 초대할 곳도 없다 — 링크를 만들 앨범부터 있어야 한다.
+  if (props.albums.length === 0) return <NoAlbumInvite go={props.go} back={props.back} />;
+  return <InviteBody {...props} />;
+}
+
+/** 초대할 앨범이 하나도 없을 때 — 링크 대신 앨범 만들기로 안내한다. */
+function NoAlbumInvite({ go, back }: Pick<InviteProps, "go" | "back">) {
+  return (
+    <>
+      {back && <Topbar back={back} title="초대" />}
+      <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
+        <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
+        <p className="text-base leading-relaxed text-body">
+          아직 참여 중인 앨범이 없어요.
+          <br />
+          앨범을 만들면 가족에게 참여 링크를 보낼 수 있어요.
+        </p>
+      </section>
+      <Button size="lg" className="mt-6 w-full" onClick={() => go("create")}>
+        <Plus className="size-5" />
+        새 앨범 만들기
+      </Button>
+      <BottomNav go={go} active="invite" />
+    </>
+  );
+}
+
+function InviteBody({
+  go,
+  albums,
+  initialAlbumId,
+  locked = false,
+  justCreated = false,
+  onReissue,
+  back,
+  notify,
+}: InviteProps) {
   const [selectedId, setSelectedId] = useState(initialAlbumId ?? albums[0]?.id);
   const album = useMemo(
     () => albums.find((a) => a.id === selectedId) ?? albums[0],
     [albums, selectedId],
   );
-  const participants = participantsOf(album.inviteCode);
+  const participants = useAlbumParticipants()[album.id] ?? [];
 
   const [link, setLink] = useState("참여 링크 준비 중…");
   useEffect(() => {
     setLink(`${window.location.origin}${window.location.pathname}?invite=${album.inviteCode}`);
   }, [album.inviteCode]);
+
+  // 링크는 발급일로부터 일주일만 쓴다.
+  const expired = isInviteExpired(album);
+  const leftDays = inviteDaysLeft(album);
 
   async function copy() {
     await copyText(link);
@@ -68,15 +116,41 @@ export function InviteScreen({
     <>
       {/* 탭으로 들어오면 상단 바가 없고, 앨범에서 들어오면 돌아갈 곳이 있어 상단 바를 둔다. */}
       {back && <Topbar back={back} title="초대" />}
+      {/* 막 만든 앨범이면 상단 바를 두지 않는다 — 만들기 화면으로는 되돌아가지 않고,
+          넘어갈 길은 아래 ‘앨범 보러 가기’ 하나로 모은다. */}
+      {justCreated ? (
+        <section className="mt-8 flex flex-col gap-3">
+          <span className="flex size-12 items-center justify-center rounded-full bg-primary text-canvas">
+            <Check className="size-6" strokeWidth={2.5} />
+          </span>
+          <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
+          <p className="text-base leading-relaxed text-body">
+            이제 함께 기록할 가족을 초대해보세요.
+            <br />
+            링크를 받은 가족은 가입 없이 참여할 수 있어요.
+          </p>
+        </section>
+      ) : (
+        <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
+          <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
+          <p className="text-base leading-relaxed text-body">
+            링크를 통해 회원가입없이
+            <br />
+            사진을 추가할 수 있어요.
+          </p>
+        </section>
+      )}
 
-      <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
-        <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
-        <p className="text-base leading-relaxed text-body">
-          링크를 통해 회원가입없이
-          <br />
-          사진을 추가할 수 있어요.
-        </p>
-      </section>
+      {/* 방금 만든 앨범이 무엇인지 한 줄로 확인시켜 준다. */}
+      {justCreated && (
+        <div className="mt-6 flex items-center gap-3 rounded-lg bg-muted p-3">
+          <img src={album.cover} alt="" className="size-12 shrink-0 rounded-md object-cover" />
+          <span className="min-w-0">
+            <b className="block truncate text-[15px] font-semibold">{album.title}</b>
+            <small className="block text-xs text-body-mid">{formatAlbumPeriod(album)}</small>
+          </span>
+        </div>
+      )}
 
       {/* 초대는 앨범 단위 — 어느 앨범으로 부를지 먼저 고른다. */}
       {!locked && albums.length > 1 && (
@@ -109,35 +183,77 @@ export function InviteScreen({
         </section>
       )}
 
-      {/* 참여 링크 — 앨범마다 코드가 다르다 */}
+      {/* 참여 링크 — 앨범마다 코드가 다르고, 발급일로부터 일주일만 쓴다 */}
       <Card variant="outline" size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-3">
-          <small className="text-xs font-semibold text-body">
-            ‘{album.title}’ 참여 링크
-          </small>
-          <div className="flex items-center gap-3">
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">
-              {link.replace("https://", "")}
-            </span>
-            <Button variant="secondary" size="sm" onClick={copy}>
+          {/* 라벨과 복사 버튼이 한 줄 — 복사는 오른쪽 끝에 붙는다. */}
+          <span className="flex items-center gap-2">
+            <small className="min-w-0 flex-1 truncate text-xs font-semibold text-body">
+              ‘{album.title}’ 참여 링크
+            </small>
+            {expired && <Badge variant="destructive">만료됨</Badge>}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="-my-1 shrink-0"
+              onClick={copy}
+              disabled={expired}
+            >
               <Copy className="size-3.5" />
               복사
             </Button>
-          </div>
-          <p className="text-xs text-body-mid">이 링크는 2026년 9월 28일까지 사용할 수 있어요.</p>
+          </span>
+          {/* 링크는 줄이지 않는다 — 두 줄이 되더라도 처음부터 끝까지 다 보여준다. */}
+          <p
+            className={cn(
+              "text-xs leading-relaxed font-medium break-all",
+              // 만료된 링크는 눌러도 소용없다는 걸 먼저 보이게 한다.
+              expired && "text-body-mid line-through",
+            )}
+          >
+            {link}
+          </p>
+          <p className="text-xs text-body-mid">
+            {expired
+              ? `${formatKoreanDate(inviteExpiresAt(album))}에 만료됐어요. 링크를 새로 만들면 다시 초대할 수 있어요.`
+              : `${formatKoreanDate(inviteExpiresAt(album))}까지 사용할 수 있어요. ${
+                  leftDays === 0 ? "오늘이 마지막 날이에요." : `${leftDays}일 남았어요.`
+                }`}
+          </p>
         </CardContent>
       </Card>
 
-      {/* 이 화면의 유일한 주요 동작 — 오렌지 CTA 하나로 둔다. */}
-      <Button size="lg" className="mt-3 w-full" onClick={share}>
-        <Share2 className="size-5" />
-        공유하기
-      </Button>
+      {/* 만료된 링크는 공유할 수 없다 — 그 자리에 새로 만들기를 둔다. */}
+      {expired ? (
+        <Button
+          size="lg"
+          className="mt-3 w-full"
+          onClick={() => {
+            onReissue(album.id);
+            notify(`새 참여 링크를 만들었어요. ${INVITE_DAYS}일간 쓸 수 있어요`);
+          }}
+        >
+          <RefreshCw className="size-5" />
+          링크 새로 만들기
+        </Button>
+      ) : (
+        <Button size="lg" className="mt-3 w-full" onClick={share}>
+          <Share2 className="size-5" />
+          공유하기
+        </Button>
+      )}
+
+      {/* 만들기 흐름에서는 초대를 마치고 앨범으로 넘어갈 길을 열어 둔다. */}
+      {justCreated && (
+        <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("detail")}>
+          앨범 보러 가기
+        </Button>
+      )}
 
       <section className="mt-9 flex flex-col gap-2">
         <SectionHeading
           title={<span className="text-lg">함께하는 가족 {participants.length}명</span>}
-          description="답변이 도착하면 알려드릴게요"
+          description="여기 있는 가족은 누구나 새 가족을 초대할 수 있어요"
         />
         <div className="flex flex-col">
           {participants.length === 0 && (
@@ -168,7 +284,8 @@ export function InviteScreen({
         </div>
       </section>
 
-      <BottomNav go={go} active="invite" />
+      {/* 만들기 흐름 중에는 한 갈래로만 진행한다 — 하단 탭은 두지 않는다. */}
+      {!justCreated && <BottomNav go={go} active="invite" />}
     </>
   );
 }

@@ -17,7 +17,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { formatAlbumPeriod } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { participantsOf } from "@/data/family";
+import { useAlbumParticipants } from "@/data/family";
 import {
   type Photo,
   formatDate,
@@ -57,7 +57,9 @@ export function DetailScreen({
   // 화면에 보이는 숫자는 모두 이 앨범의 사진·참여자에서 나온다.
   const photos = byTakenAt(photosOf(album.id));
   const voices = voicesOf(album.id);
-  const participants = participantsOf(album.inviteCode);
+  const participants = useAlbumParticipants()[album.id] ?? [];
+  // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 프로필을 두 번 세지 않는다.
+  const others = participants.filter((p) => p.name !== session?.name);
   const pending = photos.filter((p) => p.status === "기록 중").length;
 
   return (
@@ -87,7 +89,7 @@ export function DetailScreen({
                 color={session?.color}
                 className="size-8 ring-2 ring-ink/50"
               />
-              {participants.map((p) => (
+              {others.map((p) => (
                 <CharacterAvatar
                   key={p.name}
                   index={p.character}
@@ -95,7 +97,7 @@ export function DetailScreen({
                   className="size-8 ring-2 ring-ink/50"
                 />
               ))}
-              <span className="sr-only">나를 포함해 {participants.length + 1}명이 함께해요</span>
+              <span className="sr-only">나를 포함해 {others.length + 1}명이 함께해요</span>
             </span>
           </div>
         </div>
@@ -127,7 +129,6 @@ export function DetailScreen({
       <Card size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
-            <Badge variant={album.status === "완료" ? "ink" : "primarySoft"}>{album.status}</Badge>
             <span className="flex min-w-0 flex-1 items-center gap-3 text-sm text-body">
               <span className="flex items-center gap-1.5">
                 <Image className="size-4 text-body-mid" aria-hidden />
@@ -426,12 +427,12 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   alt={photo.alt ?? photo.title}
                   className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
                 />
-                <Badge
-                  variant={photo.status === "기록 중" ? "glass" : "ink"}
-                  className="absolute top-2 right-2"
-                >
-                  {photo.status}
-                </Badge>
+                {/* 기록이 끝난 사진에는 표시를 붙이지 않는다 — 남은 사진만 눈에 띄면 된다. */}
+                {photo.status === "기록 중" && (
+                  <Badge variant="glass" className="absolute top-2 right-2">
+                    {photo.status}
+                  </Badge>
+                )}
               </span>
               <span className="px-0.5">
                 <b className="block truncate text-sm font-semibold">{photo.title}</b>

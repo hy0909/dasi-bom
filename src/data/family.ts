@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 export type ParticipantStatus = "참여 중" | "초대됨" | "다시 초대";
 
 export type Participant = {
@@ -11,31 +13,26 @@ export type Participant = {
 };
 
 /**
- * 참여자는 앨범마다 따로 있다 — 초대 링크도 앨범 단위라 같은 키로 묶는다.
- * 키는 앨범의 inviteCode.
+ * 참여자는 앨범마다 따로 있다 — 키는 앨범의 id.
+ * 초대 코드가 아니라 앨범 id 로 묶는다. 링크를 새로 발급해 코드가 바뀌어도
+ * 이미 합류한 가족은 그대로 남아야 한다.
  */
-export const participantsByAlbum: Record<string, Participant[]> = {
-  EU23: [
+const initialParticipants: Record<string, Participant[]> = {
+  eu23: [
     { character: 0, color: 5, name: "엄마", note: "답변 4개", status: "참여 중" },
     { character: 1, color: 3, name: "아버지", note: "아직 답변 없음", status: "초대됨" },
-    {
-      character: 2,
-      color: 6,
-      name: "동생 민준",
-      note: "초대 실패",
-      status: "다시 초대",
-    },
+    { character: 2, color: 6, name: "동생 민준", note: "초대 실패", status: "다시 초대" },
   ],
-  JEJU: [
+  jeju: [
     { character: 0, color: 5, name: "엄마", note: "답변 9개", status: "참여 중" },
     { character: 1, color: 3, name: "아버지", note: "답변 3개", status: "참여 중" },
     { character: 3, color: 1, name: "사촌 지우", note: "답변 2개", status: "참여 중" },
   ],
-  SUMMER: [
+  summer: [
     { character: 0, color: 2, name: "할머니", note: "답변 5개", status: "참여 중" },
     { character: 2, color: 6, name: "동생 민준", note: "아직 답변 없음", status: "초대됨" },
   ],
-  SEA: [
+  seaside: [
     { character: 3, color: 4, name: "딸 서아", note: "답변 2개", status: "참여 중" },
     { character: 0, color: 0, name: "엄마", note: "아직 답변 없음", status: "초대됨" },
     { character: 1, color: 7, name: "아버지", note: "초대 실패", status: "다시 초대" },
@@ -43,6 +40,55 @@ export const participantsByAlbum: Record<string, Participant[]> = {
   ],
 };
 
-export function participantsOf(inviteCode: string): Participant[] {
-  return participantsByAlbum[inviteCode] ?? [];
+/**
+ * 링크를 타고 들어온 회원이 앨범 그룹에 합류하면 참여자가 늘어난다.
+ * 화면 여러 곳이 같은 목록을 보므로 작은 스토어로 두고 구독하게 한다.
+ */
+let store: Record<string, Participant[]> = initialParticipants;
+const listeners = new Set<() => void>();
+
+function publish(next: Record<string, Participant[]>) {
+  store = next;
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/** 앨범별 참여자 전체 — 목록 화면처럼 여러 앨범을 한 번에 그리는 곳에서 쓴다. */
+export function useAlbumParticipants() {
+  return useSyncExternalStore(
+    subscribe,
+    () => store,
+    () => initialParticipants,
+  );
+}
+
+export function participantsOf(albumId: string): Participant[] {
+  return store[albumId] ?? [];
+}
+
+/** 이미 이 앨범에 있는 사람인가 — 이름으로 본다. */
+export function isMemberOf(albumId: string, name: string) {
+  return participantsOf(albumId).some((p) => p.name === name);
+}
+
+/**
+ * 회원이 초대 링크로 들어와 앨범 그룹에 합류한다.
+ * 이미 있는 사람이면 아무 일도 하지 않는다.
+ */
+export function joinAlbum(
+  albumId: string,
+  member: Pick<Participant, "name" | "character" | "color">,
+) {
+  if (isMemberOf(albumId, member.name)) return false;
+  publish({
+    ...store,
+    [albumId]: [...participantsOf(albumId), { ...member, note: "방금 참여했어요", status: "참여 중" }],
+  });
+  return true;
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,9 @@ import { Field } from "@/components/field";
 import { MediaFrame } from "@/components/media-frame";
 import { StepProgress } from "@/components/step-progress";
 import { QuestionCard } from "@/components/question-card";
-import { formatDate, formatTime, photos } from "@/data/photos";
+import { INVITE_DAYS } from "@/data/album";
+import type { AlbumCardData } from "@/data/albums";
+import { formatDate, formatTime, photosOf } from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 function leaveGuest(go: Go) {
@@ -29,24 +31,67 @@ function leaveGuest(go: Go) {
   go("home");
 }
 
-export function GuestWelcome({ go }: { go: Go }) {
+export function GuestWelcome({
+  go,
+  album,
+  expired = false,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  /** 링크가 만료된 경우 — 참여를 받지 않고 새 링크를 부탁하게 안내한다. */
+  expired?: boolean;
+}) {
+  const [first, ...rest] = album.title.split(" ");
+
+  if (expired) {
+    return (
+      <div className="flex min-h-[calc(100dvh-80px)] flex-col items-center justify-center gap-4 text-center">
+        <span className="mb-2 flex size-16 items-center justify-center rounded-full bg-muted text-body">
+          <LinkIcon className="size-7" />
+        </span>
+        <Eyebrow>가족 앨범 초대</Eyebrow>
+        <h1 className="font-heading text-display-lg font-bold">
+          링크가
+          <br />
+          만료됐어요
+        </h1>
+        <p className="max-w-[300px] text-base leading-relaxed text-body">
+          참여 링크는 만든 날부터 {INVITE_DAYS}일 동안만 쓸 수 있어요. 초대한 가족에게 새 링크를
+          부탁해주세요.
+        </p>
+        <Button variant="outline" size="lg" className="mt-4 w-full" onClick={() => leaveGuest(go)}>
+          닫기
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex h-14 items-center justify-center">
         <Wordmark />
       </div>
 
-      <MediaFrame className="mt-2" src={photos[0].src} alt="2023년 유럽여행" caption="하연님이 초대했어요" />
+      <MediaFrame
+        className="mt-2"
+        src={album.cover}
+        alt={album.coverAlt}
+        caption="하연님이 초대했어요"
+      />
 
       <section className="mt-6 flex flex-col gap-3">
         <Eyebrow>가족 앨범 초대</Eyebrow>
         <h1 className="font-heading text-display-xl font-bold">
-          2023년
-          <br />
-          유럽여행
+          {first}
+          {rest.length > 0 && (
+            <>
+              <br />
+              {rest.join(" ")}
+            </>
+          )}
         </h1>
         <p className="text-base leading-relaxed text-body">
-          “우리 여행 사진을 보며 기억나는 순간을 들려주세요. 회원가입 없이 바로 참여할 수 있어요.”
+          “사진을 보며 기억나는 순간을 들려주세요. 회원가입 없이 바로 참여할 수 있어요.”
         </p>
       </section>
 
@@ -149,19 +194,44 @@ const guestQuestions = [
   "여행 마지막 날, 가장 아쉬웠던 건 무엇인가요?",
 ];
 
-export function GuestAnswer({ go, notify }: { go: Go; notify: Notify }) {
+export function GuestAnswer({
+  go,
+  album,
+  notify,
+}: {
+  go: Go;
+  album: AlbumCardData;
+  notify: Notify;
+}) {
   const [answer, setAnswer] = useState("");
   const [saved, setSaved] = useState(0);
-  const photo = photos[saved];
+  // 초대받은 앨범의 사진을 순서대로 본다.
+  const albumPhotos = photosOf(album.id);
+  const photo = albumPhotos[Math.min(saved, Math.max(albumPhotos.length - 1, 0))];
+  const last = Math.max(albumPhotos.length - 1, 0);
+
+  if (!photo) {
+    return (
+      <>
+        <Topbar back={() => go("guestInfo")} title="기록 남기기" />
+        <p className="mt-10 text-center text-sm text-body-mid">
+          아직 이 앨범에 사진이 없어요. 초대한 가족에게 알려주세요.
+        </p>
+      </>
+    );
+  }
 
   return (
     <>
       <Topbar back={() => go("guestInfo")} title="기록 남기기" />
-      <StepProgress step={saved + 1} total={3} />
+      <StepProgress step={saved + 1} total={albumPhotos.length} />
 
-      <MediaFrame className="mt-5" src={photo.src} alt={photo.title} caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`} />
+      <MediaFrame className="mt-5" src={photo.src} alt={photo.alt ?? photo.title} caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`} />
 
-      <QuestionCard eyebrow="이 사진에 대해 궁금해요" question={guestQuestions[saved]} />
+      <QuestionCard
+        eyebrow="이 사진에 대해 궁금해요"
+        question={guestQuestions[saved % guestQuestions.length]}
+      />
 
       <div className="mt-4 flex flex-col gap-3">
         <Textarea
@@ -176,14 +246,14 @@ export function GuestAnswer({ go, notify }: { go: Go; notify: Notify }) {
           className="w-full"
           disabled={!answer.trim()}
           onClick={() => {
-            if (saved < 2) {
+            if (saved < last) {
               setSaved(saved + 1);
               setAnswer("");
               notify("답변을 저장했어요");
             } else go("guestDone");
           }}
         >
-          {saved === 2 ? "답변 모두 제출하기" : "답변 저장하고 다음 사진"}
+          {saved === last ? "답변 모두 제출하기" : "답변 저장하고 다음 사진"}
         </Button>
       </div>
 
@@ -192,7 +262,7 @@ export function GuestAnswer({ go, notify }: { go: Go; notify: Notify }) {
           variant="link"
           size="sm"
           className="text-body"
-          onClick={() => (saved < 2 ? setSaved(saved + 1) : go("guestDone"))}
+          onClick={() => (saved < last ? setSaved(saved + 1) : go("guestDone"))}
         >
           이 사진은 건너뛸게요
         </Button>

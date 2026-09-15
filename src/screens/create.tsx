@@ -17,7 +17,7 @@ import { toast } from "sonner";
 const PLACEHOLDER_COVER =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="%23ece7e3"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#ece7e3"/></svg>`,
   );
 
 export function CreateScreen({
@@ -48,19 +48,24 @@ export function CreateScreen({
     setReady(true);
     // 앨범마다 참여 링크가 다르다 — 만들 때 코드를 한 번 발급한다.
     const code = Math.random().toString(36).slice(2, 6).toUpperCase();
-    onCreate({
-      id: code.toLowerCase(),
-      inviteCode: code,
-      title: title.trim(),
-      startDate,
-      endDate,
-      description: description.trim(),
-      status: "기록 중",
-      // 대표 사진을 고르지 않았으면 첫 사진을 올릴 때까지 회색 자리로 둔다.
-      cover: cover ?? PLACEHOLDER_COVER,
-      coverAlt: cover ? `${title.trim()} 대표 사진` : "아직 대표 사진이 없는 앨범",
-    });
-    setTimeout(() => go("detail"), 500);
+    // 다음 화면으로 넘기는 일은 앱이 맡는다 — 만든 뒤에는 초대 화면으로 이어진다.
+    setTimeout(
+      () =>
+        onCreate({
+          id: code.toLowerCase(),
+          inviteCode: code,
+          title: title.trim(),
+          startDate,
+          endDate,
+          description: description.trim(),
+          // 참여 링크는 만든 순간부터 일주일 동안 쓴다.
+          inviteIssuedAt: new Date().toISOString(),
+          // 대표 사진을 고르지 않았으면 첫 사진을 올릴 때까지 회색 자리로 둔다.
+          cover: cover ?? PLACEHOLDER_COVER,
+          coverAlt: cover ? `${title.trim()} 대표 사진` : "아직 대표 사진이 없는 앨범",
+        }),
+      500,
+    );
   }
 
   return (
@@ -88,12 +93,13 @@ export function CreateScreen({
           />
         </Field>
 
-        <div className="flex flex-col gap-4">
-          <Field label="시작일" htmlFor="start">
-            <DateField id="start" label="시작일" value={startDate} onChange={setStartDate} />
+        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다. */}
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="시작일" htmlFor="start" className="min-w-0">
+            <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
           </Field>
-          <Field label="종료일" htmlFor="end">
-            <DateField id="end" label="종료일" value={endDate} onChange={setEndDate} />
+          <Field label="종료일" htmlFor="end" className="min-w-0">
+            <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
           </Field>
         </div>
 

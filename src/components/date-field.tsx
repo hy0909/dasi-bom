@@ -22,6 +22,14 @@ export function formatPickedDate(value: string) {
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAYS[d.getDay()]}`;
 }
 
+/** 2024. 7. 10 (수) — 시작일·종료일을 한 줄에 나란히 둘 때처럼 폭이 좁은 자리용 */
+export function formatPickedDateShort(value: string) {
+  if (!value) return "";
+  const d = parseValue(value);
+  if (!d) return "";
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()} (${WEEKDAYS[d.getDay()]})`;
+}
+
 /** yyyy-mm-dd → Date. 시간대에 밀리지 않도록 로컬 자정으로 만든다. */
 function parseValue(value: string) {
   const [y, m, d] = value.split("-").map(Number);
@@ -46,6 +54,7 @@ export function DateField({
   label,
   value,
   onChange,
+  compact = false,
   className,
 }: {
   id: string;
@@ -53,6 +62,8 @@ export function DateField({
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** 좁은 칸에 들어갈 때 — 날짜를 짧게 적어 아이콘과 부딪히지 않게 한다. */
+  compact?: boolean;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -70,10 +81,14 @@ export function DateField({
         id={id}
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-12 w-full items-center gap-2 rounded-md border border-input bg-background px-3 text-left text-sm text-foreground transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+        className={cn(
+          "flex h-12 w-full items-center rounded-md border border-input bg-background text-left text-sm text-foreground transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30",
+          // 좁은 칸에서는 안쪽 여백을 줄여 글자와 아이콘이 서로 밀리지 않게 한다.
+          compact ? "gap-1.5 px-2.5" : "gap-2 px-3",
+        )}
       >
         <span className={cn("min-w-0 flex-1 truncate", !value && "text-body-mid")}>
-          {formatPickedDate(value) || "날짜 선택"}
+          {(compact ? formatPickedDateShort(value) : formatPickedDate(value)) || "날짜 선택"}
         </span>
         <CalendarIcon className="size-4 shrink-0 text-body-mid" />
       </button>
