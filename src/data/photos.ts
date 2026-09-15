@@ -12,9 +12,9 @@ export type Photo = {
   status: PhotoStatus;
   /** 대체 텍스트 — 비워두면 제목을 읽는다 */
   alt?: string;
-  /** 사진에 달린 목소리 — 가족이 남긴 음성 답변 */
+  /** 사진에 달린 목소리 — 가족이 남긴 음성 기록 */
   voices?: PhotoVoice[];
-  /** AI 가 답변을 모아 정리한 글. 기록이 끝난 사진에만 있다. */
+  /** AI 가 가족의 기록을 모아 정리한 글. 기록이 끝난 사진에만 있다. */
   story?: string;
 };
 

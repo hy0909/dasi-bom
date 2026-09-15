@@ -246,7 +246,7 @@ function AlbumReader({
           ) : (
             <div className="flex flex-col items-start gap-2 rounded-lg bg-muted p-4">
               <p className="text-sm leading-relaxed text-body">
-                아직 글이 없어요. 가족의 답변이 모이면 이 자리에 이야기가 채워져요.
+                아직 글이 없어요. 가족의 기록이 모이면 이 자리에 이야기가 채워져요.
               </p>
               <Button variant="outline" size="sm" onClick={() => go("interview")}>
                 기록 이어가기
@@ -493,7 +493,7 @@ function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
     <section className="flex flex-col gap-4">
       <SectionHeading
         title={<span className="text-lg">완성된 글 {counts["기록 완료"]}편</span>}
-        description="AI가 가족의 답변을 정리했어요"
+        description="AI가 가족의 기록을 모아 정리했어요"
       />
       <StatusFilter value={status} onChange={setStatus} counts={counts} />
 
@@ -515,7 +515,7 @@ function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   </small>
                   <b className="mt-0.5 block text-[15px] font-semibold">{photo.title}</b>
                   <p className="mt-1 line-clamp-2 text-sm leading-snug text-body">
-                    {photo.story ?? "아직 글이 없어요. 가족의 답변이 모이면 정리해드려요."}
+                    {photo.story ?? "아직 글이 없어요. 가족의 기록이 모이면 정리해드려요."}
                   </p>
                 </span>
               </div>

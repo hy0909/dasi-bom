@@ -29,7 +29,7 @@ export function InterviewScreen({
   const [question, setQuestion] = useState(0);
   const [textMode, setTextMode] = useState(false);
   const [answer, setAnswer] = useState("");
-  // 답변을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
+  // 기록을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
   const albumPhotos = photosOf(album.id);
   const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
 
@@ -50,7 +50,7 @@ export function InterviewScreen({
       setQuestion(question + 1);
       setAnswer("");
       setTextMode(false);
-      notify("답변을 저장하고 다음 질문을 만들었어요");
+      notify("기록을 저장하고 다음 질문을 만들었어요");
     } else {
       notify("사진 기록이 완성됐어요");
       go("story");
@@ -80,7 +80,7 @@ export function InterviewScreen({
       <QuestionCard eyebrow="AI가 사진을 보고 물어봐요" question={questions[question]}>
         {question > 0 && (
           <div className="mt-1 border-l-2 border-primary pl-3 text-sm leading-relaxed text-canvas-soft/80">
-            <small className="block text-xs font-semibold text-canvas-soft/60">이전 답변</small>
+            <small className="block text-xs font-semibold text-canvas-soft/60">이전 기록</small>
             “파리에 도착한 다음 날, 가족들과 작은 식당에서 저녁을 먹었어요.”
           </div>
         )}
@@ -114,7 +114,7 @@ export function InterviewScreen({
           />
           <small className="text-right text-xs tabular-nums text-body-mid">{answer.length} / 500</small>
           <Button size="lg" className="w-full" disabled={!answer.trim()} onClick={submit}>
-            {question === 2 ? "기록 완성하기" : "답변 남기기"}
+            {question === 2 ? "기록 완성하기" : "기록 남기기"}
           </Button>
         </div>
       )}

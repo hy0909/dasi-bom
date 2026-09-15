@@ -22,6 +22,16 @@ import { photosOf } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import type { Go, Notify, Screen } from "@/types";
 
+/** 내 앨범을 가르는 기준 — 내가 만든 앨범과 링크를 타고 합류한 앨범. */
+const albumFilters = ["all", "owner", "member"] as const;
+type AlbumFilter = (typeof albumFilters)[number];
+
+const filterLabels: Record<AlbumFilter, string> = {
+  all: "전체",
+  owner: "내가 만든",
+  member: "초대받은",
+};
+
 export function HomeScreen({
   go,
   albums,
@@ -35,11 +45,20 @@ export function HomeScreen({
   notify: Notify;
 }) {
   const [recent, setRecent] = useState(true);
+  const [filter, setFilter] = useState<AlbumFilter>("all");
   const session = useSession();
   const participants = useAlbumParticipants();
   const membership = useMyAlbums();
+  // 멤버십이 없는 앨범은 내가 만든 것으로 본다 — 목록에 있다는 건 이미 참여 중이라는 뜻이다.
+  const roleOf = (id: string) => membership[id]?.role ?? "owner";
+  const counts = {
+    all: albums.length,
+    owner: albums.filter((a) => roleOf(a.id) === "owner").length,
+    member: albums.filter((a) => roleOf(a.id) === "member").length,
+  };
+  const picked = filter === "all" ? albums : albums.filter((a) => roleOf(a.id) === filter);
   // 정렬은 목록의 앞뒤만 뒤집는다 — 데이터에 수정 시각이 따로 없다.
-  const list = recent ? albums : [...albums].reverse();
+  const list = recent ? picked : [...picked].reverse();
   return (
     <>
       <Topbar go={go} />
@@ -78,19 +97,42 @@ export function HomeScreen({
         className="mt-9"
         title="내 앨범"
         action={
-          list.length > 1 && (
-            <Button
-              variant="quiet"
-              size="sm"
-              className="-mr-2"
-              onClick={() => {
-                setRecent(!recent);
-                notify(recent ? "오래된 앨범부터 정렬했어요" : "최근 수정한 앨범부터 정렬했어요");
-              }}
-            >
-              {recent ? "최근 수정순" : "오래된 순"}
-              <ChevronDown className="size-4" />
-            </Button>
+          albums.length > 1 && (
+            <div className="-mr-2 flex shrink-0 items-center">
+              {/* 분류 — 내가 만든 앨범과 초대받은 앨범을 갈라 본다 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="quiet" size="sm" className="px-2">
+                    {filterLabels[filter]}
+                    <ChevronDown className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {albumFilters.map((key) => (
+                    <DropdownMenuItem key={key} onSelect={() => setFilter(key)}>
+                      {filterLabels[key]}
+                      <span className="ml-auto pl-4 text-xs tabular-nums text-body-mid">
+                        {counts[key]}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* 정렬 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="quiet" size="sm" className="px-2">
+                    {recent ? "최근 수정순" : "오래된 순"}
+                    <ChevronDown className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setRecent(true)}>최근 수정순</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRecent(false)}>오래된 순</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )
         }
       />
@@ -101,12 +143,25 @@ export function HomeScreen({
             <span className="mb-1 flex size-12 items-center justify-center rounded-full bg-muted text-body">
               <Image className="size-5" />
             </span>
-            <b className="text-[15px] font-semibold text-ink">아직 참여 중인 앨범이 없어요</b>
-            <small className="text-sm leading-relaxed text-body">
-              새 앨범을 만들거나,
-              <br />
-              가족이 보낸 참여 링크로 들어와보세요.
-            </small>
+            {albums.length === 0 ? (
+              <>
+                <b className="text-[15px] font-semibold text-ink">아직 참여 중인 앨범이 없어요</b>
+                <small className="text-sm leading-relaxed text-body">
+                  새 앨범을 만들거나,
+                  <br />
+                  가족이 보낸 참여 링크로 들어와보세요.
+                </small>
+              </>
+            ) : (
+              <>
+                <b className="text-[15px] font-semibold text-ink">
+                  {filterLabels[filter]} 앨범이 없어요
+                </b>
+                <Button variant="outline" size="sm" className="mt-1" onClick={() => setFilter("all")}>
+                  전체 보기
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : (
@@ -208,14 +263,12 @@ function AlbumCard({
     >
       <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
         <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
-        {/* 내가 만든 앨범과 링크를 타고 참여한 앨범이 한 목록에 섞인다 — 후자만 표시한다. */}
-        {membership?.role === "member" && (
-          <Badge variant="glass" className="absolute top-2 left-2 max-w-[calc(100%-56px)]">
-            <span className="truncate">
-              {membership.invitedBy ? `${membership.invitedBy}의 앨범` : "초대받은 앨범"}
-            </span>
-          </Badge>
-        )}
+        {/* 내가 만든 앨범과 링크를 타고 합류한 앨범이 한 목록에 섞인다 — 어느 쪽인지 칩으로 알린다. */}
+        <Badge variant="glass" className="absolute top-2 left-2 max-w-[calc(100%-56px)]">
+          <span className="truncate">
+            {membership?.role === "member" ? "초대받은" : "내가 만든"}
+          </span>
+        </Badge>
         {menu}
       </div>
       <CardContent className="flex flex-col gap-2">

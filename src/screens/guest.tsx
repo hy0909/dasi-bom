@@ -177,7 +177,7 @@ export function GuestInfo({ go, notify }: { go: Go; notify: Notify }) {
             onCheckedChange={(v) => setAgree(v === true)}
             className="mt-0.5 size-5 bg-canvas"
           />
-          사진·음성·답변 처리에 동의합니다.
+          사진·음성·기록 처리에 동의합니다.
         </Label>
 
         <Button size="lg" className="w-full">
@@ -249,11 +249,11 @@ export function GuestAnswer({
             if (saved < last) {
               setSaved(saved + 1);
               setAnswer("");
-              notify("답변을 저장했어요");
+              notify("기록을 저장했어요");
             } else go("guestDone");
           }}
         >
-          {saved === last ? "답변 모두 제출하기" : "답변 저장하고 다음 사진"}
+          {saved === last ? "기록 모두 제출하기" : "기록 저장하고 다음 사진"}
         </Button>
       </div>
 
@@ -285,24 +285,24 @@ export function GuestDone({ go }: { go: Go }) {
         남겨주셔서 고마워요
       </h1>
       <p className="max-w-[300px] text-base leading-relaxed text-body">
-        사진 3장에 남긴 답변이 하연님에게 전달됐어요. AI가 가족의 기록으로 따뜻하게 정리할게요.
+        사진 3장에 남긴 기록이 하연님에게 전달됐어요. AI가 한 편의 이야기로 따뜻하게 정리할게요.
       </p>
 
       <Card size="sm" className="mt-2 w-full">
         <CardContent className="grid grid-cols-2 divide-x divide-border">
           <div className="flex flex-col gap-1">
-            <small className="text-xs font-semibold text-body">답변한 사진</small>
+            <small className="text-xs font-semibold text-body">기록한 사진</small>
             <strong className="font-heading text-display-md font-bold">3장</strong>
           </div>
           <div className="flex flex-col gap-1 pl-4">
-            <small className="text-xs font-semibold text-body">텍스트 답변</small>
+            <small className="text-xs font-semibold text-body">글로 남긴 기록</small>
             <strong className="font-heading text-display-md font-bold">2개</strong>
           </div>
         </CardContent>
       </Card>
 
       <Button size="lg" className="mt-4 w-full" onClick={() => go("guestAnswer")}>
-        답변 다시 보기
+        기록 다시 보기
       </Button>
       <Button variant="link" size="sm" className="text-body" onClick={() => leaveGuest(go)}>
         참여 마치기

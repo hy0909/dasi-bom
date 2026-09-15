@@ -108,7 +108,7 @@ export function ProfileEditScreen({
         <div className="mt-4 border-t border-border pt-6">
           <b className="block text-[15px] font-semibold">회원 탈퇴</b>
           <p className="mt-1 text-sm text-body">
-            계정과 가입 정보가 지워져요. 가족이 남긴 답변은 되돌릴 수 없어요.
+            계정과 가입 정보가 지워져요. 가족이 남긴 기록은 되돌릴 수 없어요.
           </p>
           <Button
             type="button"

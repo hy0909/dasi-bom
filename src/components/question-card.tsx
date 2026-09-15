@@ -21,7 +21,7 @@ export function QuestionCard({
           </span>
           <p className="text-sm font-medium text-canvas-soft/75">{eyebrow}</p>
         </div>
-        {/* AI 질문은 항상 ‘Q.’ 로 시작한다 — 답변 글과 한눈에 구분된다. */}
+        {/* AI 질문은 항상 ‘Q.’ 로 시작한다 — 기록 글과 한눈에 구분된다. */}
         <h1 className="font-heading text-[18px] leading-[1.45] font-bold text-canvas">
           <span className="mr-1 text-primary">Q.</span>
           {question}

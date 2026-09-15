@@ -118,7 +118,7 @@ export function StoryScreen({
           <Textarea key={photo.title} className="min-h-44" defaultValue={photo.story ?? ""} />
         ) : (
           <p className="text-[17px] leading-[1.7] text-body">
-            {photo.story ?? "아직 글이 없어요. 가족의 답변이 모이면 이 자리에 정리해드려요."}
+            {photo.story ?? "아직 글이 없어요. 가족의 기록이 모이면 이 자리에 정리해드려요."}
           </p>
         )}
 
@@ -131,7 +131,7 @@ export function StoryScreen({
               <br />
               정말 행복했어요.
             </p>
-            <small className="text-sm text-body">— 엄마의 답변에서</small>
+            <small className="text-sm text-body">— 엄마의 기록에서</small>
           </CardContent>
         </Card>
 
@@ -168,7 +168,7 @@ export function StoryScreen({
         </Card>
 
         <p className="flex items-center gap-1.5 text-xs text-body-mid">
-          <Sparkles className="size-3.5" />이 기록은 가족의 답변을 바탕으로 AI가 정리했어요.
+          <Sparkles className="size-3.5" />이 글은 가족이 남긴 기록을 모아 AI가 정리했어요.
         </p>
       </article>
 
