@@ -200,12 +200,15 @@ export function HomeScreen({
                     <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "invite")}>
                       공유
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onSelect={() => notify("삭제는 확인 후 진행돼요")}
-                    >
-                      삭제
-                    </DropdownMenuItem>
+                    {/* 수정·공유는 구성원 누구나. 삭제만 앨범을 만든 사람에게 남긴다. */}
+                    {roleOf(item.id) === "owner" && (
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={() => notify("삭제는 확인 후 진행돼요")}
+                      >
+                        삭제
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               }

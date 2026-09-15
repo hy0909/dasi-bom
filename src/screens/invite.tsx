@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Plus, RefreshCw, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { CharacterAvatar } from "@/components/character-avatar";
 import {
   INVITE_DAYS,
   formatAlbumPeriod,
+  formatAlbumStart,
   formatKoreanDate,
   inviteDaysLeft,
   inviteExpiresAt,
@@ -17,6 +18,7 @@ import {
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
+import { photosOf } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
@@ -84,6 +86,12 @@ function InviteBody({
     [albums, selectedId],
   );
   const participants = useAlbumParticipants()[album.id] ?? [];
+
+  // 고른 앨범이 목록 아래쪽이면 처음부터 보이도록 스크롤을 맞춘다.
+  const selectedRow = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    selectedRow.current?.scrollIntoView({ block: "nearest" });
+  }, []);
 
   const [link, setLink] = useState("참여 링크 준비 중…");
   useEffect(() => {
@@ -156,29 +164,50 @@ function InviteBody({
       {!locked && albums.length > 1 && (
         <section className="mt-6 flex flex-col gap-2">
           <span className="text-xs font-semibold text-body">초대할 앨범</span>
+          {/* 행 높이 56 + 경계선 1 = 57. 3개 반(약 200px)까지만 보이고 나머지는 안에서 스크롤한다 —
+              반쯤 잘린 행이 아래에 더 있다는 표시가 된다. */}
           <div
-            className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5"
+            className="max-h-[200px] overflow-y-auto overscroll-contain rounded-lg border border-border"
             role="radiogroup"
             aria-label="초대할 앨범"
           >
-            {albums.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                role="radio"
-                aria-checked={item.id === album.id}
-                onClick={() => setSelectedId(item.id)}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-lg border py-1.5 pr-3 pl-1.5 text-sm font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-                  item.id === album.id
-                    ? "border-ink bg-ink text-canvas"
-                    : "border-border text-body hover:bg-muted",
-                )}
-              >
-                <img src={item.cover} alt="" className="size-7 rounded-md object-cover" />
-                {item.title}
-              </button>
-            ))}
+            {albums.map((item) => {
+              const on = item.id === album.id;
+              return (
+                <button
+                  key={item.id}
+                  ref={on ? selectedRow : undefined}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setSelectedId(item.id)}
+                  className={cn(
+                    "flex h-14 w-full items-center gap-3 border-b border-border px-3 text-left transition-colors outline-none last:border-b-0 focus-visible:ring-3 focus-visible:-outline-offset-2 focus-visible:ring-ring/40",
+                    on ? "bg-muted" : "hover:bg-muted/60",
+                  )}
+                >
+                  <img
+                    src={item.cover}
+                    alt=""
+                    className="size-9 shrink-0 rounded-md object-cover"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <b className="block truncate text-sm font-semibold">{item.title}</b>
+                    <small className="block truncate text-[11.5px] text-body-mid">
+                      {formatAlbumStart(item)} · 사진 {photosOf(item.id).length}장
+                    </small>
+                  </span>
+                  <span
+                    className={cn(
+                      "grid size-[18px] shrink-0 place-items-center rounded-full border transition-colors",
+                      on ? "border-primary" : "border-mute",
+                    )}
+                  >
+                    {on && <span className="size-2.5 rounded-full bg-primary" />}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
