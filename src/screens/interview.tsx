@@ -8,7 +8,7 @@ import { StepProgress } from "@/components/step-progress";
 import { MediaFrame } from "@/components/media-frame";
 import { QuestionCard } from "@/components/question-card";
 import type { AlbumCardData } from "@/data/albums";
-import { formatDate, formatTime, photosOf } from "@/data/photos";
+import { formatDate, formatTime, useAlbumPhotos } from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 const questions = [
@@ -30,7 +30,7 @@ export function InterviewScreen({
   const [textMode, setTextMode] = useState(false);
   const [answer, setAnswer] = useState("");
   // 기록을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
-  const albumPhotos = photosOf(album.id);
+  const albumPhotos = useAlbumPhotos(album.id);
   const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
 
   if (!photo) {

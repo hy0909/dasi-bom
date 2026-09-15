@@ -217,7 +217,7 @@ export default function App() {
             notify={notify}
           />
         )}
-        {screen === "upload" && <UploadScreen go={go} notify={notify} />}
+        {screen === "upload" && <UploadScreen go={go} album={current} notify={notify} />}
         {screen === "notices" && <NoticesScreen go={go} />}
         {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
         {screen === "albumEdit" && (

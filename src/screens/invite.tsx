@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Plus, RefreshCw, RotateCcw, Share2 } from "lucide-react";
+import { Check, Copy, ImagePlus, Plus, RefreshCw, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,7 +18,7 @@ import {
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
-import { photosOf } from "@/data/photos";
+import { usePhotoStore } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
@@ -86,6 +86,7 @@ function InviteBody({
     [albums, selectedId],
   );
   const participants = useAlbumParticipants()[album.id] ?? [];
+  const photoStore = usePhotoStore();
 
   // 고른 앨범이 목록 아래쪽이면 처음부터 보이도록 스크롤을 맞춘다.
   const selectedRow = useRef<HTMLButtonElement>(null);
@@ -194,7 +195,7 @@ function InviteBody({
                   <span className="min-w-0 flex-1">
                     <b className="block truncate text-sm font-semibold">{item.title}</b>
                     <small className="block truncate text-[11.5px] text-body-mid">
-                      {formatAlbumStart(item)} · 사진 {photosOf(item.id).length}장
+                      {formatAlbumStart(item)} · 사진 {photoStore[item.id]?.length ?? 0}장
                     </small>
                   </span>
                   <span
@@ -272,10 +273,11 @@ function InviteBody({
         </Button>
       )}
 
-      {/* 만들기 흐름에서는 초대를 마치고 앨범으로 넘어갈 길을 열어 둔다. */}
+      {/* 만든 직후에는 빈 앨범이다 — 초대 다음 할 일은 사진을 채우는 것. */}
       {justCreated && (
-        <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("detail")}>
-          앨범 보러 가기
+        <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("upload")}>
+          <ImagePlus className="size-5" />
+          앨범에 사진 추가
         </Button>
       )}
 

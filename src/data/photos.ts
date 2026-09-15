@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 export type PhotoStatus = "기록 중" | "기록 완료";
 
 export type Photo = {
@@ -189,9 +191,73 @@ export const photosByAlbum: Record<string, Photo[]> = {
   ],
 };
 
+/**
+ * 사진은 업로드로 늘어난다 — 참여자·멤버십과 같은 방식의 작은 스토어를 둔다.
+ * 앨범 상세의 사진·기록 탭과 홈의 사진 수가 같은 목록을 본다.
+ */
+let store: Record<string, Photo[]> = photosByAlbum;
+/** 사진이 없는 앨범이 매번 새 배열을 만들지 않도록 하나를 돌려 쓴다. */
+const EMPTY: Photo[] = [];
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
 /** 앨범 한 벌의 사진. 새로 만든 앨범처럼 사진이 아직 없으면 빈 목록. */
 export function photosOf(albumId: string): Photo[] {
-  return photosByAlbum[albumId] ?? [];
+  return store[albumId] ?? EMPTY;
+}
+
+/** 한 앨범의 사진을 구독한다 — 사진을 추가하면 이 목록을 쓰는 화면이 다시 그려진다. */
+export function useAlbumPhotos(albumId: string): Photo[] {
+  const read = () => store[albumId] ?? EMPTY;
+  return useSyncExternalStore(subscribe, read, read);
+}
+
+/** 여러 앨범의 사진 수를 한 번에 보는 자리(홈·초대 목록)에서 쓴다. */
+export function usePhotoStore() {
+  return useSyncExternalStore(
+    subscribe,
+    () => store,
+    () => store,
+  );
+}
+
+/** 촬영 시각이 이른 사진부터 — 앨범 읽기 순서이자 기록을 시작할 순서다. */
+export function byTakenAt(list: Photo[]) {
+  return [...list].sort((a, b) => a.takenAt.localeCompare(b.takenAt));
+}
+
+/**
+ * 업로드한 사진을 앨범에 넣는다.
+ * 넣자마자 촬영 시각순으로 정렬해 두므로, 가장 오래된 사진부터 기록하게 된다.
+ * 새 사진은 아직 기록 전이다.
+ */
+export function addPhotos(albumId: string, added: Photo[]) {
+  if (added.length === 0) return;
+  store = { ...store, [albumId]: byTakenAt([...(store[albumId] ?? []), ...added]) };
+  listeners.forEach((listener) => listener());
+}
+
+/**
+ * 고른 파일 한 장을 사진으로 바꾼다.
+ * 촬영 시각은 파일의 수정 시각으로 갈음하고, 위치는 알 수 없다(EXIF 는 읽지 않는다).
+ */
+export function photoFromFile(file: File): Photo {
+  const takenAt = new Date(file.lastModified || Date.now());
+  const offset = takenAt.getTimezoneOffset() * 60000;
+  return {
+    src: URL.createObjectURL(file),
+    title: file.name.replace(/\.[^.]+$/, ""),
+    takenAt: new Date(takenAt.getTime() - offset).toISOString().slice(0, 19),
+    place: "위치 정보 없음",
+    shortPlace: "위치 없음",
+    status: "기록 중",
+  };
 }
 
 /** 앨범에 도착한 목소리 — 어느 사진에 달렸는지까지 함께 넘긴다. */

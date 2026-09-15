@@ -34,7 +34,8 @@ import {
   formatDuration,
   formatShortDate,
   formatTime,
-  photosOf,
+  byTakenAt,
+  useAlbumPhotos,
   voicesOf,
 } from "@/data/photos";
 import { useSession } from "@/lib/auth";
@@ -133,11 +134,6 @@ function MemberSummary({
   );
 }
 
-/** 촬영 시각 순 — 연대표와 앨범 읽기 흐름이 같은 순서를 쓴다. */
-function byTakenAt(list: Photo[]) {
-  return [...list].sort((a, b) => a.takenAt.localeCompare(b.takenAt));
-}
-
 export function DetailScreen({
   go,
   album,
@@ -152,7 +148,7 @@ export function DetailScreen({
   const session = useSession();
 
   // 화면에 보이는 숫자는 모두 이 앨범의 사진·참여자에서 나온다.
-  const photos = byTakenAt(photosOf(album.id));
+  const photos = byTakenAt(useAlbumPhotos(album.id));
   const voices = voicesOf(album.id);
   const participants = useAlbumParticipants()[album.id] ?? [];
   // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 프로필을 두 번 세지 않는다.

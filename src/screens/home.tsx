@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ArrowRight, ChevronDown, Ellipsis, Image, Plus, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -17,8 +16,8 @@ import { CharacterAvatar } from "@/components/character-avatar";
 import { formatAlbumStart } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
-import { type Membership, useMyAlbums } from "@/data/membership";
-import { photosOf } from "@/data/photos";
+import { useMyAlbums } from "@/data/membership";
+import { usePhotoStore } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import type { Go, Notify, Screen } from "@/types";
 
@@ -49,6 +48,7 @@ export function HomeScreen({
   const session = useSession();
   const participants = useAlbumParticipants();
   const membership = useMyAlbums();
+  const photoStore = usePhotoStore();
   // 멤버십이 없는 앨범은 내가 만든 것으로 본다 — 목록에 있다는 건 이미 참여 중이라는 뜻이다.
   const roleOf = (id: string) => membership[id]?.role ?? "owner";
   const counts = {
@@ -170,8 +170,7 @@ export function HomeScreen({
             <AlbumCard
               key={item.id}
               album={item}
-              membership={membership[item.id]}
-              photoCount={photosOf(item.id).length}
+              photoCount={photoStore[item.id]?.length ?? 0}
               members={[
                 { character: session?.tone ?? 0, color: session?.color ?? 0 },
                 // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 두 번 세지 않는다.
@@ -240,15 +239,12 @@ const MAX_FACES = 3;
 
 function AlbumCard({
   album,
-  membership,
   photoCount,
   members,
   onOpen,
   menu,
 }: {
   album: AlbumCardData;
-  /** 내가 이 앨범에 들어온 경위 — 초대받은 앨범이면 카드에 표시한다. */
-  membership?: Membership;
   photoCount: number;
   members: { character: number; color: number }[];
   onOpen: () => void;
@@ -266,12 +262,6 @@ function AlbumCard({
     >
       <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
         <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
-        {/* 내가 만든 앨범과 링크를 타고 합류한 앨범이 한 목록에 섞인다 — 어느 쪽인지 칩으로 알린다. */}
-        <Badge variant="glass" className="absolute top-2 left-2 max-w-[calc(100%-56px)]">
-          <span className="truncate">
-            {membership?.role === "member" ? "초대받은" : "내가 만든"}
-          </span>
-        </Badge>
         {menu}
       </div>
       <CardContent className="flex flex-col gap-2">
