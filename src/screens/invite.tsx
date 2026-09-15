@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, ImagePlus, Plus, RefreshCw, RotateCcw, Share2 } from "lucide-react";
+import { Check, Copy, ImagePlus, Plus, RefreshCw, RotateCcw, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -125,20 +125,33 @@ function InviteBody({
     <>
       {/* 탭으로 들어오면 상단 바가 없고, 앨범에서 들어오면 돌아갈 곳이 있어 상단 바를 둔다. */}
       {back && <Topbar back={back} title="초대" />}
-      {/* 막 만든 앨범이면 상단 바를 두지 않는다 — 만들기 화면으로는 되돌아가지 않고,
-          넘어갈 길은 아래 ‘앨범 보러 가기’ 하나로 모은다. */}
+      {/* 막 만든 앨범이면 뒤로가기를 두지 않는다 — 만들기 화면으로는 되돌아가지 않는다.
+          나가는 길은 오른쪽 위 닫기(앨범 홈)와 아래 ‘앨범에 사진 추가’ 둘이다. */}
       {justCreated ? (
-        <section className="mt-8 flex flex-col gap-3">
-          <span className="flex size-12 items-center justify-center rounded-full bg-primary text-canvas">
-            <Check className="size-6" strokeWidth={2.5} />
-          </span>
-          <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
-          <p className="text-base leading-relaxed text-body">
-            이제 함께 기록할 가족을 초대해보세요.
-            <br />
-            링크를 받은 가족은 가입 없이 참여할 수 있어요.
-          </p>
-        </section>
+        <>
+          <header className="relative z-10 flex h-14 items-center justify-end">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="-mr-2"
+              onClick={() => go("home")}
+              aria-label="닫기"
+            >
+              <X className="size-5" />
+            </Button>
+          </header>
+          <section className="mt-4 flex flex-col gap-3">
+            <span className="flex size-12 items-center justify-center rounded-full bg-primary text-canvas">
+              <Check className="size-6" strokeWidth={2.5} />
+            </span>
+            <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
+            <p className="text-base leading-relaxed text-body">
+              이제 함께 기록할 가족을 초대해보세요.
+              <br />
+              링크를 받은 가족은 가입 없이 참여할 수 있어요.
+            </p>
+          </section>
+        </>
       ) : (
         <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
           <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
