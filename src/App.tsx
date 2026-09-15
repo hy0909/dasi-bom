@@ -164,7 +164,9 @@ export default function App() {
   // 홈과 초대 화면이 보는 목록 — 앱이 아는 앨범이 아니라 내가 참여 중인 앨범이다.
   const myAlbums = albums.filter((a) => membership[a.id]);
 
-  const roomy = TAB_SCREENS.includes(screen) || screen === "detail";
+  // 초대 화면은 탭으로 들어왔을 때만 하단 탭이 뜬다 — 앨범에서 들어오면 화면을 꽉 채운다.
+  const inviteCoversPage = screen === "invite" && (justCreated || history.length > 0);
+  const roomy = (TAB_SCREENS.includes(screen) || screen === "detail") && !inviteCoversPage;
 
   return (
     <AppShell>

@@ -15,9 +15,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { MemberRow } from "@/components/member-row";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { formatAlbumPeriod } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { useAlbumParticipants } from "@/data/family";
+import { type Participant, useAlbumParticipants } from "@/data/family";
+import { useMyAlbums } from "@/data/membership";
 import {
   type Photo,
   formatDate,
@@ -35,6 +45,93 @@ import type { Go, Notify } from "@/types";
 type Section = "앨범" | "기록";
 /** 기록 안에서 갈라지는 분류 */
 type RecordTab = "사진" | "목소리" | "글" | "연대표";
+
+/** 이름을 앞에서부터 이만큼만 쓰고 나머지는 '외 n명'으로 접는다. */
+const NAMES_SHOWN = 3;
+/** 겹쳐 보여줄 프로필 수 */
+const FACES_SHOWN = 3;
+
+/**
+ * 사진 위 참여자 줄 — 프로필 몇 개와 이름 요약을 한 줄로 두고,
+ * 누르면 전체 명단을 모달로 편다. 사람이 몇이든 hero 높이는 그대로다.
+ */
+function MemberSummary({
+  session,
+  others,
+  iAmOwner,
+}: {
+  session: ReturnType<typeof useSession>;
+  others: Participant[];
+  iAmOwner: boolean;
+}) {
+  const me = {
+    character: session?.tone ?? 0,
+    color: session?.color ?? 0,
+    name: session?.name ? `나 (${session.name})` : "나",
+  };
+  const total = others.length + 1;
+  const names = ["나", ...others.map((p) => p.name)];
+  const shown = names.slice(0, NAMES_SHOWN);
+  const hidden = names.length - shown.length;
+  const faces = [
+    { character: me.character, color: me.color, key: "me" },
+    ...others.map((p) => ({ character: p.character, color: p.color, key: p.name })),
+  ].slice(0, FACES_SHOWN);
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="-mx-1 mt-1 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
+        >
+          <span className="flex shrink-0 -space-x-2">
+            {faces.map((f) => (
+              <CharacterAvatar
+                key={f.key}
+                index={f.character}
+                color={f.color}
+                className="size-8 ring-2 ring-ink/50"
+              />
+            ))}
+          </span>
+          <span className="min-w-0 truncate text-[13px] font-semibold text-canvas-soft/90">
+            {shown.join(" · ")}
+            {hidden > 0 && <span className="text-canvas-soft/60"> 외 {hidden}명</span>}
+          </span>
+          <span className="sr-only">함께하는 가족 {total}명 — 눌러서 전체 보기</span>
+        </button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-[360px] gap-3 p-5">
+        <DialogHeader>
+          <DialogTitle>함께하는 가족 {total}명</DialogTitle>
+          <DialogDescription>
+            링크를 받은 가족은 누구나 이 앨범에 기록을 남길 수 있어요.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="-mx-1 flex max-h-[320px] flex-col overflow-y-auto overscroll-contain">
+          <MemberRow
+            character={me.character}
+            color={me.color}
+            name={me.name}
+            note={iAmOwner ? "이 앨범을 만들었어요" : "초대 링크로 참여했어요"}
+          />
+          {others.map((p) => (
+            <MemberRow
+              key={p.name}
+              character={p.character}
+              color={p.color}
+              name={p.name}
+              note={p.note}
+              trailing={<Badge variant={p.status === "참여 중" ? "primarySoft" : "default"}>{p.status}</Badge>}
+            />
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 /** 촬영 시각 순 — 연대표와 앨범 읽기 흐름이 같은 순서를 쓴다. */
 function byTakenAt(list: Photo[]) {
@@ -60,6 +157,7 @@ export function DetailScreen({
   const participants = useAlbumParticipants()[album.id] ?? [];
   // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 프로필을 두 번 세지 않는다.
   const others = participants.filter((p) => p.name !== session?.name);
+  const iAmOwner = useMyAlbums()[album.id]?.role !== "member";
   const pending = photos.filter((p) => p.status === "기록 중").length;
 
   return (
@@ -83,22 +181,11 @@ export function DetailScreen({
                 </>
               )}
             </h1>
-            <span className="mt-1 flex -space-x-2">
-              <CharacterAvatar
-                index={session?.tone}
-                color={session?.color}
-                className="size-8 ring-2 ring-ink/50"
-              />
-              {others.map((p) => (
-                <CharacterAvatar
-                  key={p.name}
-                  index={p.character}
-                  color={p.color}
-                  className="size-8 ring-2 ring-ink/50"
-                />
-              ))}
-              <span className="sr-only">나를 포함해 {others.length + 1}명이 함께해요</span>
-            </span>
+            <MemberSummary
+              session={session}
+              others={others}
+              iAmOwner={iAmOwner}
+            />
           </div>
         </div>
 

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { CharacterAvatar } from "@/components/character-avatar";
+import { MemberRow } from "@/components/member-row";
 import {
   INVITE_DAYS,
   formatAlbumPeriod,
@@ -65,7 +65,7 @@ function NoAlbumInvite({ go, back }: Pick<InviteProps, "go" | "back">) {
         <Plus className="size-5" />
         새 앨범 만들기
       </Button>
-      <BottomNav go={go} active="invite" />
+      {!back && <BottomNav go={go} active="invite" />}
     </>
   );
 }
@@ -288,33 +288,35 @@ function InviteBody({
           {participants.length === 0 && (
             <p className="py-6 text-sm text-body-mid">아직 초대한 가족이 없어요.</p>
           )}
-          {/* 행 자체를 버튼으로 두지 않는다 — '다시 초대'가 행 안의 버튼이라 중첩이 된다. */}
           {participants.map(({ character, color, name, note, status }) => (
-            <div key={name} className="flex w-full items-center gap-3 px-1 py-3">
-              <CharacterAvatar index={character} color={color} size="lg" />
-              <span className="min-w-0 flex-1">
-                <b className="block truncate text-[15px] font-semibold">{name}</b>
-                <small className="block truncate text-[13px] text-body-mid">{note}</small>
-              </span>
-              {status === "다시 초대" ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => notify(`${name}에게 초대를 다시 보냈어요`)}
-                >
-                  <RotateCcw className="size-3.5" />
-                  다시 초대
-                </Button>
-              ) : (
-                <Badge variant={statusVariant[status]}>{status}</Badge>
-              )}
-            </div>
+            <MemberRow
+              key={name}
+              character={character}
+              color={color}
+              name={name}
+              note={note}
+              trailing={
+                status === "다시 초대" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => notify(`${name}에게 초대를 다시 보냈어요`)}
+                  >
+                    <RotateCcw className="size-3.5" />
+                    다시 초대
+                  </Button>
+                ) : (
+                  <Badge variant={statusVariant[status]}>{status}</Badge>
+                )
+              }
+            />
           ))}
         </div>
       </section>
 
-      {/* 만들기 흐름 중에는 한 갈래로만 진행한다 — 하단 탭은 두지 않는다. */}
-      {!justCreated && <BottomNav go={go} active="invite" />}
+      {/* 하단 탭은 탭으로 들어왔을 때만 둔다 — 앨범에서 들어오거나 만들기 흐름 중이면
+          되돌아갈 곳이 상단 바 하나뿐이어야 한다. */}
+      {!justCreated && !back && <BottomNav go={go} active="invite" />}
     </>
   );
 }
