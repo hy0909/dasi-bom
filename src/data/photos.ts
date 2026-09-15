@@ -254,7 +254,7 @@ export function photoFromFile(file: File): Photo {
     src: URL.createObjectURL(file),
     title: file.name.replace(/\.[^.]+$/, ""),
     takenAt: new Date(takenAt.getTime() - offset).toISOString().slice(0, 19),
-    place: "위치 정보 없음",
+    place: "위치 없음",
     shortPlace: "위치 없음",
     status: "기록 중",
   };
