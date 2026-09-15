@@ -151,17 +151,14 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
 function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () => void }) {
   const list = sorted ? [...photos].reverse() : photos;
   return (
-    <section className="flex flex-col gap-4">
-      <SectionHeading
-        title={<span className="text-lg">사진 3장</span>}
-        description="사진을 눌러 기록을 이어가세요"
-        action={
-          <Button variant="quiet" size="sm" className="-mr-2" onClick={onSort}>
-            {sorted ? "진행 상태순" : "촬영일순"}
-            <ChevronDown className="size-4" />
-          </Button>
-        }
-      />
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-body">전체 {photos.length}장</p>
+        <Button variant="quiet" size="sm" className="-mr-2" onClick={onSort}>
+          {sorted ? "진행 상태순" : "촬영일순"}
+          <ChevronDown className="size-4" />
+        </Button>
+      </div>
       <div className="grid grid-cols-2 gap-3">
         {list.map((photo) => {
           const index = photos.indexOf(photo);
