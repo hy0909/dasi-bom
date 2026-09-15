@@ -1,24 +1,31 @@
 import { useEffect, useState } from "react";
-import { Copy, MessageSquare, Share2, Smartphone } from "lucide-react";
+import { Copy, MessageSquare, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { ListRow } from "@/components/list-row";
 import { photos } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import type { Go, Notify } from "@/types";
 
-/** [캐릭터 인덱스, 이름, 답변 수, 상태] */
-const participants: [number, string, string, "완료" | "참여 중" | "초대됨"][] = [
-  [2, "엄마", "답변 4개", "완료"],
-  [1, "아버지", "답변 2개", "참여 중"],
-  [4, "동생 민준", "아직 답변 없음", "초대됨"],
+type ParticipantStatus = "참여 중" | "초대됨" | "다시 초대";
+
+type Participant = {
+  character: number;
+  name: string;
+  note: string;
+  status: ParticipantStatus;
+};
+
+const participants: Participant[] = [
+  { character: 2, name: "엄마", note: "답변 4개", status: "참여 중" },
+  { character: 1, name: "아버지", note: "아직 답변 없음", status: "초대됨" },
+  { character: 4, name: "동생 민준", note: "초대가 전달되지 않았어요", status: "다시 초대" },
 ];
 
-const statusVariant = { 완료: "ink", "참여 중": "primary", 초대됨: "default" } as const;
+const statusVariant = { "참여 중": "primary", 초대됨: "default" } as const;
 
 export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
   const [link, setLink] = useState("초대 링크 준비 중…");
@@ -83,7 +90,7 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
         </CardContent>
       </Card>
 
-      <div className="mt-3 grid grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-3">
         <ShareButton icon={<Share2 className="size-5" />} label="공유하기" onClick={share} />
         <ShareButton
           icon={<MessageSquare className="size-5" />}
@@ -92,7 +99,6 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
             window.location.href = `sms:?&body=${encodeURIComponent(`2023년 유럽여행 앨범에 초대해요 ${link}`)}`;
           }}
         />
-        <ShareButton icon={<Smartphone className="size-5" />} label="초대 화면 체험" onClick={() => go("guest")} />
       </div>
 
       <section className="mt-9 flex flex-col gap-2">
@@ -101,15 +107,27 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
           description="답변이 도착하면 알려드릴게요"
         />
         <div className="flex flex-col">
-          {participants.map(([character, name, count, status]) => (
-            <ListRow
-              key={name}
-              onClick={() => notify(`${name} · ${count}`)}
-              leading={<CharacterAvatar index={character} size="lg" />}
-              title={name}
-              description={count}
-              trailing={<Badge variant={statusVariant[status]}>{status}</Badge>}
-            />
+          {/* 행 자체를 버튼으로 두지 않는다 — '다시 초대'가 행 안의 버튼이라 중첩이 된다. */}
+          {participants.map(({ character, name, note, status }) => (
+            <div key={name} className="flex w-full items-center gap-3 px-1 py-3">
+              <CharacterAvatar index={character} size="lg" />
+              <span className="min-w-0 flex-1">
+                <b className="block truncate text-[15px] font-semibold">{name}</b>
+                <small className="block truncate text-[13px] text-body-mid">{note}</small>
+              </span>
+              {status === "다시 초대" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => notify(`${name}에게 초대를 다시 보냈어요`)}
+                >
+                  <RotateCcw className="size-3.5" />
+                  다시 초대
+                </Button>
+              ) : (
+                <Badge variant={statusVariant[status]}>{status}</Badge>
+              )}
+            </div>
           ))}
         </div>
       </section>
