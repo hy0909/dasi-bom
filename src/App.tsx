@@ -32,7 +32,7 @@ const TAB_SCREENS: Screen[] = ["home", "invite", "notices", "profile"];
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   /** 뒤로가기용 방문 기록. 화면마다 돌아갈 곳을 하드코딩하면 진입 경로가 둘 이상일 때 어긋난다. */
-  const [, setHistory] = useState<Screen[]>([]);
+  const [history, setHistory] = useState<Screen[]>([]);
   const [album, setAlbum] = useState(defaultAlbum);
   const [ready, setReady] = useState(false);
 
@@ -103,7 +103,14 @@ export default function App() {
         {screen === "interview" && <InterviewScreen go={go} notify={notify} />}
         {screen === "voice" && <VoiceScreen go={go} notify={notify} />}
         {screen === "story" && <StoryScreen go={go} notify={notify} />}
-        {screen === "invite" && <InviteScreen go={go} notify={notify} />}
+        {screen === "invite" && (
+          // 탭으로 들어오면 방문 기록이 비어 있다 — 그때는 뒤로가기를 두지 않는다.
+          <InviteScreen
+            go={go}
+            back={history.length > 0 ? goBack : undefined}
+            notify={notify}
+          />
+        )}
         {screen === "upload" && <UploadScreen go={go} notify={notify} />}
         {screen === "notices" && <NoticesScreen go={go} />}
         {screen === "profile" && <ProfileScreen go={go} notify={notify} />}

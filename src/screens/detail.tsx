@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Check, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Pause, Play, Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
-import { Topbar } from "@/components/topbar";
 import { SectionHeading } from "@/components/section-heading";
+import { CharacterAvatar } from "@/components/character-avatar";
 import { type Album, formatAlbumPeriod } from "@/data/album";
+import { participants } from "@/data/family";
 import { formatShortDate, photos } from "@/data/photos";
+import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
@@ -18,45 +19,68 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
   const [tab, setTab] = useState<Tab>("사진");
   const [sorted, setSorted] = useState(false);
   const [first, ...rest] = album.title.split(" ");
+  const session = useSession();
 
   return (
     <>
-      <Topbar
-        back={() => go("home")}
-        action={
-          <Button variant="ghost" size="sm" className="-mr-2" onClick={() => go("invite")}>
-            <UserPlus className="size-4" />
-            가족 초대
-          </Button>
-        }
-      />
+      {/* hero — 좌우 여백과 상단 여백을 무시하고 꽉 채우는 1:1 사진 */}
+      <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))]">
+        <div className="relative aspect-square w-full overflow-hidden bg-ink">
+          <img
+            src={photos[0].src}
+            alt="해질 녘 에펠탑을 함께 바라보는 가족"
+            className="size-full object-cover"
+          />
+          {/* 아래쪽은 제목이, 위쪽은 상단 버튼이 읽히도록 각각 어둡게 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/55 to-transparent" />
 
-      {/* hero — 사진 위 ink 그라데이션, display-lg 헤드라인 */}
-      <section className="relative mt-1 aspect-[4/4.4] overflow-hidden rounded-xl bg-ink">
-        <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
-          <p className="text-sm font-medium text-canvas-soft/80">{formatAlbumPeriod(album)}</p>
-          <h1 className="font-heading text-display-xl font-bold">
-            {first}
-            {rest.length > 0 && (
-              <>
-                <br />
-                {rest.join(" ")}
-              </>
-            )}
-          </h1>
-          <AvatarGroup className="mt-1 *:data-[slot=avatar]:ring-ink/60">
-            {["하", "엄", "아"].map((n, i) => (
-              <Avatar key={n} className="size-8">
-                <AvatarFallback className={cn(i === 0 ? "bg-primary text-canvas" : "bg-canvas text-ink")}>
-                  {n}
-                </AvatarFallback>
-              </Avatar>
-            ))}
-            <AvatarGroupCount className="bg-ink-soft text-canvas ring-ink/60">+1</AvatarGroupCount>
-          </AvatarGroup>
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
+            <p className="text-sm font-medium text-canvas-soft/80">{formatAlbumPeriod(album)}</p>
+            <h1 className="font-heading text-display-xl font-bold">
+              {first}
+              {rest.length > 0 && (
+                <>
+                  <br />
+                  {rest.join(" ")}
+                </>
+              )}
+            </h1>
+            <span className="mt-1 flex -space-x-2">
+              <CharacterAvatar index={session?.tone} className="size-8 ring-2 ring-ink/50" />
+              {participants.map((p) => (
+                <CharacterAvatar
+                  key={p.name}
+                  index={p.character}
+                  className="size-8 ring-2 ring-ink/50"
+                />
+              ))}
+              <span className="sr-only">나를 포함해 {participants.length + 1}명이 함께해요</span>
+            </span>
+          </div>
         </div>
+
+        {/* 사진 위에 얹는 상단 바 — 흰색 컨트롤 */}
+        <header className="absolute inset-x-0 top-0 flex h-14 items-center justify-between px-5 pt-[env(safe-area-inset-top)]">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="-ml-2 text-canvas hover:bg-canvas/15 hover:text-canvas"
+            onClick={() => go("home")}
+            aria-label="뒤로가기"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-canvas bg-transparent text-canvas hover:bg-canvas/15 hover:text-canvas"
+            onClick={() => go("invite")}
+          >
+            <UserPlus className="size-4" />
+            초대
+          </Button>
+        </header>
       </section>
 
       {/* summary — card-content */}

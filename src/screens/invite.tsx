@@ -3,17 +3,28 @@ import { Copy, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { participants } from "@/data/family";
 import { photos } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
+import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
 const statusVariant = { "참여 중": "primary", 초대됨: "default" } as const;
 
-export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
+export function InviteScreen({
+  go,
+  back,
+  notify,
+}: {
+  go: Go;
+  /** 앨범 상세처럼 상위 화면에서 들어온 경우에만 전달된다. */
+  back?: () => void;
+  notify: Notify;
+}) {
   const [link, setLink] = useState("초대 링크 준비 중…");
   useEffect(() => setLink(`${window.location.origin}${window.location.pathname}?invite=EU23`), []);
 
@@ -37,8 +48,10 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
 
   return (
     <>
-      {/* 탭 최상위 화면이라 상단 바가 없다 — 돌아갈 상위 화면도, 필요한 액션도 없다. */}
-      <section className="mt-8 flex flex-col gap-3">
+      {/* 탭으로 들어오면 상단 바가 없고, 앨범에서 들어오면 돌아갈 곳이 있어 상단 바를 둔다. */}
+      {back && <Topbar back={back} title="초대" />}
+
+      <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
         <div className="mb-2 flex -space-x-4">
           {photos.map((p, i) => (
             <img
