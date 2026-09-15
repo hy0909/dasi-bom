@@ -13,7 +13,7 @@ import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
-type Tab = "사진" | "목소리" | "이야기" | "연대표";
+type Tab = "사진" | "목소리" | "기록" | "연대표";
 
 export function DetailScreen({ go, album, notify }: { go: Go; album: Album; notify: Notify }) {
   const [tab, setTab] = useState<Tab>("사진");
@@ -90,7 +90,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
             <Badge variant={album.status === "완료" ? "ink" : "primary"}>{album.status}</Badge>
             <p className="min-w-0 flex-1 text-sm text-body">
               {album.status === "완료"
-                ? "가족의 이야기가 모두 담겼어요."
+                ? "가족의 기록이 모두 담겼어요."
                 : "사진 1장의 답변을 기다리고 있어요."}
             </p>
             <Button variant="outline" size="sm" onClick={() => go("albumEdit")}>
@@ -99,7 +99,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
           </div>
           {album.status === "기록 중" && (
             <Button variant="secondary" className="w-full" onClick={() => go("interview")}>
-              이어서 이야기 남기기
+              이어서 기록 남기기
             </Button>
           )}
         </CardContent>
@@ -107,7 +107,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="mt-6 gap-5 pb-20">
         <TabsList variant="line" className="w-full border-b border-border">
-          {(["사진", "목소리", "이야기", "연대표"] as Tab[]).map((item) => (
+          {(["사진", "목소리", "기록", "연대표"] as Tab[]).map((item) => (
             <TabsTrigger key={item} value={item} className="text-[15px]">
               {item}
             </TabsTrigger>
@@ -126,7 +126,7 @@ export function DetailScreen({ go, album, notify }: { go: Go; album: Album; noti
         <TabsContent value="목소리">
           <VoiceTab notify={notify} />
         </TabsContent>
-        <TabsContent value="이야기">
+        <TabsContent value="기록">
           <StoryTab go={go} />
         </TabsContent>
         <TabsContent value="연대표">
@@ -151,7 +151,7 @@ function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () 
     <section className="flex flex-col gap-4">
       <SectionHeading
         title={<span className="text-lg">사진 3장</span>}
-        description="사진을 눌러 이야기를 이어가세요"
+        description="사진을 눌러 기록을 이어가세요"
         action={
           <Button variant="quiet" size="sm" className="-mr-2" onClick={onSort}>
             {sorted ? "진행 상태순" : "촬영일순"}
@@ -177,7 +177,7 @@ function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () 
                 />
                 <span className="absolute top-2 right-2">
                   {index === 0 ? (
-                    <Badge variant="ink" aria-label="이야기 완성" className="size-6 px-0">
+                    <Badge variant="ink" aria-label="기록 완성" className="size-6 px-0">
                       <Check className="size-3.5!" strokeWidth={3} />
                     </Badge>
                   ) : index === 1 ? (
@@ -210,7 +210,7 @@ function VoiceTab({ notify }: { notify: Notify }) {
     <section className="flex flex-col gap-4">
       <SectionHeading
         title={<span className="text-lg">가족의 목소리 4개</span>}
-        description="그날의 온도가 담긴 이야기"
+        description="그날의 온도가 담긴 목소리"
       />
       <div className="flex flex-col divide-y divide-border">
         {["엄마", "아버지", "나"].map((name, i) => (
@@ -240,7 +240,7 @@ function StoryTab({ go }: { go: Go }) {
   return (
     <section className="flex flex-col gap-4">
       <SectionHeading
-        title={<span className="text-lg">완성된 이야기 2편</span>}
+        title={<span className="text-lg">완성된 기록 2편</span>}
         description="AI가 가족의 답변을 정리했어요"
       />
       <Card
@@ -271,7 +271,7 @@ function TimelineTab({ go }: { go: Go }) {
     <section className="flex flex-col gap-4">
       <SectionHeading
         title={<span className="text-lg">우리 여행 연대표</span>}
-        description="이야기가 시간순으로 정리됐어요"
+        description="기록이 시간순으로 정리됐어요"
       />
       <ol className="relative ml-[58px] flex flex-col border-l border-border">
         {photos.map((photo, i) => (

@@ -46,14 +46,14 @@ export function GuestWelcome({ go }: { go: Go }) {
           유럽여행
         </h1>
         <p className="text-base leading-relaxed text-body">
-          “우리 여행 사진을 보며 기억나는 이야기를 들려주세요. 회원가입 없이 바로 참여할 수 있어요.”
+          “우리 여행 사진을 보며 기억나는 순간을 들려주세요. 회원가입 없이 바로 참여할 수 있어요.”
         </p>
       </section>
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex flex-col gap-3">
           <b className="text-[15px] font-semibold">이렇게 참여해요</b>
-          {["사진을 천천히 살펴봐요", "AI 질문에 목소리나 글로 답해요", "가족의 한 편의 이야기로 완성돼요"].map(
+          {["사진을 천천히 살펴봐요", "AI 질문에 목소리나 글로 답해요", "가족의 한 편의 기록으로 완성돼요"].map(
             (step, i) => (
               <p key={step} className="flex items-center gap-3 text-sm text-body">
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-canvas">
@@ -156,7 +156,7 @@ export function GuestAnswer({ go, notify }: { go: Go; notify: Notify }) {
 
   return (
     <>
-      <Topbar back={() => go("guestInfo")} title="이야기 남기기" />
+      <Topbar back={() => go("guestInfo")} title="기록 남기기" />
       <StepProgress step={saved + 1} total={3} />
 
       <MediaFrame className="mt-5" src={photo.src} alt={photo.title} caption={`${formatDate(photo.takenAt)} · ${formatTime(photo.takenAt)} · ${photo.shortPlace}`} />
@@ -208,14 +208,14 @@ export function GuestDone({ go }: { go: Go }) {
       <span className="mb-2 flex size-16 items-center justify-center rounded-full bg-primary text-canvas">
         <Check className="size-8" strokeWidth={3} />
       </span>
-      <Eyebrow>{name}님의 이야기</Eyebrow>
+      <Eyebrow>{name}님의 기록</Eyebrow>
       <h1 className="font-heading text-display-lg font-bold">
         소중한 기억을
         <br />
         남겨주셔서 고마워요
       </h1>
       <p className="max-w-[300px] text-base leading-relaxed text-body">
-        사진 3장에 남긴 답변이 하연님에게 전달됐어요. AI가 가족의 이야기로 따뜻하게 정리할게요.
+        사진 3장에 남긴 답변이 하연님에게 전달됐어요. AI가 가족의 기록으로 따뜻하게 정리할게요.
       </p>
 
       <Card size="sm" className="mt-2 w-full">

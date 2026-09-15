@@ -25,7 +25,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
     <>
       <Topbar
         back={() => go("detail")}
-        title="사진 이야기"
+        title="사진 기록"
         action={
           <Button variant="ghost" size="sm" className="-mr-2" onClick={() => setEditing(!editing)}>
             {editing ? "취소" : "수정"}
@@ -150,7 +150,7 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
         </Card>
 
         <p className="flex items-center gap-1.5 text-xs text-body-mid">
-          <Sparkles className="size-3.5" />이 이야기는 가족의 답변을 바탕으로 AI가 정리했어요.
+          <Sparkles className="size-3.5" />이 기록은 가족의 답변을 바탕으로 AI가 정리했어요.
         </p>
       </article>
 
@@ -161,10 +161,10 @@ export function StoryScreen({ go, notify }: { go: Go; notify: Notify }) {
             className="w-full shadow-float"
             onClick={() => {
               setEditing(false);
-              notify(`${style} 스타일로 이야기를 저장했어요`);
+              notify(`${style} 스타일로 기록을 저장했어요`);
             }}
           >
-            이야기 저장하기
+            기록 저장하기
           </Button>
         </div>
       )}

@@ -37,7 +37,7 @@ export function InviteScreen({
       try {
         await navigator.share({
           title: "2023년 유럽여행에 초대해요",
-          text: "사진을 보고 떠오르는 이야기를 들려주세요.",
+          text: "사진을 보고 떠오르는 기억을 들려주세요.",
           url: link,
         });
       } catch {
@@ -65,7 +65,7 @@ export function InviteScreen({
         </div>
         <h1 className="font-heading text-display-lg font-bold">
           가족의 목소리로
-          <br />빈 이야기를 채워주세요
+          <br />빈 기록을 채워주세요
         </h1>
         <p className="text-base leading-relaxed text-body">
           링크를 통해 회원가입없이

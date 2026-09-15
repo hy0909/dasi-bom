@@ -52,7 +52,7 @@ export function CreateScreen({
             기록해볼까요?
           </>
         }
-        description="사진과 이야기는 나중에도 추가할 수 있어요."
+        description="사진과 기록은 나중에도 추가할 수 있어요."
       />
 
       <form className="mt-8 flex flex-col gap-6 pb-20" onSubmit={submit}>
@@ -91,7 +91,7 @@ export function CreateScreen({
             className="min-h-24"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 이야기를 모았어요."
+            placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
           />
         </Field>
 

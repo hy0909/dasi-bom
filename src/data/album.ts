@@ -14,7 +14,7 @@ export const defaultAlbum: Album = {
   title: "2023년 유럽여행",
   startDate: "2023-07-10",
   endDate: "2023-07-17",
-  description: "가족들과 처음 떠난 유럽여행의 사진과 이야기를 모았어요.",
+  description: "가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요.",
   status: "기록 중",
 };
 

@@ -16,7 +16,7 @@ export const photos: Photo[] = [
     takenAt: "2023-07-10T20:12:00",
     place: "Paris, France",
     shortPlace: "파리",
-    status: "이야기 완성",
+    status: "기록 완성",
   },
   {
     src: "https://images.unsplash.com/photo-1747409729637-646f000b9bf9?auto=format&fit=crop&w=1200&q=85",

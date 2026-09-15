@@ -76,7 +76,7 @@ export function AlbumEditScreen({
             className="min-h-24"
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-            placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 이야기를 모았어요."
+            placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
           />
         </Field>
 

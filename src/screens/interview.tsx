@@ -31,7 +31,7 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
       setTextMode(false);
       notify("답변을 저장하고 다음 질문을 만들었어요");
     } else {
-      notify("사진 이야기가 완성됐어요");
+      notify("사진 기록이 완성됐어요");
       go("story");
     }
   }
@@ -40,7 +40,7 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
     <>
       <Topbar
         back={() => go("detail")}
-        title="사진 이야기 남기기"
+        title="사진 기록 남기기"
         action={
           <Button variant="ghost" size="sm" className="-mr-2" onClick={() => go("detail")}>
             나가기
@@ -88,12 +88,12 @@ export function InterviewScreen({ go, notify }: { go: Go; notify: Notify }) {
             autoFocus
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            placeholder="사진을 보며 떠오르는 이야기를 들려주세요."
+            placeholder="사진을 보며 떠오르는 기억을 들려주세요."
             maxLength={500}
           />
           <small className="text-right text-xs tabular-nums text-body-mid">{answer.length} / 500</small>
           <Button size="lg" className="w-full" disabled={!answer.trim()} onClick={submit}>
-            {question === 2 ? "이야기 완성하기" : "답변 남기기"}
+            {question === 2 ? "기록 완성하기" : "답변 남기기"}
           </Button>
         </div>
       )}
