@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
+import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
 import { type Album, defaultAlbum } from "@/data/album";
 import type { Go } from "@/types";
@@ -75,25 +76,12 @@ export function CreateScreen({
           />
         </Field>
 
-        {/* 날짜 입력은 기기 로케일에 따라 내용 폭이 달라진다 — 칸을 좁히지 말고 늘어나게 둔다 */}
-        <div className="grid grid-cols-2 gap-2">
-          <Field className="min-w-0" label="시작일" htmlFor="start">
-            <Input
-              id="start"
-              type="date"
-              className="w-full min-w-0 px-3 text-sm"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
+        <div className="flex flex-col gap-4">
+          <Field label="시작일" htmlFor="start">
+            <DateField id="start" value={startDate} onChange={setStartDate} />
           </Field>
-          <Field className="min-w-0" label="종료일" htmlFor="end">
-            <Input
-              id="end"
-              type="date"
-              className="w-full min-w-0 px-3 text-sm"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+          <Field label="종료일" htmlFor="end">
+            <DateField id="end" value={endDate} onChange={setEndDate} />
           </Field>
         </div>
 

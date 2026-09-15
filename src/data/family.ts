@@ -22,7 +22,7 @@ export const participantsByAlbum: Record<string, Participant[]> = {
       character: 2,
       color: 6,
       name: "동생 민준",
-      note: "초대가 전달되지 않았어요",
+      note: "초대 실패",
       status: "다시 초대",
     },
   ],
@@ -38,7 +38,7 @@ export const participantsByAlbum: Record<string, Participant[]> = {
   SEA: [
     { character: 3, color: 4, name: "딸 서아", note: "답변 2개", status: "참여 중" },
     { character: 0, color: 0, name: "엄마", note: "아직 답변 없음", status: "초대됨" },
-    { character: 1, color: 7, name: "아버지", note: "초대가 전달되지 않았어요", status: "다시 초대" },
+    { character: 1, color: 7, name: "아버지", note: "초대 실패", status: "다시 초대" },
     { character: 2, color: 6, name: "동생 민준", note: "아직 답변 없음", status: "초대됨" },
   ],
 };

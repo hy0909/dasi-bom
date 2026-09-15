@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Topbar } from "@/components/topbar";
 import { Field } from "@/components/field";
+import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
 import { cn } from "@/lib/utils";
 import type { Album, AlbumStatus } from "@/data/album";
@@ -51,24 +52,19 @@ export function AlbumEditScreen({
           />
         </Field>
 
-        {/* 날짜 입력은 기기 로케일에 따라 내용 폭이 달라진다 — 칸을 좁히지 말고 늘어나게 둔다 */}
-        <div className="grid grid-cols-2 gap-2">
-          <Field className="min-w-0" label="시작일" htmlFor="album-start">
-            <Input
+        <div className="flex flex-col gap-4">
+          <Field label="시작일" htmlFor="album-start">
+            <DateField
               id="album-start"
-              type="date"
-              className="w-full min-w-0 px-3 text-sm"
               value={draft.startDate}
-              onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}
+              onChange={(startDate) => setDraft({ ...draft, startDate })}
             />
           </Field>
-          <Field className="min-w-0" label="종료일" htmlFor="album-end">
-            <Input
+          <Field label="종료일" htmlFor="album-end">
+            <DateField
               id="album-end"
-              type="date"
-              className="w-full min-w-0 px-3 text-sm"
               value={draft.endDate}
-              onChange={(e) => setDraft({ ...draft, endDate: e.target.value })}
+              onChange={(endDate) => setDraft({ ...draft, endDate })}
             />
           </Field>
         </div>
