@@ -43,8 +43,6 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
             <Switch checked={alert} onCheckedChange={setAlert} aria-label="가족 기록 알림" />
           </div>
           <Separator />
-          <ListRow title="공유 링크 관리" chevron onClick={() => notify("공유 링크 1개가 활성화되어 있어요")} />
-          <Separator />
           <ListRow title="이용약관 및 개인정보" chevron onClick={() => notify("이용약관을 확인했어요")} />
           <Separator />
           <ListRow
