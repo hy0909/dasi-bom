@@ -32,3 +32,8 @@ export function formatAlbumPeriod({ startDate, endDate }: Pick<Album, "startDate
       : `${end.getFullYear()}년 ${end.getMonth() + 1}월 ${end.getDate()}일`;
   return `${head} - ${tail}`;
 }
+
+/** 2023년 7월 10일 — 목록 카드처럼 폭이 좁은 자리에서는 시작일만 보여준다. */
+export function formatAlbumStart({ startDate }: Pick<Album, "startDate">) {
+  return formatAlbumPeriod({ startDate, endDate: "" });
+}

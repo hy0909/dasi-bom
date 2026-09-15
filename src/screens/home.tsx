@@ -14,7 +14,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { type Album, formatAlbumPeriod } from "@/data/album";
+import { type Album, formatAlbumStart } from "@/data/album";
+import { sampleAlbums } from "@/data/albums";
 import { participants } from "@/data/family";
 import { photos } from "@/data/photos";
 import { useSession } from "@/lib/auth";
@@ -22,6 +23,7 @@ import type { Go, Notify } from "@/types";
 
 export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify: Notify }) {
   const [recent, setRecent] = useState(true);
+  const session = useSession();
   return (
     <>
       <Topbar go={go} />
@@ -75,7 +77,52 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
         }
       />
 
-      <RecordCard album={album} go={go} notify={notify} />
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <AlbumCard
+          album={album}
+          cover={photos[0].src}
+          coverAlt="해질 녘 에펠탑을 함께 바라보는 가족"
+          photoCount={photos.length}
+          members={[session?.tone ?? 0, ...participants.map((p) => p.character)]}
+          onOpen={() => go("detail")}
+          menu={
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon-xs"
+                  className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
+                  aria-label="앨범 더보기"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Ellipsis className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuItem onSelect={() => go("albumEdit")}>정보 수정</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => go("invite")}>공유</DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => notify("삭제는 확인 후 진행돼요")}
+                >
+                  삭제
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+        />
+        {sampleAlbums.map((item) => (
+          <AlbumCard
+            key={item.id}
+            album={item}
+            cover={item.cover}
+            coverAlt={item.coverAlt}
+            photoCount={item.photoCount}
+            members={item.members}
+            onOpen={() => go("detail")}
+          />
+        ))}
+      </div>
 
       <div className="mt-6 flex items-start gap-3 rounded-lg bg-muted p-4">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink">
@@ -95,86 +142,72 @@ export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify
   );
 }
 
-/** 겹쳐 보여줄 프로필 최대 개수 — 6번째부터는 '+N명'으로 접는다. */
-const MAX_FACES = 5;
+/** 그리드 카드에서 겹쳐 보여줄 프로필 최대 개수 */
+const MAX_FACES = 3;
 
-function RecordCard({ album, go, notify }: { album: Album; go: Go; notify: Notify }) {
-  const session = useSession();
-  const members = [
-    { key: "me", character: session?.tone ?? 0 },
-    ...participants.map((p) => ({ key: p.name, character: p.character })),
-  ];
+function AlbumCard({
+  album,
+  cover,
+  coverAlt,
+  photoCount,
+  members,
+  onOpen,
+  menu,
+}: {
+  album: Album;
+  cover: string;
+  coverAlt: string;
+  photoCount: number;
+  members: number[];
+  onOpen: () => void;
+  menu?: React.ReactNode;
+}) {
   const overflow = members.length - MAX_FACES;
   return (
     <Card
-      className="mt-4 cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+      size="sm"
       role="button"
       tabIndex={0}
-      onClick={() => go("detail")}
-      onKeyDown={(e) => e.key === "Enter" && go("detail")}
+      onClick={onOpen}
+      onKeyDown={(e) => e.key === "Enter" && onOpen()}
+      className="cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
     >
-      <div className="relative -mt-(--card-spacing) aspect-[16/10] overflow-hidden">
-        <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
+      <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
+        <img src={cover} alt={coverAlt} className="size-full object-cover" />
         <Badge
           variant={album.status === "완료" ? "ink" : "glass"}
-          className="absolute top-3 left-3"
+          className="absolute top-2 left-2"
         >
           {album.status}
         </Badge>
+        {menu}
       </div>
-      <CardContent className="flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-heading text-display-sm font-bold">{album.title}</h3>
-            <p className="mt-1 text-sm text-body">{formatAlbumPeriod(album)}</p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="-mt-1 -mr-2"
-                aria-label="앨범 더보기"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Ellipsis className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onSelect={() => go("albumEdit")}>
-                정보 수정
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => go("invite")}>공유</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onSelect={() => notify("삭제는 확인 후 진행돼요")}>
-                삭제
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <CardContent className="flex flex-col gap-2">
+        <div>
+          <h3 className="line-clamp-2 font-heading text-[15px] leading-snug font-bold">
+            {album.title}
+          </h3>
+          <p className="mt-1 text-xs text-body-mid">{formatAlbumStart(album)}</p>
         </div>
-        {/* 날짜 블록과 한 칸 더 띄운다 */}
-        <div className="mt-1">
-          <div className="flex items-center justify-between gap-3">
-            {/* 함께하는 사람 — 소유자 + 초대된 가족. 5개까지만 보이고 나머지는 수로 접는다. */}
-            <span className="flex items-center gap-2">
-              <span className="flex -space-x-2">
-                {members.slice(0, MAX_FACES).map((m) => (
-                  <CharacterAvatar
-                    key={m.key}
-                    index={m.character}
-                    className="size-7 ring-2 ring-card"
-                  />
-                ))}
-              </span>
-              {overflow > 0 && (
-                <span className="text-sm font-semibold text-body">+{overflow}명</span>
-              )}
-              <span className="sr-only">나를 포함해 {members.length}명이 함께해요</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-1.5">
+            <span className="flex -space-x-1.5">
+              {members.slice(0, MAX_FACES).map((character, i) => (
+                <CharacterAvatar
+                  key={i}
+                  index={character}
+                  className="size-6 ring-2 ring-card"
+                />
+              ))}
             </span>
-            <span className="flex items-center gap-1.5 text-sm text-body">
-              <Image className="size-4 text-body-mid" aria-hidden />
-              <span className="sr-only">사진</span>3
-            </span>
-          </div>
+            {overflow > 0 && <span className="text-xs font-semibold text-body">+{overflow}</span>}
+            <span className="sr-only">{members.length}명이 함께해요</span>
+          </span>
+          <span className="flex items-center gap-1 text-xs text-body">
+            <Image className="size-3.5 text-body-mid" aria-hidden />
+            <span className="sr-only">사진</span>
+            {photoCount}
+          </span>
         </div>
       </CardContent>
     </Card>
