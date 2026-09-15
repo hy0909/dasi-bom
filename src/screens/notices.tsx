@@ -17,15 +17,16 @@ export function NoticesScreen({ go }: { go: Go }) {
           description="‘파리에 도착한 첫날’ · 방금 전"
           trailing={<span className="size-2 rounded-full bg-primary" aria-label="새 알림" />}
         />
+        {/* 앨범 단위 알림이라 앨범 상세로 보낸다 — 사진 한 장이 아니라 앨범이 다 채워진 경우 */}
         <ListRow
-          onClick={() => go("story")}
+          onClick={() => go("detail")}
           leading={
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-ink text-canvas">
               <Sparkles className="size-5" />
             </span>
           }
-          title="새로운 사진 이야기가 완성됐어요"
-          description="‘다 함께한 저녁 식사’ · 2시간 전"
+          title="새 앨범이 완성됐어요"
+          description="‘2023년 유럽여행’ · 2시간 전"
           chevron
         />
       </section>
