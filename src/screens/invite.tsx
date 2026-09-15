@@ -12,7 +12,7 @@ import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
-const statusVariant = { "참여 중": "primary", 초대됨: "default" } as const;
+const statusVariant = { "참여 중": "primarySoft", 초대됨: "default" } as const;
 
 /** 초대 화면이 다루는 앨범 한 벌 — 링크와 참여자가 이 단위로 묶인다. */
 export type InviteAlbum = {
