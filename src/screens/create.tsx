@@ -7,11 +7,21 @@ import { Topbar } from "@/components/topbar";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { StickyBar } from "@/components/sticky-bar";
+import { type Album, defaultAlbum } from "@/data/album";
 import type { Go } from "@/types";
 import { toast } from "sonner";
 
-export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: string) => void }) {
+export function CreateScreen({
+  go,
+  onCreate,
+}: {
+  go: Go;
+  onCreate: (album: Omit<Album, "status">) => void;
+}) {
   const [title, setTitle] = useState("");
+  const [startDate, setStartDate] = useState(defaultAlbum.startDate);
+  const [endDate, setEndDate] = useState(defaultAlbum.endDate);
+  const [description, setDescription] = useState("");
   const [ready, setReady] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
 
@@ -27,7 +37,7 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
     e.preventDefault();
     if (!title.trim()) return;
     setReady(true);
-    onCreate(title.trim());
+    onCreate({ title: title.trim(), startDate, endDate, description: description.trim() });
     setTimeout(() => go("detail"), 500);
   }
 
@@ -58,10 +68,20 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="시작일" htmlFor="start">
-            <Input id="start" type="date" defaultValue="2023-07-10" />
+            <Input
+              id="start"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
           </Field>
           <Field label="종료일" htmlFor="end">
-            <Input id="end" type="date" defaultValue="2023-07-17" />
+            <Input
+              id="end"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </Field>
         </div>
 
@@ -69,6 +89,8 @@ export function CreateScreen({ go, onCreate }: { go: Go; onCreate: (title: strin
           <Textarea
             id="desc"
             className="min-h-24"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 이야기를 모았어요."
           />
         </Field>

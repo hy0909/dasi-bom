@@ -16,6 +16,8 @@ import { GuestWelcome, GuestInfo, GuestAnswer, GuestDone } from "@/screens/guest
 import { NoticesScreen } from "@/screens/notices";
 import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
+import { AlbumEditScreen } from "@/screens/album-edit";
+import { defaultAlbum } from "@/data/album";
 import { LoginScreen } from "@/screens/login";
 import { SignupTerms, SignupProfile } from "@/screens/signup";
 import { getSession } from "@/lib/auth";
@@ -31,7 +33,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   /** 뒤로가기용 방문 기록. 화면마다 돌아갈 곳을 하드코딩하면 진입 경로가 둘 이상일 때 어긋난다. */
   const [, setHistory] = useState<Screen[]>([]);
-  const [title, setTitle] = useState("2023년 유럽여행");
+  const [album, setAlbum] = useState(defaultAlbum);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -93,9 +95,11 @@ export default function App() {
         {screen === "login" && <LoginScreen go={go} notify={notify} />}
         {screen === "signupTerms" && <SignupTerms go={go} notify={notify} />}
         {screen === "signupProfile" && <SignupProfile go={go} notify={notify} />}
-        {screen === "home" && <HomeScreen go={go} title={title} notify={notify} />}
-        {screen === "create" && <CreateScreen go={go} onCreate={setTitle} />}
-        {screen === "detail" && <DetailScreen go={go} title={title} notify={notify} />}
+        {screen === "home" && <HomeScreen go={go} album={album} notify={notify} />}
+        {screen === "create" && (
+          <CreateScreen go={go} onCreate={(next) => setAlbum({ ...defaultAlbum, ...next })} />
+        )}
+        {screen === "detail" && <DetailScreen go={go} album={album} notify={notify} />}
         {screen === "interview" && <InterviewScreen go={go} notify={notify} />}
         {screen === "voice" && <VoiceScreen go={go} notify={notify} />}
         {screen === "story" && <StoryScreen go={go} notify={notify} />}
@@ -103,6 +107,9 @@ export default function App() {
         {screen === "upload" && <UploadScreen go={go} notify={notify} />}
         {screen === "notices" && <NoticesScreen go={go} />}
         {screen === "profile" && <ProfileScreen go={go} notify={notify} />}
+        {screen === "albumEdit" && (
+          <AlbumEditScreen album={album} onSave={setAlbum} back={goBack} notify={notify} />
+        )}
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />
         )}

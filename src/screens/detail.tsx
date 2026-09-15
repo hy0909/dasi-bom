@@ -7,16 +7,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { Topbar } from "@/components/topbar";
 import { SectionHeading } from "@/components/section-heading";
+import { type Album, formatAlbumPeriod } from "@/data/album";
 import { formatShortDate, photos } from "@/data/photos";
 import { cn } from "@/lib/utils";
 import type { Go, Notify } from "@/types";
 
 type Tab = "사진" | "목소리" | "이야기" | "연대표";
 
-export function DetailScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
+export function DetailScreen({ go, album, notify }: { go: Go; album: Album; notify: Notify }) {
   const [tab, setTab] = useState<Tab>("사진");
   const [sorted, setSorted] = useState(false);
-  const [first, ...rest] = title.split(" ");
+  const [first, ...rest] = album.title.split(" ");
 
   return (
     <>
@@ -35,7 +36,7 @@ export function DetailScreen({ go, title, notify }: { go: Go; title: string; not
         <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
-          <p className="text-sm font-medium text-canvas-soft/80">2023년 7월 10일 - 7월 17일</p>
+          <p className="text-sm font-medium text-canvas-soft/80">{formatAlbumPeriod(album)}</p>
           <h1 className="font-heading text-display-xl font-bold">
             {first}
             {rest.length > 0 && (
@@ -61,16 +62,22 @@ export function DetailScreen({ go, title, notify }: { go: Go; title: string; not
       {/* summary — card-content */}
       <Card size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Ring value={70} />
-            <p className="min-w-0 flex-1 text-sm leading-snug text-body">
-              <b className="block text-[15px] font-semibold text-ink">조금만 더 이야기해주세요</b>
-              사진 1장의 답변을 기다리고 있어요.
+          <div className="flex items-center gap-3">
+            <Badge variant={album.status === "완료" ? "ink" : "primary"}>{album.status}</Badge>
+            <p className="min-w-0 flex-1 text-sm text-body">
+              {album.status === "완료"
+                ? "가족의 이야기가 모두 담겼어요."
+                : "사진 1장의 답변을 기다리고 있어요."}
             </p>
+            <Button variant="outline" size="sm" onClick={() => go("albumEdit")}>
+              앨범 정보
+            </Button>
           </div>
-          <Button variant="secondary" className="w-full" onClick={() => go("interview")}>
-            이어서 이야기 남기기
-          </Button>
+          {album.status === "기록 중" && (
+            <Button variant="secondary" className="w-full" onClick={() => go("interview")}>
+              이어서 이야기 남기기
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -113,32 +120,6 @@ export function DetailScreen({ go, title, notify }: { go: Go; title: string; not
   );
 }
 
-function Ring({ value }: { value: number }) {
-  const r = 22;
-  const c = 2 * Math.PI * r;
-  return (
-    <span className="relative grid size-14 shrink-0 place-items-center">
-      <svg viewBox="0 0 52 52" className="absolute inset-0 size-full -rotate-90">
-        <circle cx="26" cy="26" r={r} fill="none" stroke="var(--mute)" strokeOpacity={0.45} strokeWidth="4" />
-        <circle
-          cx="26"
-          cy="26"
-          r={r}
-          fill="none"
-          stroke="var(--primary)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - value / 100)}
-        />
-      </svg>
-      <span className="text-sm font-bold tabular-nums">
-        {value}
-        <small className="text-[10px] font-semibold">%</small>
-      </span>
-    </span>
-  );
-}
 
 function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () => void }) {
   const list = sorted ? [...photos].reverse() : photos;

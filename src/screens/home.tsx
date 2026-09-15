@@ -3,7 +3,6 @@ import { ArrowRight, ChevronDown, Ellipsis, Image, Plus, Sparkles } from "lucide
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +14,13 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { type Album, formatAlbumPeriod } from "@/data/album";
 import { participants } from "@/data/family";
 import { photos } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
 
-export function HomeScreen({ go, title, notify }: { go: Go; title: string; notify: Notify }) {
+export function HomeScreen({ go, album, notify }: { go: Go; album: Album; notify: Notify }) {
   const [recent, setRecent] = useState(true);
   return (
     <>
@@ -75,7 +75,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
         }
       />
 
-      <RecordCard title={title} go={go} notify={notify} />
+      <RecordCard album={album} go={go} notify={notify} />
 
       <div className="mt-6 flex items-start gap-3 rounded-lg bg-muted p-4">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink">
@@ -95,7 +95,7 @@ export function HomeScreen({ go, title, notify }: { go: Go; title: string; notif
   );
 }
 
-function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Notify }) {
+function RecordCard({ album, go, notify }: { album: Album; go: Go; notify: Notify }) {
   const session = useSession();
   return (
     <Card
@@ -107,15 +107,18 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
     >
       <div className="relative -mt-(--card-spacing) aspect-[16/10] overflow-hidden">
         <img src={photos[0].src} alt="해질 녘 에펠탑을 함께 바라보는 가족" className="size-full object-cover" />
-        <Badge variant="glass" className="absolute top-3 left-3">
-          이야기 수집 중
+        <Badge
+          variant={album.status === "완료" ? "ink" : "glass"}
+          className="absolute top-3 left-3"
+        >
+          {album.status}
         </Badge>
       </div>
       <CardContent className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-heading text-display-sm font-bold">{title}</h3>
-            <p className="mt-1 text-sm text-body">2023년 7월 10일 - 7월 17일</p>
+            <h3 className="font-heading text-display-sm font-bold">{album.title}</h3>
+            <p className="mt-1 text-sm text-body">{formatAlbumPeriod(album)}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -130,8 +133,8 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onSelect={() => notify("앨범 이름 수정 화면을 준비했어요")}>
-                이름 수정
+              <DropdownMenuItem onSelect={() => go("albumEdit")}>
+                정보 수정
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => go("invite")}>공유</DropdownMenuItem>
               <DropdownMenuItem variant="destructive" onSelect={() => notify("삭제는 확인 후 진행돼요")}>
@@ -141,7 +144,7 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
           </DropdownMenu>
         </div>
         {/* 날짜 블록과 한 칸 더 띄운다 */}
-        <div className="mt-1 flex flex-col gap-2">
+        <div className="mt-1">
           <div className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-3">
               {/* 함께하는 사람 — 소유자 + 초대된 가족 */}
@@ -163,11 +166,7 @@ function RecordCard({ title, go, notify }: { title: string; go: Go; notify: Noti
                 <span className="sr-only">사진</span>3
               </span>
             </span>
-            <span className="text-sm text-body">
-              <b className="font-semibold text-ink">70%</b> 완성
-            </span>
           </div>
-          <Progress value={70} />
         </div>
       </CardContent>
     </Card>

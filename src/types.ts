@@ -5,6 +5,7 @@ export type Screen =
   | "home"
   | "create"
   | "detail"
+  | "albumEdit"
   | "interview"
   | "voice"
   | "story"
