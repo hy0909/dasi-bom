@@ -196,21 +196,37 @@ function PhotoTab({ go, sorted, onSort }: { go: Go; sorted: boolean; onSort: () 
   );
 }
 
+const voices = ["엄마", "아버지", "나"];
+
 function VoiceTab({ notify }: { notify: Notify }) {
   const [playing, setPlaying] = useState<number | null>(null);
+  const [recent, setRecent] = useState(true);
+  const list = recent ? voices : [...voices].reverse();
+
   function toggle(i: number, name: string) {
     const next = playing === i ? null : i;
     setPlaying(next);
     notify(next === null ? "재생을 멈췄어요" : `${name}의 목소리를 재생합니다`);
   }
   return (
-    <section className="flex flex-col gap-4">
-      <SectionHeading
-        title={<span className="text-lg">가족의 목소리 4개</span>}
-        description="그날의 온도가 담긴 목소리"
-      />
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-body">전체 {voices.length}개</p>
+        <Button
+          variant="quiet"
+          size="sm"
+          className="-mr-2"
+          onClick={() => {
+            setRecent(!recent);
+            notify(recent ? "오래된 목소리부터 정렬했어요" : "최근 목소리부터 정렬했어요");
+          }}
+        >
+          {recent ? "최근순" : "오래된 순"}
+          <ChevronDown className="size-4" />
+        </Button>
+      </div>
       <div className="flex flex-col divide-y divide-border">
-        {["엄마", "아버지", "나"].map((name, i) => (
+        {list.map((name, i) => (
           <article key={name} className="flex items-center gap-3 py-3">
             <Button
               variant={playing === i ? "default" : "secondary"}
