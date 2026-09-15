@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Copy, MessageSquare, RotateCcw, Share2 } from "lucide-react";
+import { Copy, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -90,16 +90,11 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
         </CardContent>
       </Card>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <ShareButton icon={<Share2 className="size-5" />} label="공유하기" onClick={share} />
-        <ShareButton
-          icon={<MessageSquare className="size-5" />}
-          label="문자로 보내기"
-          onClick={() => {
-            window.location.href = `sms:?&body=${encodeURIComponent(`2023년 유럽여행 앨범에 초대해요 ${link}`)}`;
-          }}
-        />
-      </div>
+      {/* 이 화면의 유일한 주요 동작 — 오렌지 CTA 하나로 둔다. */}
+      <Button size="lg" className="mt-3 w-full" onClick={share}>
+        <Share2 className="size-5" />
+        공유하기
+      </Button>
 
       <section className="mt-9 flex flex-col gap-2">
         <SectionHeading
@@ -137,15 +132,3 @@ export function InviteScreen({ go, notify }: { go: Go; notify: Notify }) {
   );
 }
 
-function ShareButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <Button
-      variant="soft"
-      onClick={onClick}
-      className="h-auto flex-col gap-2 rounded-xl py-4 text-xs font-semibold [&_svg:not([class*='size-'])]:size-5"
-    >
-      <span className="flex size-10 items-center justify-center rounded-full bg-canvas text-ink">{icon}</span>
-      {label}
-    </Button>
-  );
-}
