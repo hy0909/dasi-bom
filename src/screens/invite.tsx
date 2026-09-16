@@ -344,7 +344,7 @@ function InviteBody({
       <section className="mt-9 flex flex-col gap-2">
         <SectionHeading
           title={<span className="text-lg">기록 중인 사람 {participants.length}명</span>}
-          description="여기 있는 가족은 누구나 새 가족을 초대할 수 있어요"
+          description="앨범 구성원은 누구나 새 구성원을 초대할 수 있어요"
         />
         <div className="flex flex-col">
           {participants.length === 0 && (
