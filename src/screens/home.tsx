@@ -199,7 +199,7 @@ export function HomeScreen({
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      className="absolute top-1 right-1 text-white hover:bg-transparent hover:text-white aria-expanded:bg-transparent [&_svg]:drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+                      className="-mt-1 -mr-2 shrink-0 text-body-mid hover:bg-transparent hover:text-ink aria-expanded:bg-transparent aria-expanded:text-ink"
                       aria-label={`${item.title} 더보기`}
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -280,13 +280,16 @@ function AlbumCard({
           className="transition-transform duration-300 group-hover/album:-translate-y-0.5"
         />
         <span className="sr-only">{album.coverAlt}</span>
-        {menu}
       </div>
       <div className="flex flex-col gap-2 px-1">
         <div>
-          <h3 className="line-clamp-2 font-heading text-[15px] leading-snug font-bold">
-            {album.title}
-          </h3>
+          {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
+          <div className="flex items-start justify-between gap-1">
+            <h3 className="line-clamp-2 min-w-0 font-heading text-[15px] leading-snug font-bold">
+              {album.title}
+            </h3>
+            {menu}
+          </div>
           <p className="mt-1 text-xs text-body-mid">{formatAlbumStart(album)}</p>
         </div>
         <div className="flex items-center justify-between gap-2">

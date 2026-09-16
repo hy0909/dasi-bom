@@ -222,47 +222,47 @@
     inset 0 1px 4px rgb(0 0 0 / 0.18);
 }
 
-/* 패브릭 하드커버 앨범 — 4:6, 왼쪽 책등, 가운데 파인 사진 창 */
+/* 북클로스 하드커버 앨범 — 4:5, 가는 가로 결의 리넨, 왼쪽 위에서 오는 부드러운 빛 */
 .album-cover {
   container-type: size;
-  border-radius: 3px 7px 7px 3px;
+  border-radius: 2px 4px 4px 2px;
   background-color: var(--cover);
   background-image:
-    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 2px),
-    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.045) 0 1px, transparent 1px 2px),
-    linear-gradient(180deg, rgb(255 255 255 / 0.10), transparent 35%, rgb(0 0 0 / 0.10)),
-    radial-gradient(120% 100% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.22));
+    /* 왼쪽 위가 살짝 밝고 오른쪽 아래가 살짝 어두운, 아주 완만한 빛 */
+    linear-gradient(135deg, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0) 45%, rgb(0 0 0 / 0.08)),
+    /* 가로로 흐르는 가는 실 */
+    repeating-linear-gradient(180deg, rgb(255 255 255 / 0.03) 0 1px, rgb(0 0 0 / 0.03) 1px 2px);
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 1px 1px rgb(0 0 0 / 0.12),
-    0 6px 14px -6px rgb(32 21 21 / 0.35),
-    0 16px 28px -14px rgb(32 21 21 / 0.35);
+    inset 1px 1px 0 rgb(255 255 255 / 0.10),
+    inset -1px -1px 0 rgb(0 0 0 / 0.12),
+    3px 5px 10px -4px rgb(0 0 0 / 0.22),
+    10px 16px 30px -12px rgb(32 21 21 / 0.28);
 }
-/* 직물의 미세한 알갱이 */
+/* 리넨의 촘촘한 올 — 아주 가는 노이즈를 가로 방향으로 살짝만 늘여 연하게 */
 .album-cover::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0.4;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  opacity: 0.32;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45 0.95' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
 }
+/* 책등 — 왼쪽 가장자리의 가느다란 밝은 모서리와 그 옆의 옅은 접힘 그늘 */
 .album-cover-spine {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 8%;
-  border-radius: 3px 0 0 3px;
+  width: 4%;
+  border-radius: 2px 0 0 2px;
   background: linear-gradient(
     90deg,
-    rgb(0 0 0 / 0.30),
-    rgb(0 0 0 / 0.10) 35%,
-    rgb(255 255 255 / 0.12) 60%,
-    rgb(0 0 0 / 0.14) 85%,
-    transparent
+    rgb(255 255 255 / 0.16) 0,
+    rgb(255 255 255 / 0.05) 30%,
+    rgb(0 0 0 / 0.10) 60%,
+    rgb(0 0 0 / 0) 100%
   );
 }
 .album-cover-well {
@@ -271,31 +271,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-left: 4%; /* 책등만큼 살짝 오른쪽으로 */
+  padding-left: 2%; /* 책등만큼 살짝 오른쪽으로 */
 }
 .album-cover-window {
   position: relative;
   display: block;
   line-height: 0;
-  box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.10),
-    0 1px 0 rgb(255 255 255 / 0.10);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.05);
 }
-/* 창 안쪽으로 파인 그늘 */
+/* 창 안쪽 — 종이 두께만큼 얕게 파인 그늘, 아래쪽 모서리는 살짝 밝게 */
 .album-cover-window::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.45),
-    inset 0 3px 8px rgb(0 0 0 / 0.45),
-    inset 0 -1px 2px rgb(255 255 255 / 0.10);
+    inset 0 0 0 1px rgb(0 0 0 / 0.22),
+    inset 1px 2px 3px rgb(0 0 0 / 0.30),
+    inset -1px -1px 0 rgb(255 255 255 / 0.18);
 }
 .album-cover-window img {
   display: block;
   width: auto;
   height: auto;
-  max-width: 58cqw;
+  max-width: 52cqw;
   max-height: 46cqh;
 }
