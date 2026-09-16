@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, ChevronDown, Ellipsis, Image, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronDown, EllipsisVertical, Image, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -183,13 +183,13 @@ export function HomeScreen({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="secondary"
+                      variant="ghost"
                       size="icon-xs"
-                      className="absolute top-2 right-2 rounded-full bg-canvas/90 text-ink hover:bg-canvas"
+                      className="absolute top-1 right-1 text-white hover:bg-transparent hover:text-white aria-expanded:bg-transparent [&_svg]:drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
                       aria-label={`${item.title} 더보기`}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Ellipsis className="size-4" />
+                      <EllipsisVertical className="size-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
