@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   ArrowLeft,
   AudioLines,
@@ -282,6 +282,62 @@ function Empty({ children }: { children: React.ReactNode }) {
 
 /* ── 앨범 — 사진과 글, 목소리가 한 줄기로 이어지는 읽기 화면 ─────────────── */
 
+
+/** 문자열을 32비트 정수 씨앗으로 — 같은 앨범이면 같은 기울기 순서가 나온다. */
+function seedOf(text: string) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+/**
+ * 사진마다 즉석사진 프레임의 기울기(도) — 좌우 2~20도.
+ * 대개 왼쪽·오른쪽을 번갈아 가고(80%), 가끔 같은 쪽이 이어진다. 이웃과 같은 각도는 피한다.
+ */
+function frameTilts(seed: string, count: number) {
+  let s = seedOf(seed);
+  const rnd = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 2 ** 32);
+  const out: number[] = [];
+  let side = rnd() < 0.5 ? -1 : 1;
+  for (let i = 0; i < count; i++) {
+    if (i > 0 && rnd() < 0.8) side = -side;
+    let mag = 2 + rnd() * 18;
+    const prev = out[i - 1];
+    // 같은 쪽으로 이어질 때 각도까지 비슷하면 눈에 띄게 벌린다.
+    if (prev !== undefined && Math.sign(prev) === side && Math.abs(Math.abs(prev) - mag) < 4) {
+      mag = Math.abs(prev) > 11 ? Math.abs(prev) - 6 : Math.abs(prev) + 6;
+    }
+    out.push(Math.round(side * mag * 10) / 10);
+  }
+  return out;
+}
+
+/** 프레임 안쪽 여백 — 옆 12px씩, 위 12px, 아래 40px (p-3 pb-10). */
+const FRAME_X = 24;
+const FRAME_Y = 52;
+/** 본문 폭 기준값(px) — 폰 캔버스 430 - 좌우 여백 40. 실제 폭은 %로 따라간다. */
+const BODY_W = 390;
+
+/**
+ * 기울어진 프레임이 본문 폭을 넘지 않는 가로 폭(px)과, 회전으로 위아래로 삐져나오는 여유(px).
+ * ratio = 사진 가로/세로. 회전한 사각형의 가로 폭 w·cos + h·sin ≤ 본문 폭을 만족하는 w를 푼다.
+ */
+function tiltLayout(deg: number, ratio: number) {
+  const a = (Math.abs(deg) * Math.PI) / 180;
+  const sin = Math.sin(a);
+  const cos = Math.cos(a);
+  const w = Math.min(BODY_W, (BODY_W + (FRAME_X / ratio - FRAME_Y) * sin) / (cos + sin / ratio));
+  const h = (w - FRAME_X) / ratio + FRAME_Y;
+  const extra = Math.max(0, (w * sin + h * cos - h) / 2);
+  return {
+    box: { paddingBlock: Math.ceil(extra) } as CSSProperties,
+    frame: {
+      width: `${Math.round((w / BODY_W) * 1000) / 10}%`,
+      transform: `rotate(${deg}deg)`,
+    } as CSSProperties,
+  };
+}
+
 function AlbumReader({
   go,
   album,
@@ -293,6 +349,11 @@ function AlbumReader({
   photos: Photo[];
   notify: Notify;
 }) {
+  // 기울기는 앨범마다 고정된다 — 다시 그려도 같은 사진은 같은 각도.
+  const tilts = frameTilts(album.id, photos.length);
+  // 사진 비율은 로드된 뒤 알 수 있다 — 그때 폭과 여유를 다시 맞춘다. 그전엔 4:3으로 본다.
+  const [ratios, setRatios] = useState<Record<string, number>>({});
+
   if (photos.length === 0)
     return <Empty>아직 사진이 없어요. 아래 ‘사진 추가’로 시작해보세요.</Empty>;
 
@@ -313,15 +374,30 @@ function AlbumReader({
             </span>
           </header>
 
-          {/* 본문 사진은 즉석사진 프레임에 담는다 — 흰 테두리, 아래가 두꺼운 여백, 연한 그림자.
-              사진은 원본 가로세로 비율 그대로 프레임 폭을 꽉 채운다. 배경은 그대로 두고 프레임만 얹는다. */}
-          <figure className="bg-white p-3 pb-10 shadow-[0_2px_10px_rgba(0,0,0,0.10),0_0_0_1px_rgba(0,0,0,0.04)]">
-            <img
-              src={photo.src}
-              alt={photo.alt ?? photo.title}
-              className="block h-auto w-full"
-            />
-          </figure>
+          {/* 본문 사진은 즉석사진 프레임에 담는다 — 종이 질감, 아래가 두꺼운 여백, 퍼지는 그림자.
+              사진은 원본 가로세로 비율 그대로 프레임 폭을 채우고, 프레임은 사진마다 다른 각도로 기울인다.
+              기울어진 프레임이 옆 여백을 넘지 않도록 각도에 맞춰 폭을 줄이고 위아래 여유를 둔다. */}
+          <div style={tiltLayout(tilts[i], ratios[photo.src] ?? 4 / 3).box}>
+            <figure
+              className="polaroid mx-auto p-3 pb-10"
+              style={tiltLayout(tilts[i], ratios[photo.src] ?? 4 / 3).frame}
+            >
+              <div className="polaroid-photo">
+                <img
+                  src={photo.src}
+                  alt={photo.alt ?? photo.title}
+                  className="block h-auto w-full"
+                  onLoad={(e) => {
+                    const { naturalWidth, naturalHeight } = e.currentTarget;
+                    if (naturalWidth && naturalHeight)
+                      setRatios((m) =>
+                        m[photo.src] ? m : { ...m, [photo.src]: naturalWidth / naturalHeight },
+                      );
+                  }}
+                />
+              </div>
+            </figure>
+          </div>
 
           <h2 className="mt-1 font-heading text-display-sm font-bold">{photo.title}</h2>
 
