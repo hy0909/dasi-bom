@@ -199,7 +199,7 @@ export function HomeScreen({
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      className="-mt-1 -mr-2 shrink-0 text-body-mid hover:bg-transparent hover:text-ink aria-expanded:bg-transparent aria-expanded:text-ink"
+                      className="-mt-1 -mr-2 shrink-0 text-mute hover:bg-transparent hover:text-body aria-expanded:bg-transparent aria-expanded:text-body"
                       aria-label={`${item.title} 더보기`}
                       onClick={(e) => e.stopPropagation()}
                     >
