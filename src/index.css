@@ -337,7 +337,7 @@
   position: fixed;
   z-index: 60;
   pointer-events: none;
-  perspective: 1400px;
+  perspective: 1700px;
   perspective-origin: 50% 50%;
 }
 .album-opening-book {
@@ -386,21 +386,57 @@
   z-index: 2;
   background: linear-gradient(90deg, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.2) 45%, transparent 75%);
 }
-/* 앞표지 — 왼쪽 책등을 축으로 돈다 */
-.album-opening-front {
+/* 앞표지 띠 — 각 띠는 자기 왼쪽 모서리를 축으로 돌고, 앞 띠의 끝에서 이어진다 */
+.album-opening-strip {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
   transform-origin: 0% 50%;
-  transform-style: preserve-3d;
+  will-change: transform;
 }
-.album-opening-face {
-  backface-visibility: hidden;
+.album-opening-strip-front {
+  position: absolute;
+  top: 0;
+  bottom: 0;
 }
-.album-opening-endpaper {
+/* 표지 안쪽 — 크림색 면지. 90도를 넘어가면 이쪽이 보인다 */
+.album-opening-strip-back {
   position: absolute;
   inset: 0;
-  transform: rotateY(180deg);
-  border-radius: 4px 2px 2px 4px;
+  visibility: hidden;
   background: linear-gradient(168deg, #f7f3ec 0%, #efeadf 60%, #e8e2d5 100%);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+.album-opening-strip.is-back .album-opening-strip-front {
+  visibility: hidden;
+}
+.album-opening-strip.is-back .album-opening-strip-back {
+  visibility: visible;
+}
+
+/* 열림 오버레이 안의 커버는 평면이다 — 띠마다 옆면이 원근으로 비치면 안 된다 */
+.album-opening .album-book {
+  perspective: none;
+}
+.album-opening .album-book-body {
+  transform: none;
+  transition: none;
+}
+.album-opening .album-book-side {
+  display: none;
+}
+
+/* 표지 앞모서리 — 두께만큼의 좁은 면, 리넨으로 감싸 있고 살짝 어둡다 */
+.album-opening-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  opacity: 0;
+  background-color: var(--cover);
+  background-image:
+    linear-gradient(90deg, rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.12) 50%, rgb(0 0 0 / 0.3)),
+    repeating-linear-gradient(180deg, rgb(255 255 255 / 0.03) 0 1px, rgb(0 0 0 / 0.03) 1px 2px);
 }
