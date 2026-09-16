@@ -313,14 +313,15 @@ function AlbumReader({
             </span>
           </header>
 
-          {/* 본문 사진은 좌우를 꽉 채운다 — 읽는 흐름이 사진에서 한 번 쉰다 */}
-          <div className="-mx-5">
+          {/* 본문 사진은 즉석사진 프레임에 담는다 — 흰 테두리, 아래가 두꺼운 여백, 연한 그림자.
+              사진은 원본 가로세로 비율 그대로 프레임 폭을 꽉 채운다. 배경은 그대로 두고 프레임만 얹는다. */}
+          <figure className="bg-white p-3 pb-10 shadow-[0_2px_10px_rgba(0,0,0,0.10),0_0_0_1px_rgba(0,0,0,0.04)]">
             <img
               src={photo.src}
               alt={photo.alt ?? photo.title}
-              className="block w-full object-cover"
+              className="block h-auto w-full"
             />
-          </div>
+          </figure>
 
           <h2 className="mt-1 font-heading text-display-sm font-bold">{photo.title}</h2>
 
