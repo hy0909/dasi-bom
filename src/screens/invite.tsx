@@ -264,9 +264,12 @@ function InviteBody({
                     collisionBoundary={canvas}
                     collisionPadding={16}
                     className="w-auto max-w-[calc(100vw-40px)] flex-row items-center gap-1 py-1.5 pr-1 pl-3"
+                    // 폰 캔버스보다 넓어지지 않게 — 넓은 화면 미리보기에서는 100vw 기준이 폰 폭을 넘는다.
+                    style={canvas ? { maxWidth: canvas.clientWidth - 32 } : undefined}
                   >
                     <span className="text-xs leading-snug">
-                      초대 링크 유효기간은 일주일이에요. {expiresShort}까지 쓸 수 있어요.
+                      초대 링크 유효기간은 일주일이에요. {expiresShort}까지 쓸 수 있고, 만료되면 새로
+                      만들 수 있어요.
                     </span>
                     <PopoverClose asChild>
                       <button
