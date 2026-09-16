@@ -52,9 +52,9 @@ export function InviteScreen(props: InviteProps) {
 function NoAlbumInvite({ go, back }: Pick<InviteProps, "go" | "back">) {
   return (
     <>
-      {back && <Topbar back={back} title="초대" />}
-      <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
-        <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
+      {back ? <Topbar back={back} title="초대" /> : <Topbar go={go} />}
+      <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-7")}>
+        <h1 className="font-heading text-display-lg font-bold">우리의 추억을 기록해요</h1>
         <p className="text-base leading-relaxed text-body">
           아직 참여 중인 앨범이 없어요.
           <br />
@@ -155,9 +155,9 @@ function InviteBody({
         </>
       ) : (
         <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-7")}>
-          <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
+          <h1 className="font-heading text-display-lg font-bold">우리의 추억을 기록해요</h1>
           <p className="text-base leading-relaxed text-body">
-            링크를 통해 회원가입없이
+            링크를 공유하면 회원가입 없이
             <br />
             사진을 추가할 수 있어요.
           </p>
