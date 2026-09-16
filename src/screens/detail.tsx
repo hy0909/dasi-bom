@@ -158,9 +158,9 @@ export function DetailScreen({
 
   return (
     <>
-      {/* hero — 좌우 여백과 상단 여백을 무시하고 꽉 채우는 1:1 사진 */}
+      {/* hero — 좌우 여백과 상단 여백을 무시하고 꽉 채우는 4:5 사진. 앨범 커버와 같은 비율이라 열림 모션이 그대로 이어진다 */}
       <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))]">
-        <div className="relative aspect-square w-full overflow-hidden bg-ink">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink">
           <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
           {/* 아래쪽은 제목이, 위쪽은 상단 버튼이 읽히도록 각각 어둡게 */}
           <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
