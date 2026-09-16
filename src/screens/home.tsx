@@ -354,7 +354,8 @@ function AlbumBanner({
               onClick={(e) =>
                 onOpen(
                   album.id,
-                  (e.currentTarget.querySelector(".album-cover") ?? e.currentTarget).getBoundingClientRect(),
+                  // 호버로 돌아간 앞표지가 아니라 돌지 않는 뿌리 상자를 잰다 — 첫 프레임이 튀지 않게
+                  (e.currentTarget.querySelector(".album-book") ?? e.currentTarget).getBoundingClientRect(),
                 )
               }
               aria-label={`${album.title} 열기`}

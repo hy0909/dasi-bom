@@ -7,20 +7,18 @@ import { coverVariant } from "@/lib/variant";
 
 /** 1) 앨범이 그 자리에서 화면 폭까지 커지는 시간 */
 const GROW_MS = 900;
-/** 아래 화면을 가리는 스크림이 차오르는 시간 */
+/** 아래 화면을 완전히 가리는 스크림이 차오르는 시간 */
 const SCRIM_MS = 520;
-/** 스크림이 다 찬 뒤, 가려진 채로 아래 화면을 상세로 바꾸는 시점 */
-const REVEAL_AT_MS = 720;
-/** 2) 표지가 넘어가기 시작하는 시점과 넘어가는 데 드는 시간 — 무게 있게 천천히 */
-const FLIP_START_MS = 900;
+/** 2) 표지가 넘어가기 시작하는 시점(= 확대가 끝난 뒤)과 넘어가는 데 드는 시간 — 무게 있게 천천히 */
+const FLIP_START_MS = GROW_MS;
 const FLIP_MS = 1300;
 /** 3) 표지가 다 넘어간 뒤 오버레이가 상세 화면으로 녹아드는 시간 */
 const FADE_MS = 520;
 
 /**
  * 앨범 열림 — 순서가 곧 의미다.
- * 1) 눌린 앨범 한 권이 4:5 그대로 화면 폭까지 커진다. 그동안 나머지 화면은 어두운 스크림에 가려진다.
- * 2) 가려진 채로 아래 화면이 상세로 바뀐다. 표지는 아직 닫혀 있어 사진은 보이지 않는다.
+ * 1) 눌린 앨범 한 권이 4:5 그대로 화면 폭까지 커진다. 그동안 나머지 화면은 불투명한 스크림에 완전히 가려진다.
+ * 2) 확대와 스크림이 모두 끝난 뒤, 가려진 채로 아래 화면이 상세로 바뀐다. 표지는 아직 닫혀 있어 사진은 보이지 않는다.
  * 3) 표지가 왼쪽 책등을 축으로 천천히 넘어가고, 그 아래 사진(= 상세 hero 와 같은 사진·같은 자리)이 드러난다.
  * 4) 표지가 다 넘어간 뒤 오버레이가 녹아 사라지면 상세 화면만 남는다.
  * 앞·뒷면을 처음부터 함께 두고 backface-visibility 로만 가르므로 중간에 면을 갈아끼우는 번쩍임이 없다.
@@ -58,37 +56,55 @@ export function AlbumOpening({
     const fill = "forwards" as const;
     const px = (v: number) => `${v}px`;
 
-    book.animate(
+    const grow = book.animate(
       [
         { left: px(from.left), top: px(from.top), width: px(from.width), height: px(from.height) },
         { left: px(target.left), top: px(target.top), width: px(target.width), height: px(target.height) },
       ],
       { duration: GROW_MS, easing: "cubic-bezier(.45,0,.2,1)", fill },
     );
-    scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: SCRIM_MS, easing: "ease-out", fill });
-    front.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }], {
+    const veil = scrim.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: SCRIM_MS,
+      easing: "ease-out",
+      fill,
+    });
+    const flip = front.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }], {
       duration: FLIP_MS,
       delay: FLIP_START_MS,
       easing: "cubic-bezier(.5,.05,.2,1)",
       fill,
     });
+    const animations = [grow, veil, flip];
 
+    let revealed = false;
     let finished = false;
+    let fade: Animation | undefined;
+    const doReveal = () => {
+      if (revealed) return;
+      revealed = true;
+      reveal.current();
+    };
     const finish = () => {
       if (finished) return;
       finished = true;
-      const fade = el.animate([{ opacity: 1 }, { opacity: 0 }], {
+      doReveal();
+      fade = el.animate([{ opacity: 1 }, { opacity: 0 }], {
         duration: FADE_MS,
         easing: "cubic-bezier(.4,0,.2,1)",
         fill,
       });
       fade.onfinish = () => done.current();
     };
-    const revealTimer = window.setTimeout(() => reveal.current(), REVEAL_AT_MS);
-    const finishTimer = window.setTimeout(finish, FLIP_START_MS + FLIP_MS);
+    // 전환 시점은 애니메이션 자체에 묶는다 — 확대와 스크림이 다 끝난 뒤에만 상세로 바꾸고, 표지가 다 넘어간 뒤에만 녹아든다
+    const quiet = () => undefined;
+    Promise.all([grow.finished, veil.finished]).then(doReveal, quiet);
+    flip.finished.then(finish, quiet);
+    // 탭이 뒤로 가 있어 애니메이션이 멈춰도 오버레이가 영영 남지는 않게 — 시계 기준 마지막 안전장치
+    const safety = window.setTimeout(finish, FLIP_START_MS + FLIP_MS + 1500);
     return () => {
-      window.clearTimeout(revealTimer);
-      window.clearTimeout(finishTimer);
+      window.clearTimeout(safety);
+      animations.forEach((a) => a.cancel());
+      fade?.cancel();
     };
   }, [from]);
 

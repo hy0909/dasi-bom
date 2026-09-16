@@ -341,13 +341,15 @@ html {
   position: fixed;
   inset: 0;
   z-index: 60;
-  pointer-events: none;
+  /* 진행 중에는 아래를 누를 수 없다 — 다른 앨범을 눌러 순서가 꼬이지 않게 */
+  pointer-events: auto;
 }
+/* 아래 화면을 완전히 가리는 불투명 스크림 — 이 뒤에서 상세로 바뀐다 */
 .album-opening-scrim {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: rgb(32 21 21 / 0.6);
+  background: var(--ink);
 }
 .album-opening-book {
   position: absolute;
@@ -361,8 +363,9 @@ html {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  border-radius: 2px 4px 4px 2px;
   background: #201515;
+  /* 닫힌 표지와 같은 평면에 있으면 WebKit 에서 사진이 비쳐 나올 수 있다 — 살짝 뒤로 */
+  transform: translateZ(-1px);
 }
 .album-opening-photo {
   position: absolute;
@@ -382,6 +385,10 @@ html {
 .album-opening-face {
   position: absolute;
   inset: 0;
+}
+/* WebKit 은 조상의 backface-visibility 를 합성된 자손(이미지, 블렌드 레이어)에 물려주지 않는다 — 자손까지 명시 */
+.album-opening-face,
+.album-opening-face * {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }

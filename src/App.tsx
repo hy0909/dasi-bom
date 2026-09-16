@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell, PhoneCanvas } from "@/components/phone-shell";
+import { flushSync } from "react-dom";
 import { AlbumOpening } from "@/components/album-opening";
 import { Wordmark } from "@/components/wordmark";
 import type { Screen } from "@/types";
@@ -95,15 +96,20 @@ export default function App() {
   }, []);
 
   const go = (next: Screen, instant = false) => {
-    // 초대 화면을 벗어나면 앨범 만들기 흐름은 끝난다.
-    if (next !== "invite") setJustCreated(false);
-    if (next !== screen) {
-      setHistory((past) =>
-        // 탭 사이 이동은 기록하지 않는다 — 탭은 서로의 상위 화면이 아니다.
-        TAB_SCREENS.includes(next) && TAB_SCREENS.includes(screen) ? [] : [...past, screen],
-      );
-      setScreen(next);
-    }
+    const move = () => {
+      // 초대 화면을 벗어나면 앨범 만들기 흐름은 끝난다.
+      if (next !== "invite") setJustCreated(false);
+      if (next !== screen) {
+        setHistory((past) =>
+          // 탭 사이 이동은 기록하지 않는다 — 탭은 서로의 상위 화면이 아니다.
+          TAB_SCREENS.includes(next) && TAB_SCREENS.includes(screen) ? [] : [...past, screen],
+        );
+        setScreen(next);
+      }
+    };
+    // 즉시 전환은 화면 교체와 스크롤을 한 프레임에 묶는다 — 스크롤만 먼저 튀는 프레임이 없게
+    if (instant) flushSync(move);
+    else move();
     window.scrollTo({ top: 0, behavior: instant ? "instant" : "smooth" });
   };
 
@@ -119,10 +125,12 @@ export default function App() {
 
   /** 앨범을 하나 지목하고 그 앨범의 화면으로 간다. 커버 자리(from)가 오면 열림 모션으로 상세에 들어간다. */
   const openAlbum = (id: string, next: Screen, from?: DOMRect) => {
+    // 열림 모션이 진행 중이면 어떤 이동도 받지 않는다 — 다른 앨범으로 바뀌거나 순서가 꼬이지 않게
+    if (opening) return;
     setOpenId(id);
     const album = albums.find((a) => a.id === id);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (from && next === "detail" && album && !reduce && !opening) {
+    if (from && next === "detail" && album && !reduce) {
       setOpening({ album, from });
       return;
     }
