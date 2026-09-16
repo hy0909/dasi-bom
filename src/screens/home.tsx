@@ -49,7 +49,7 @@ export function HomeScreen({
   go: Go;
   albums: AlbumCardData[];
   /** 앨범을 지목해 그 앨범의 화면으로 간다 — 카드마다 다른 앨범이 열려야 한다. */
-  onOpenAlbum: (id: string, screen: Screen) => void;
+  onOpenAlbum: (id: string, screen: Screen, from?: DOMRect) => void;
   notify: Notify;
 }) {
   const [recent, setRecent] = useState(true);
@@ -74,7 +74,7 @@ export function HomeScreen({
 
       {/* 앨범 배너 — 한 장씩 크게, 옆으로 넘긴다. 아래 목록은 그대로 둔다. */}
       {albums.length > 0 && (
-        <AlbumBanner albums={albums} onOpen={(id) => onOpenAlbum(id, "detail")} />
+        <AlbumBanner albums={albums} onOpen={(id, from) => onOpenAlbum(id, "detail", from)} />
       )}
 
       <div className="mt-7">
@@ -192,7 +192,7 @@ export function HomeScreen({
                   .filter((p) => p.name !== session?.name)
                   .map((p) => ({ character: p.character, color: p.color })),
               ]}
-              onOpen={() => onOpenAlbum(item.id, "detail")}
+              onOpen={(from) => onOpenAlbum(item.id, "detail", from)}
               menu={
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -261,24 +261,26 @@ function AlbumCard({
   album: AlbumCardData;
   photoCount: number;
   members: { character: number; color: number }[];
-  onOpen: () => void;
+  onOpen: (from: DOMRect) => void;
   menu?: React.ReactNode;
 }) {
   const overflow = members.length - MAX_FACES;
+  const coverRef = useRef<HTMLDivElement>(null);
+  // 열림 모션이 이 커버 자리에서 시작하도록 위치를 넘긴다.
+  const open = () => onOpen(coverRef.current!.getBoundingClientRect());
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(e) => e.key === "Enter" && onOpen()}
-      className="group/album flex cursor-pointer flex-col gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+      onClick={open}
+      onKeyDown={(e) => e.key === "Enter" && open()}
+      className="group/album album-3d-hover flex cursor-pointer flex-col gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
     >
       {/* 패브릭 앨범 — 그림자가 잘리지 않게 옆과 아래에 숨 쉴 공간을 둔다 */}
       <div className="relative px-2 pt-1 pb-3">
-        <AlbumCover
-          album={album}
-          className="transition-transform duration-300 group-hover/album:-translate-y-0.5"
-        />
+        <div ref={coverRef}>
+          <AlbumCover album={album} />
+        </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
       <div className="flex flex-col gap-2 px-1">
@@ -324,7 +326,7 @@ function AlbumBanner({
   onOpen,
 }: {
   albums: AlbumCardData[];
-  onOpen: (id: string) => void;
+  onOpen: (id: string, from: DOMRect) => void;
 }) {
   const [index, setIndex] = useState(0);
   const track = useRef<HTMLDivElement>(null);
@@ -349,9 +351,14 @@ function AlbumBanner({
             <button
               key={album.id}
               type="button"
-              onClick={() => onOpen(album.id)}
+              onClick={(e) =>
+                onOpen(
+                  album.id,
+                  (e.currentTarget.querySelector(".album-cover") ?? e.currentTarget).getBoundingClientRect(),
+                )
+              }
               aria-label={`${album.title} 열기`}
-              className="relative flex aspect-square w-full shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-2xl p-6 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+              className="album-3d-hover relative flex aspect-square w-full shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-2xl p-6 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
               style={{ backgroundColor: bg, color: fg }}
             >
               <AlbumCover album={album} className="-mt-8 h-64 w-auto" />

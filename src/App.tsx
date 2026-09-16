@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell, PhoneCanvas } from "@/components/phone-shell";
+import { AlbumOpening } from "@/components/album-opening";
 import { Wordmark } from "@/components/wordmark";
-import type { Go, Screen } from "@/types";
+import type { Screen } from "@/types";
 import { HomeScreen } from "@/screens/home";
 import { CreateScreen } from "@/screens/create";
 import { DetailScreen } from "@/screens/detail";
@@ -93,7 +94,7 @@ export default function App() {
     setReady(true);
   }, []);
 
-  const go: Go = (next) => {
+  const go = (next: Screen, instant = false) => {
     // 초대 화면을 벗어나면 앨범 만들기 흐름은 끝난다.
     if (next !== "invite") setJustCreated(false);
     if (next !== screen) {
@@ -103,8 +104,11 @@ export default function App() {
       );
       setScreen(next);
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: instant ? "instant" : "smooth" });
   };
+
+  // 앨범 열림 모션 — 눌린 커버가 커지며 펼쳐지는 동안 아래에서 상세로 바뀐다.
+  const [opening, setOpening] = useState<{ album: AlbumCardData; from: DOMRect } | null>(null);
 
   /** 방문 기록을 갈아끼우며 이동한다 — 앨범을 만든 뒤처럼 되돌아갈 수 없는 흐름에 쓴다. */
   const jump = (next: Screen, past: Screen[]) => {
@@ -113,9 +117,15 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  /** 앨범을 하나 지목하고 그 앨범의 화면으로 간다. */
-  const openAlbum = (id: string, next: Screen) => {
+  /** 앨범을 하나 지목하고 그 앨범의 화면으로 간다. 커버 자리(from)가 오면 열림 모션으로 상세에 들어간다. */
+  const openAlbum = (id: string, next: Screen, from?: DOMRect) => {
     setOpenId(id);
+    const album = albums.find((a) => a.id === id);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (from && next === "detail" && album && !reduce && !opening) {
+      setOpening({ album, from });
+      return;
+    }
     go(next);
   };
 
@@ -240,6 +250,14 @@ export default function App() {
         {screen === "guestDone" && <GuestDone go={go} />}
       </PhoneCanvas>
       <Toaster />
+      {opening && (
+        <AlbumOpening
+          album={opening.album}
+          from={opening.from}
+          onReveal={() => go("detail", true)}
+          onDone={() => setOpening(null)}
+        />
+      )}
     </AppShell>
   );
 }
