@@ -1,7 +1,8 @@
-import { COVER_COLORS, type CoverColorId } from "@/data/album";
+import { COVER_COLORS, coverFabricTone, type CoverColorId } from "@/data/album";
+import { coverVariant } from "@/lib/variant";
 import { cn } from "@/lib/utils";
 
-/** 앨범 커버 색 고르기 — 11가지 원형 스와치. */
+/** 앨범 커버 색 고르기 — 11가지 원형 스와치. 스와치는 실제 커버 천의 색으로 보인다. */
 export function CoverColorPicker({
   value,
   onChange,
@@ -23,7 +24,7 @@ export function CoverColorPicker({
             "size-8 rounded-full outline-none transition-transform focus-visible:ring-3 focus-visible:ring-ring/40",
             value === c.id ? "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-canvas" : "hover:scale-105",
           )}
-          style={{ backgroundColor: c.hex }}
+          style={{ backgroundColor: coverFabricTone(c.hex, coverVariant) }}
         />
       ))}
     </div>

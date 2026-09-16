@@ -143,7 +143,7 @@ export function CreateScreen({
             {/* 고른 색과 대표 사진이 실제 커버로 어떻게 보이는지 바로 보여준다. */}
             <AlbumCover
               album={{ id: "preview", coverColor, cover: cover ?? PLACEHOLDER_COVER }}
-              className="mt-1 w-20 shrink-0"
+              className="mt-1 w-40 shrink-0"
             />
             <CoverColorPicker value={coverColor} onChange={setCoverColor} />
           </div>

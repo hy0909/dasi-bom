@@ -7,6 +7,8 @@ import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
 import { coverColorOf, type Album } from "@/data/album";
+import type { AlbumCardData } from "@/data/albums";
+import { AlbumCover } from "@/components/album-cover";
 import { CoverColorPicker } from "@/components/cover-color-picker";
 import type { Notify } from "@/types";
 
@@ -16,12 +18,12 @@ export function AlbumEditScreen({
   back,
   notify,
 }: {
-  album: Album;
+  album: AlbumCardData;
   onSave: (album: Album) => void;
   back: () => void;
   notify: Notify;
 }) {
-  const [draft, setDraft] = useState(album);
+  const [draft, setDraft] = useState<Album>(album);
 
   const trimmed = draft.title.trim();
   const changed =
@@ -89,10 +91,17 @@ export function AlbumEditScreen({
         </Field>
 
         <Field label="앨범 커버 색">
-          <CoverColorPicker
-            value={coverColorOf(draft).id}
-            onChange={(coverColor) => setDraft({ ...draft, coverColor })}
-          />
+          <div className="flex items-start gap-4">
+            {/* 만들기와 같은 미리보기 — 고른 색이 실제 커버로 어떻게 보이는지 */}
+            <AlbumCover
+              album={{ id: album.id, coverColor: coverColorOf(draft).id, cover: album.cover }}
+              className="mt-1 w-40 shrink-0"
+            />
+            <CoverColorPicker
+              value={coverColorOf(draft).id}
+              onChange={(coverColor) => setDraft({ ...draft, coverColor })}
+            />
+          </div>
         </Field>
 
         <StickyBar>
