@@ -100,13 +100,13 @@ function MemberSummary({
             {shown.join(" · ")}
             {hidden > 0 && <span className="text-canvas-soft/60"> 외 {hidden}명</span>}
           </span>
-          <span className="sr-only">함께하는 가족 {total}명 — 눌러서 전체 보기</span>
+          <span className="sr-only">기록 중인 사람 {total}명 — 눌러서 전체 보기</span>
         </button>
       </DialogTrigger>
 
       <DialogContent className="max-w-[360px] gap-3 p-5">
         <DialogHeader>
-          <DialogTitle>함께하는 가족 {total}명</DialogTitle>
+          <DialogTitle>기록 중인 사람 {total}명</DialogTitle>
           <DialogDescription>
             링크를 받은 가족은 누구나 이 앨범에 기록을 남길 수 있어요.
           </DialogDescription>
