@@ -9,7 +9,93 @@ export type Album = {
   startDate: string;
   endDate: string;
   description: string;
+  /** 커버 색 — 만들 때 고른다. 없으면 id 로 정해지는 기본색. */
+  coverColor?: CoverColorId;
 };
+
+/** 앨범 커버 색 — 만들 때 고르는 11가지. */
+export const COVER_COLORS = [
+  { id: "blue", label: "파랑", hex: "#3C9FFF" },
+  { id: "skyblue", label: "하늘", hex: "#30C2F1" },
+  { id: "red", label: "빨강", hex: "#FF6769" },
+  { id: "violet", label: "보라", hex: "#AE8AFF" },
+  { id: "gray", label: "회색", hex: "#9DA1AA" },
+  { id: "yellow", label: "노랑", hex: "#F3BE00" },
+  { id: "pink", label: "핑크", hex: "#F791DE" },
+  { id: "orange", label: "오렌지", hex: "#F98E2A" },
+  { id: "turquoise", label: "청록", hex: "#26C8A2" },
+  { id: "brown", label: "갈색", hex: "#CBAD70" },
+  { id: "green", label: "초록", hex: "#36D72E" },
+] as const;
+export type CoverColorId = (typeof COVER_COLORS)[number]["id"];
+
+/** 고른 색이 없으면 앨범 id 로 하나를 고정한다 — 같은 앨범은 늘 같은 색. */
+export function coverColorOf(album: Pick<Album, "id" | "coverColor">) {
+  const picked = COVER_COLORS.find((c) => c.id === album.coverColor);
+  if (picked) return picked;
+  let h = 0;
+  for (let i = 0; i < album.id.length; i++) h = (h * 31 + album.id.charCodeAt(i)) >>> 0;
+  return COVER_COLORS[h % COVER_COLORS.length];
+}
+
+function hexToHsl(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h =
+    max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h /= 6;
+  return [h, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number) {
+  const f = (n: number) => {
+    const k = (n + h * 12) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(c * 255)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+/**
+ * 커버 천의 색.
+ * fabric(A안): 고른 색을 채도 낮추고 어둡게 — 레퍼런스의 갈색 패브릭처럼 차분한 톤.
+ * vivid(B안): 고른 색 그대로에 살짝만 어둡게 — 천 질감을 얹어도 색이 쨍하게 남는다.
+ */
+export function coverFabricTone(hex: string, variant: "fabric" | "vivid") {
+  const [h, s, l] = hexToHsl(hex);
+  if (variant === "vivid") return hslToHex(h, Math.min(1, s * 0.95), l * 0.88);
+  return hslToHex(h, Math.min(s, 0.42), 0.3);
+}
+
+/** 배너 배경 — A안은 쨍한 색 그대로, B안은 그 색의 연한 톤. */
+export function coverBannerTone(hex: string, variant: "fabric" | "vivid") {
+  if (variant === "fabric") return hex;
+  const [h, s] = hexToHsl(hex);
+  return hslToHex(h, Math.min(s, 0.7), 0.9);
+}
+
+/** 배경 위 글자색 — 밝은 배경이면 먹색, 어두우면 흰색. */
+export function readableOn(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const lum =
+    0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+  return lum > 0.4 ? "#201515" : "#ffffff";
+}
 
 /** 초대 링크 유효 기간 — 발급일로부터 일주일. */
 export const INVITE_DAYS = 7;

@@ -14,6 +14,7 @@ export type AlbumCardData = Album & {
 export const initialAlbums: AlbumCardData[] = [
   {
     ...defaultAlbum,
+    coverColor: "brown",
     cover: photosOf(defaultAlbum.id)[0].src,
     coverAlt: "해질 녘 에펠탑을 함께 바라보는 가족",
   },
@@ -23,6 +24,7 @@ export const initialAlbums: AlbumCardData[] = [
     // 초대한 지 오래된 앨범 — 링크가 이미 만료돼 새로 만들어야 한다.
     inviteIssuedAt: daysAgo(23),
     title: "제주 가족여행",
+    coverColor: "blue",
     startDate: "2024-05-03",
     endDate: "2024-05-06",
     description: "사촌들까지 다 모인 3박 4일. 바다와 오름을 돌아다닌 기록이에요.",
@@ -34,6 +36,7 @@ export const initialAlbums: AlbumCardData[] = [
     inviteCode: "SUMMER",
     inviteIssuedAt: daysAgo(1),
     title: "할머니와 보낸 여름",
+    coverColor: "green",
     startDate: "2024-08-02",
     endDate: "2024-08-11",
     description: "방학 내내 할머니 댁에서 지낸 여름의 기록이에요.",
@@ -45,6 +48,7 @@ export const initialAlbums: AlbumCardData[] = [
     inviteCode: "SEA",
     inviteIssuedAt: daysAgo(6),
     title: "바닷가 산책",
+    coverColor: "skyblue",
     startDate: "2024-09-21",
     endDate: "2024-09-21",
     description: "특별할 것 없던 하루가 제일 오래 남았어요.",

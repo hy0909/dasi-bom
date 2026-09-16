@@ -8,7 +8,9 @@ import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { defaultAlbum } from "@/data/album";
+import { COVER_COLORS, defaultAlbum, type CoverColorId } from "@/data/album";
+import { AlbumCover } from "@/components/album-cover";
+import { CoverColorPicker } from "@/components/cover-color-picker";
 import type { AlbumCardData } from "@/data/albums";
 import type { Go } from "@/types";
 import { toast } from "sonner";
@@ -33,6 +35,10 @@ export function CreateScreen({
   const [description, setDescription] = useState("");
   const [ready, setReady] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
+  // 커버 색은 무작위로 하나 골라 두고 시작한다 — 바꾸지 않아도 앨범마다 색이 갈린다.
+  const [coverColor, setCoverColor] = useState<CoverColorId>(
+    () => COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].id,
+  );
 
   function chooseFile(file?: File) {
     if (!file) return;
@@ -58,6 +64,7 @@ export function CreateScreen({
           startDate,
           endDate,
           description: description.trim(),
+          coverColor,
           // 참여 링크는 만든 순간부터 일주일 동안 쓴다.
           inviteIssuedAt: new Date().toISOString(),
           // 대표 사진을 고르지 않았으면 첫 사진을 올릴 때까지 회색 자리로 둔다.
@@ -130,6 +137,17 @@ export function CreateScreen({
             onChange={(e) => chooseFile(e.target.files?.[0])}
           />
         </label>
+
+        <Field label="앨범 커버 색">
+          <div className="flex items-start gap-4">
+            {/* 고른 색과 대표 사진이 실제 커버로 어떻게 보이는지 바로 보여준다. */}
+            <AlbumCover
+              album={{ id: "preview", coverColor, cover: cover ?? PLACEHOLDER_COVER }}
+              className="mt-1 w-20 shrink-0"
+            />
+            <CoverColorPicker value={coverColor} onChange={setCoverColor} />
+          </div>
+        </Field>
 
         <StickyBar>
           <Button size="lg" className="w-full" disabled={!title.trim() || ready}>

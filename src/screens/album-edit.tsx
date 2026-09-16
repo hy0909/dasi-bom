@@ -6,7 +6,8 @@ import { Topbar } from "@/components/topbar";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import type { Album } from "@/data/album";
+import { coverColorOf, type Album } from "@/data/album";
+import { CoverColorPicker } from "@/components/cover-color-picker";
 import type { Notify } from "@/types";
 
 export function AlbumEditScreen({
@@ -84,6 +85,13 @@ export function AlbumEditScreen({
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
+          />
+        </Field>
+
+        <Field label="앨범 커버 색">
+          <CoverColorPicker
+            value={coverColorOf(draft).id}
+            onChange={(coverColor) => setDraft({ ...draft, coverColor })}
           />
         </Field>
 

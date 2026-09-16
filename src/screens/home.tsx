@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight, ChevronDown, EllipsisVertical, Image, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +13,16 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { formatAlbumStart } from "@/data/album";
+import { AlbumCover } from "@/components/album-cover";
+import {
+  coverBannerTone,
+  coverColorOf,
+  formatAlbumPeriod,
+  formatAlbumStart,
+  readableOn,
+} from "@/data/album";
+import { coverVariant } from "@/lib/variant";
+import { cn } from "@/lib/utils";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -62,6 +71,11 @@ export function HomeScreen({
   return (
     <>
       <Topbar go={go} />
+
+      {/* 앨범 배너 — 한 장씩 크게, 옆으로 넘긴다. 아래 목록은 그대로 둔다. */}
+      {albums.length > 0 && (
+        <AlbumBanner albums={albums} onOpen={(id) => onOpenAlbum(id, "detail")} />
+      )}
 
       <div className="mt-7">
         <h1 className="font-heading text-display-xl font-bold">
@@ -252,19 +266,23 @@ function AlbumCard({
 }) {
   const overflow = members.length - MAX_FACES;
   return (
-    <Card
-      size="sm"
+    <div
       role="button"
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(e) => e.key === "Enter" && onOpen()}
-      className="cursor-pointer transition-shadow hover:shadow-card focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+      className="group/album flex cursor-pointer flex-col gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
     >
-      <div className="relative -mt-(--card-spacing) aspect-square overflow-hidden">
-        <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
+      {/* 패브릭 앨범 — 그림자가 잘리지 않게 옆과 아래에 숨 쉴 공간을 둔다 */}
+      <div className="relative px-2 pt-1 pb-3">
+        <AlbumCover
+          album={album}
+          className="transition-transform duration-300 group-hover/album:-translate-y-0.5"
+        />
+        <span className="sr-only">{album.coverAlt}</span>
         {menu}
       </div>
-      <CardContent className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 px-1">
         <div>
           <h3 className="line-clamp-2 font-heading text-[15px] leading-snug font-bold">
             {album.title}
@@ -279,7 +297,7 @@ function AlbumCard({
                   key={i}
                   index={m.character}
                   color={m.color}
-                  className="size-6 ring-2 ring-card"
+                  className="size-6 ring-2 ring-canvas"
                 />
               ))}
             </span>
@@ -292,7 +310,72 @@ function AlbumCard({
             {photoCount}
           </span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+  );
+}
+
+/** 앨범 배너 — 쨍한 배경 위에 앨범 한 권을 크게. 옆으로 밀어 다음 앨범으로. */
+function AlbumBanner({
+  albums,
+  onOpen,
+}: {
+  albums: AlbumCardData[];
+  onOpen: (id: string) => void;
+}) {
+  const [index, setIndex] = useState(0);
+  const track = useRef<HTMLDivElement>(null);
+
+  function onScroll() {
+    const el = track.current;
+    if (!el) return;
+    setIndex(Math.max(0, Math.min(albums.length - 1, Math.round(el.scrollLeft / el.clientWidth))));
+  }
+
+  return (
+    <section className="mt-5" aria-label="앨범 배너">
+      <div
+        ref={track}
+        onScroll={onScroll}
+        className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {albums.map((album) => {
+          const bg = coverBannerTone(coverColorOf(album).hex, coverVariant);
+          const fg = readableOn(bg);
+          return (
+            <button
+              key={album.id}
+              type="button"
+              onClick={() => onOpen(album.id)}
+              aria-label={`${album.title} 열기`}
+              className="relative flex aspect-square w-full shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-2xl p-6 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+              style={{ backgroundColor: bg, color: fg }}
+            >
+              <AlbumCover album={album} className="-mt-8 h-64 w-auto" />
+              <span className="absolute inset-x-6 bottom-5 flex items-end justify-between gap-3">
+                <span className="min-w-0">
+                  <b className="block truncate font-heading text-lg font-bold">{album.title}</b>
+                  <small className="block text-xs opacity-80">{formatAlbumPeriod(album)}</small>
+                </span>
+                <ArrowRight className="size-5 shrink-0 opacity-80" />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {albums.length > 1 && (
+        <div className="mt-3 flex justify-center gap-1.5" aria-hidden>
+          {albums.map((album, i) => (
+            <span
+              key={album.id}
+              className={cn(
+                "h-1.5 rounded-full transition-all",
+                i === index ? "w-4 bg-ink" : "w-1.5 bg-ink/20",
+              )}
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
