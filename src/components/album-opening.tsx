@@ -53,14 +53,34 @@ export function AlbumOpening({
     const strips = Array.from(el.querySelectorAll<HTMLElement>(".album-opening-strip"));
     const edge = el.querySelector<HTMLElement>(".album-opening-edge");
     const shade = el.querySelector<HTMLElement>(".album-opening-shade");
-    const photo = el.querySelector<HTMLElement>(".album-opening-photo");
     // 상세 hero 는 폰 캔버스 폭의 정사각이고 페이지 맨 위에 붙는다.
     const cr = document.querySelector<HTMLElement>("[data-screen]")?.getBoundingClientRect();
     const target = { left: cr?.left ?? 0, width: cr?.width ?? window.innerWidth };
 
     let start: number | undefined;
     let revealed = false;
+    let finished = false;
     let raf = 0;
+
+    const doReveal = () => {
+      if (revealed) return;
+      revealed = true;
+      reveal.current();
+    };
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      cancelAnimationFrame(raf);
+      const fade = el.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 260,
+        easing: "ease-out",
+        fill: "forwards",
+      });
+      fade.onfinish = () => done.current();
+    };
+    // 탭이 뒤로 가 있거나 프레임이 밀려도 화면 전환은 제때 일어나야 한다 — 시계 기준 안전장치
+    const revealTimer = window.setTimeout(doReveal, FLIP_START_MS + FLIP_MS * 0.5);
+    const finishTimer = window.setTimeout(finish, END_MS + 400);
 
     const frame = (now: number) => {
       if (start === undefined) start = now;
@@ -101,29 +121,21 @@ export function AlbumOpening({
         edge.style.opacity = f > 0.02 && f < 0.98 ? "1" : "0";
       }
 
-      // 3) 표지가 속지에 드리우던 그늘이 걷히고 사진이 또렷해진다
+      // 3) 표지가 속지에 드리우던 그늘이 걷힌다 — 사진은 처음부터 또렷하다
       if (shade) shade.style.opacity = String(1 - easeOut(f));
-      if (photo) photo.style.opacity = String(lerp(0.35, 1, easeOut(clamp((t - 600) / 900))));
 
       // 4) 절반 넘게 넘어갔을 때 아래 화면을 상세로 바꾼다
-      if (!revealed && base < -100) {
-        revealed = true;
-        reveal.current();
-      }
+      if (base < -100) doReveal();
 
-      if (t < END_MS) {
-        raf = requestAnimationFrame(frame);
-      } else {
-        const fade = el.animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: 260,
-          easing: "ease-out",
-          fill: "forwards",
-        });
-        fade.onfinish = () => done.current();
-      }
+      if (t < END_MS) raf = requestAnimationFrame(frame);
+      else finish();
     };
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(finishTimer);
+    };
   }, [from]);
 
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
