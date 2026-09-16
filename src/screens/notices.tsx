@@ -2,15 +2,13 @@ import { Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { Topbar } from "@/components/topbar";
 import type { Go } from "@/types";
 
 export function NoticesScreen({ go }: { go: Go }) {
   return (
     <>
-      {/* 탭 최상위 화면 — 홈과 같은 상단 바를 두어 네 탭의 제목 시작 위치를 맞춘다. */}
-      <Topbar go={go} />
-      <h1 className="mt-7 font-heading text-display-lg font-bold">알림</h1>
+      {/* 탭 최상위 화면 — 상단 바 없이 제목을 홈의 워드마크와 같은 높이에서 시작한다. */}
+      <h1 className="mt-2.5 font-heading text-display-lg font-bold">알림</h1>
       <section className="mt-6 flex flex-col">
         <ListRow
           onClick={() => go("detail")}
