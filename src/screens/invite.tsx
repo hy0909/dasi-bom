@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, ImagePlus, Plus, RefreshCw, RotateCcw, Share2, X } from "lucide-react";
+import { Check, Copy, ImagePlus, Info, Plus, RefreshCw, RotateCcw, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
@@ -102,6 +103,11 @@ function InviteBody({
   // 링크는 발급일로부터 일주일만 쓴다.
   const expired = isInviteExpired(album);
   const leftDays = inviteDaysLeft(album);
+  const expiresAt = inviteExpiresAt(album);
+  const expiresShort = `${expiresAt.getMonth() + 1}월 ${expiresAt.getDate()}일`;
+  // 말풍선이 폰 캔버스 밖으로 나가지 않게 — 넓은 화면 미리보기에서도 폰 폭 안에 머문다.
+  const [canvas, setCanvas] = useState<Element | null>(null);
+  useEffect(() => setCanvas(document.querySelector("[data-screen]")), []);
 
   async function copy() {
     await copyText(link);
@@ -230,16 +236,56 @@ function InviteBody({
       {/* 참여 링크 — 앨범마다 코드가 다르고, 발급일로부터 일주일만 쓴다 */}
       <Card variant="outline" size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-3">
-          {/* 라벨과 복사 버튼이 한 줄 — 복사는 오른쪽 끝에 붙는다. */}
+          {/* 라벨 · 남은 유효기간(D-n) · 안내 · 복사가 한 줄 — 복사는 오른쪽 끝에 붙는다. */}
           <span className="flex items-center gap-2">
-            <small className="min-w-0 flex-1 truncate text-xs font-semibold text-body">
+            <small className="min-w-0 truncate text-xs font-semibold text-body">
               ‘{album.title}’ 참여 링크
             </small>
-            {expired && <Badge variant="destructive">만료됨</Badge>}
+            {expired ? (
+              <Badge variant="destructive">만료됨</Badge>
+            ) : (
+              <span className="flex shrink-0 items-center gap-0.5">
+                <b className="text-xs font-bold tabular-nums text-primary">
+                  {leftDays === 0 ? "D-DAY" : `D-${leftDays}`}
+                </b>
+                {/* 유효기간 안내 — 한 줄 말풍선. 닫기나 바깥을 누르면 닫힌다(Popover 기본 동작). */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="유효기간 안내"
+                      className="flex size-6 items-center justify-center rounded-full text-body-mid outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/40"
+                    >
+                      <Info className="size-3.5" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="bottom"
+                    align="end"
+                    collisionBoundary={canvas}
+                    collisionPadding={16}
+                    className="w-auto max-w-[calc(100vw-40px)] flex-row items-center gap-1 py-1.5 pr-1 pl-3"
+                  >
+                    <span className="text-xs leading-snug">
+                      초대 링크 유효기간은 일주일이에요. {expiresShort}까지 쓸 수 있어요.
+                    </span>
+                    <PopoverClose asChild>
+                      <button
+                        type="button"
+                        aria-label="닫기"
+                        className="flex size-6 shrink-0 items-center justify-center rounded-full text-body-mid outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/40"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </PopoverClose>
+                  </PopoverContent>
+                </Popover>
+              </span>
+            )}
             <Button
               variant="secondary"
               size="sm"
-              className="-my-1 shrink-0"
+              className="-my-1 ml-auto shrink-0"
               onClick={copy}
               disabled={expired}
             >
@@ -257,13 +303,13 @@ function InviteBody({
           >
             {link}
           </p>
-          <p className="text-xs text-body-mid">
-            {expired
-              ? `${formatKoreanDate(inviteExpiresAt(album))}에 만료됐어요. 링크를 새로 만들면 다시 초대할 수 있어요.`
-              : `${formatKoreanDate(inviteExpiresAt(album))}까지 사용할 수 있어요. ${
-                  leftDays === 0 ? "오늘이 마지막 날이에요." : `${leftDays}일 남았어요.`
-                }`}
-          </p>
+          {/* 남은 기간은 위 D-n으로 보이므로, 만료됐을 때만 안내 문장을 둔다. */}
+          {expired && (
+            <p className="text-xs text-body-mid">
+              {formatKoreanDate(inviteExpiresAt(album))}에 만료됐어요. 링크를 새로 만들면 다시 초대할
+              수 있어요.
+            </p>
+          )}
         </CardContent>
       </Card>
 
