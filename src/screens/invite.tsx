@@ -123,8 +123,9 @@ function InviteBody({
 
   return (
     <>
-      {/* 탭으로 들어오면 상단 바가 없고, 앨범에서 들어오면 돌아갈 곳이 있어 상단 바를 둔다. */}
+      {/* 탭으로 들어오면 홈과 같은 상단 바(워드마크·프로필), 앨범에서 들어오면 뒤로가기 상단 바를 둔다. */}
       {back && <Topbar back={back} title="초대" />}
+      {!back && !justCreated && <Topbar go={go} />}
       {/* 막 만든 앨범이면 뒤로가기를 두지 않는다 — 만들기 화면으로는 되돌아가지 않는다.
           나가는 길은 오른쪽 위 닫기(앨범 홈)와 아래 ‘앨범에 사진 추가’ 둘이다. */}
       {justCreated ? (
@@ -153,7 +154,7 @@ function InviteBody({
           </section>
         </>
       ) : (
-        <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-8")}>
+        <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-7")}>
           <h1 className="font-heading text-display-lg font-bold">함께 추억을 기록해요</h1>
           <p className="text-base leading-relaxed text-body">
             링크를 통해 회원가입없이

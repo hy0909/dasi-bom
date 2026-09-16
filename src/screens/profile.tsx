@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { BottomNav } from "@/components/bottom-nav";
 import { ListRow } from "@/components/list-row";
 import { CharacterAvatar } from "@/components/character-avatar";
+import { Topbar } from "@/components/topbar";
 import { ProviderIcon } from "@/components/provider-icons";
 import { signOut, useSession } from "@/lib/auth";
 import type { Go, Notify } from "@/types";
@@ -16,8 +17,9 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
 
   return (
     <>
-      {/* 탭 최상위 화면이라 상단 바가 없다 — 돌아갈 상위 화면이 없다. */}
-      <h1 className="mt-8 font-heading text-display-lg font-bold">내 설정</h1>
+      {/* 탭 최상위 화면 — 홈과 같은 상단 바를 두어 네 탭의 제목 시작 위치를 맞춘다. */}
+      <Topbar go={go} />
+      <h1 className="mt-7 font-heading text-display-lg font-bold">내 설정</h1>
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex items-center gap-4">
