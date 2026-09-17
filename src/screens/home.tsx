@@ -171,7 +171,7 @@ export function HomeScreen({
           </CardContent>
         </Card>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-5">
           {list.map((item) => (
             <AlbumCard
               key={item.id}
