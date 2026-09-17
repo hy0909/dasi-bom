@@ -10,6 +10,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { MemberRow } from "@/components/member-row";
 import {
   INVITE_DAYS,
+  albumPeriod,
   formatAlbumPeriod,
   formatAlbumStart,
   formatKoreanDate,
@@ -88,6 +89,8 @@ function InviteBody({
   );
   const participants = useAlbumParticipants()[album.id] ?? [];
   const photoStore = usePhotoStore();
+  /** 기간을 비워 둔 앨범은 사진의 촬영 날짜가 기간이 된다. */
+  const periodOf = (item: AlbumCardData) => albumPeriod(item, photoStore[item.id] ?? []);
 
   // 고른 앨범이 목록 아래쪽이면 처음부터 보이도록 스크롤을 맞춘다.
   const selectedRow = useRef<HTMLButtonElement>(null);
@@ -175,7 +178,9 @@ function InviteBody({
           <img src={album.cover} alt="" className="size-12 shrink-0 rounded-md object-cover" />
           <span className="min-w-0">
             <b className="block truncate text-[15px] font-semibold">{album.title}</b>
-            <small className="block text-xs text-body-mid">{formatAlbumPeriod(album)}</small>
+            <small className="block text-xs text-body-mid">
+              {formatAlbumPeriod(periodOf(album)) || "사진을 넣으면 촬영 날짜로 기간이 채워져요"}
+            </small>
           </span>
         </div>
       )}
@@ -214,7 +219,9 @@ function InviteBody({
                   <span className="min-w-0 flex-1">
                     <b className="block truncate text-sm font-semibold">{item.title}</b>
                     <small className="block truncate text-[11.5px] text-body-mid">
-                      {formatAlbumStart(item)} · 사진 {photoStore[item.id]?.length ?? 0}장
+                      {[formatAlbumStart(periodOf(item)), `사진 ${photoStore[item.id]?.length ?? 0}장`]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </small>
                   </span>
                   <span

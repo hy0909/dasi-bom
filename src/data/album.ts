@@ -11,7 +11,43 @@ export type Album = {
   description: string;
   /** 커버 색 — 만들 때 고른다. 없으면 id 로 정해지는 기본색. */
   coverColor?: CoverColorId;
+  /** 표지 판형 — 만들 때 고른다. 없으면 세로형(4:5). */
+  coverShape?: CoverShapeId;
+  /** 표지에서 사진이 앉는 자리 — 만들 때 고른다. 없으면 기본 창. */
+  coverFrame?: CoverFrameId;
 };
+
+/**
+ * 앨범 판형 — 만들 때 고르는 네 가지 표지 비율.
+ * aspect 는 세로/가로 — 열림 모션과 상세 hero 가 이 값으로 앨범의 자리를 잡는다.
+ */
+export const COVER_SHAPES = [
+  { id: "portrait", label: "세로형", ratio: "4:5", aspect: 5 / 4, cls: "aspect-[4/5]" },
+  { id: "square", label: "정사각형", ratio: "1:1", aspect: 1, cls: "aspect-square" },
+  { id: "landscape", label: "가로형", ratio: "4:3", aspect: 3 / 4, cls: "aspect-[4/3]" },
+  { id: "tall", label: "긴 세로형", ratio: "3:5", aspect: 5 / 3, cls: "aspect-[3/5]" },
+] as const;
+export type CoverShapeId = (typeof COVER_SHAPES)[number]["id"];
+
+/** 고르지 않았으면 세로형 — 지금까지의 앨범은 모두 이 판형이다. */
+export function coverShapeOf(album: Pick<Album, "coverShape">) {
+  return COVER_SHAPES.find((s) => s.id === album.coverShape) ?? COVER_SHAPES[0];
+}
+
+/** 표지에서 사진이 보이는 자리 — 만들 때 고르는 다섯 가지. */
+export const COVER_FRAMES = [
+  { id: "window", label: "기본 창", hint: "사진 비율 그대로 파인 창" },
+  { id: "baroque", label: "고전 액자", hint: "금박 몰딩을 두른 액자" },
+  { id: "square", label: "정사각 창", hint: "정사각 안에 사진 전체" },
+  { id: "oval", label: "타원 창", hint: "가로로 긴 타원" },
+  { id: "photo", label: "사진 표지", hint: "표지를 사진으로 가득" },
+] as const;
+export type CoverFrameId = (typeof COVER_FRAMES)[number]["id"];
+
+/** 고르지 않았으면 기본 창 — 지금까지의 앨범은 모두 이 창이다. */
+export function coverFrameOf(album: Pick<Album, "coverFrame">) {
+  return COVER_FRAMES.find((f) => f.id === album.coverFrame) ?? COVER_FRAMES[0];
+}
 
 /** 앨범 커버 색 — 만들 때 고르는 11가지. */
 export const COVER_COLORS = [
@@ -139,6 +175,42 @@ export const defaultAlbum: Album = {
   endDate: "2023-07-17",
   description: "가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요.",
 };
+
+/**
+ * 사진의 촬영 시각에서 뽑은 기간 — 가장 이른 사진이 시작일, 가장 늦은 사진이 종료일이다.
+ * 사진이 없으면 기간도 없다.
+ */
+export function photoPeriod(photos: { takenAt: string }[]) {
+  if (photos.length === 0) return { startDate: "", endDate: "" };
+  let first = photos[0].takenAt;
+  let last = photos[0].takenAt;
+  for (const { takenAt } of photos) {
+    if (takenAt < first) first = takenAt;
+    if (takenAt > last) last = takenAt;
+  }
+  return { startDate: first.slice(0, 10), endDate: last.slice(0, 10) };
+}
+
+/**
+ * 화면에 보이는 앨범 기간.
+ * 날짜를 적어 둔 앨범은 적은 대로 쓰고, 비워 둔 앨범은 사진의 촬영 날짜로 채운다.
+ * 한쪽만 적어 두면 나머지 한쪽만 사진에서 채운다.
+ */
+export function albumPeriod(
+  album: Pick<Album, "startDate" | "endDate">,
+  photos: { takenAt: string }[],
+) {
+  const fromPhotos = photoPeriod(photos);
+  return {
+    startDate: album.startDate || fromPhotos.startDate,
+    endDate: album.endDate || fromPhotos.endDate,
+    /** 사진에서 채운 날짜인가 — 앨범 정보 화면이 이 사실을 알려준다. */
+    auto: {
+      start: !album.startDate && !!fromPhotos.startDate,
+      end: !album.endDate && !!fromPhotos.endDate,
+    },
+  };
+}
 
 /** 2023년 7월 10일 - 7월 17일 — 같은 해면 뒤쪽 연도는 생략한다. */
 export function formatAlbumPeriod({ startDate, endDate }: Pick<Album, "startDate" | "endDate">) {

@@ -8,9 +8,15 @@ import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { COVER_COLORS, defaultAlbum, type CoverColorId } from "@/data/album";
+import {
+  COVER_COLORS,
+  type CoverColorId,
+  type CoverFrameId,
+  type CoverShapeId,
+} from "@/data/album";
 import { AlbumCover } from "@/components/album-cover";
 import { CoverColorPicker } from "@/components/cover-color-picker";
+import { CoverFramePicker, CoverShapePicker } from "@/components/cover-style-picker";
 import type { AlbumCardData } from "@/data/albums";
 import type { Go } from "@/types";
 import { toast } from "sonner";
@@ -19,7 +25,7 @@ import { toast } from "sonner";
 const PLACEHOLDER_COVER =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#ece7e3"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="#ece7e3"/></svg>`,
   );
 
 export function CreateScreen({
@@ -30,8 +36,9 @@ export function CreateScreen({
   onCreate: (album: AlbumCardData) => void;
 }) {
   const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState(defaultAlbum.startDate);
-  const [endDate, setEndDate] = useState(defaultAlbum.endDate);
+  // 날짜는 비워 두고 시작한다 — 적지 않으면 사진의 촬영 날짜에서 채운다.
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [ready, setReady] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
@@ -39,6 +46,9 @@ export function CreateScreen({
   const [coverColor, setCoverColor] = useState<CoverColorId>(
     () => COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].id,
   );
+  // 판형과 사진이 앉는 자리 — 기본값은 지금까지의 앨범과 같은 세로형 기본 창이다.
+  const [coverShape, setCoverShape] = useState<CoverShapeId>("portrait");
+  const [coverFrame, setCoverFrame] = useState<CoverFrameId>("window");
 
   function chooseFile(file?: File) {
     if (!file) return;
@@ -65,6 +75,8 @@ export function CreateScreen({
           endDate,
           description: description.trim(),
           coverColor,
+          coverShape,
+          coverFrame,
           // 참여 링크는 만든 순간부터 일주일 동안 쓴다.
           inviteIssuedAt: new Date().toISOString(),
           // 대표 사진을 고르지 않았으면 첫 사진을 올릴 때까지 회색 자리로 둔다.
@@ -100,14 +112,20 @@ export function CreateScreen({
           />
         </Field>
 
-        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다. */}
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="시작일" htmlFor="start" className="min-w-0">
-            <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
-          </Field>
-          <Field label="종료일" htmlFor="end" className="min-w-0">
-            <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
-          </Field>
+        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다.
+            둘 다 비워 둬도 된다 — 그러면 사진의 촬영 날짜가 앨범 기간이 된다. */}
+        <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="시작일" htmlFor="start" className="min-w-0">
+              <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
+            </Field>
+            <Field label="종료일" htmlFor="end" className="min-w-0">
+              <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
+            </Field>
+          </div>
+          <p className="text-xs text-body-mid">
+            비워 두면 사진을 넣을 때 가장 이른 촬영 날짜와 가장 늦은 촬영 날짜로 채워져요.
+          </p>
         </div>
 
         <Field label="짧은 설명" htmlFor="desc">
@@ -140,13 +158,33 @@ export function CreateScreen({
 
         <Field label="앨범 커버 색">
           <div className="flex items-start gap-4">
-            {/* 고른 색과 대표 사진이 실제 커버로 어떻게 보이는지 바로 보여준다. */}
+            {/* 고른 색·판형·사진 자리가 실제 커버로 어떻게 보이는지 바로 보여준다. */}
             <AlbumCover
-              album={{ id: "preview", coverColor, cover: cover ?? PLACEHOLDER_COVER }}
+              album={{
+                id: "preview",
+                coverColor,
+                coverShape,
+                coverFrame,
+                cover: cover ?? PLACEHOLDER_COVER,
+              }}
               className="mt-1 w-40 shrink-0"
             />
             <CoverColorPicker value={coverColor} onChange={setCoverColor} />
           </div>
+        </Field>
+
+        <Field label="앨범 판형">
+          <CoverShapePicker value={coverShape} onChange={setCoverShape} />
+        </Field>
+
+        <Field label="사진이 보이는 자리">
+          <CoverFramePicker
+            value={coverFrame}
+            onChange={setCoverFrame}
+            shape={coverShape}
+            color={coverColor}
+            cover={cover ?? PLACEHOLDER_COVER}
+          />
         </Field>
 
         <StickyBar>

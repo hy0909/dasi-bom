@@ -15,12 +15,16 @@ import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { AlbumCover } from "@/components/album-cover";
 import {
+  albumPeriod,
   coverBannerTone,
   coverColorOf,
+  coverFabricTone,
+  coverShapeOf,
   formatAlbumPeriod,
   formatAlbumStart,
   readableOn,
 } from "@/data/album";
+import type { CoverShapeId } from "@/data/album";
 import { coverVariant } from "@/lib/variant";
 import { cn } from "@/lib/utils";
 import type { AlbumCardData } from "@/data/albums";
@@ -42,7 +46,7 @@ const filterLabels: Record<AlbumFilter, string> = {
 
 export function HomeScreen({
   go,
-  albums,
+  albums: myAlbums,
   onOpenAlbum,
   notify,
 }: {
@@ -58,6 +62,11 @@ export function HomeScreen({
   const participants = useAlbumParticipants();
   const membership = useMyAlbums();
   const photoStore = usePhotoStore();
+  // 기간을 비워 둔 앨범은 사진의 촬영 날짜를 기간으로 쓴다 — 배너와 목록이 같은 날짜를 본다.
+  const albums = myAlbums.map((album) => {
+    const { startDate, endDate } = albumPeriod(album, photoStore[album.id] ?? []);
+    return { ...album, startDate, endDate };
+  });
   // 멤버십이 없는 앨범은 내가 만든 것으로 본다 — 목록에 있다는 건 이미 참여 중이라는 뜻이다.
   const roleOf = (id: string) => membership[id]?.role ?? "owner";
   const counts = {
@@ -325,6 +334,18 @@ function AlbumCard({
 }
 
 /** 앨범 배너 — 쨍한 배경 위에 앨범 한 권을 크게. 옆으로 밀어 다음 앨범으로. */
+/**
+ * 배너 안에서 앨범 한 권이 앉는 크기.
+ * 세로로 긴 판형은 배너보다 커서 아래가 잘리고, 가로로 넓은 판형은 배너 안에 다 들어온다.
+ * 어느 쪽이든 사진이 앉는 자리는 배너 안에 온전히 남는다.
+ */
+const BANNER_FIT: Record<CoverShapeId, string> = {
+  portrait: "-mt-3 h-[146%] w-auto",
+  tall: "-mt-4 h-[152%] w-auto",
+  square: "mt-4 h-auto w-[70%]",
+  landscape: "mt-8 h-auto w-[86%]",
+};
+
 function AlbumBanner({
   albums,
   photoCountOf,
@@ -344,15 +365,17 @@ function AlbumBanner({
   }
 
   return (
-    <section className="mt-5" aria-label="앨범 배너">
+    // 헤더 바로 아래에 붙는 전면 배너 — 좌우로 꽉 차고 모서리도 깎지 않는다
+    <section className="-mx-5" aria-label="앨범 배너">
       <div
         ref={track}
         onScroll={onScroll}
-        className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {albums.map((album) => {
           const bg = coverBannerTone(coverColorOf(album).hex, coverVariant);
-          const fg = readableOn(bg);
+          // 제목은 배경이 아니라 표지 천 위에 얹힌다 — 읽히는 색도 천을 기준으로 고른다
+          const fg = readableOn(coverFabricTone(coverColorOf(album).hex, coverVariant));
           return (
             <button
               key={album.id}
@@ -365,16 +388,32 @@ function AlbumBanner({
                 )
               }
               aria-label={`${album.title} 열기`}
-              className="album-3d-hover relative flex aspect-square w-full shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-2xl p-6 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+              className="album-3d-hover relative flex aspect-[4/3] w-full shrink-0 snap-center flex-col items-center overflow-hidden text-left outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring/40"
               style={{ backgroundColor: bg, color: fg }}
             >
-              <AlbumCover album={album} photoCount={photoCountOf(album.id)} className="-mt-8 h-64 w-auto" />
-              <span className="absolute inset-x-6 bottom-5 flex items-end justify-between gap-3">
+              {/* 앨범 한 권이 배너보다 크다 — 위에서부터 놓고 아래는 배너 밖으로 잘린다. 사진 창은 다 보인다 */}
+              <AlbumCover
+                album={album}
+                photoCount={photoCountOf(album.id)}
+                className={cn("shrink-0", BANNER_FIT[coverShapeOf(album).id])}
+              />
+              {/* 사진 표지처럼 밝은 표지 위에서도 제목이 읽히도록, 위쪽만 아주 옅게 깐다 */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-24"
+                style={{
+                  background: `linear-gradient(to bottom, ${
+                    fg === "#ffffff" ? "rgb(0 0 0 / 0.42)" : "rgb(255 255 255 / 0.5)"
+                  }, transparent)`,
+                }}
+              />
+              {/* 제목은 사진 창 위쪽, 표지의 빈 천 자리에 */}
+              <span className="absolute inset-x-5 top-4 flex items-start justify-between gap-3">
                 <span className="min-w-0">
                   <b className="block truncate font-heading text-lg font-bold">{album.title}</b>
                   <small className="block text-xs opacity-80">{formatAlbumPeriod(album)}</small>
                 </span>
-                <ArrowRight className="size-5 shrink-0 opacity-80" />
+                <ArrowRight className="mt-0.5 size-5 shrink-0 opacity-80" />
               </span>
             </button>
           );

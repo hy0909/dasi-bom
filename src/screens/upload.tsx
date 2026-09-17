@@ -1,10 +1,18 @@
 import { useRef, useState } from "react";
 import { FolderOpen, Images, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Topbar } from "@/components/topbar";
+import { albumPeriod, formatAlbumPeriod } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { type Photo, addPhotos, byTakenAt, photoFromFile } from "@/data/photos";
+import {
+  type Photo,
+  addPhotos,
+  byTakenAt,
+  formatDate,
+  photoFromFile,
+  useAlbumPhotos,
+  withPlace,
+} from "@/data/photos";
 import type { Go, Notify } from "@/types";
 
 /** 파일 탐색기를 다운로드 폴더에서 열 수 있는 환경인가 — 데스크톱 크로미움 계열. */
@@ -27,15 +35,35 @@ export function UploadScreen({
   notify: Notify;
 }) {
   const [items, setItems] = useState<Photo[]>([]);
+  /** 사진에서 촬영 정보를 읽고 지명을 받아오는 중 — 그동안은 추가를 막는다. */
+  const [reading, setReading] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const touch = isTouch();
   const folder = !touch && canOpenFolder();
 
-  function add(files: File[]) {
+  // 앨범에 이미 있는 사진까지 더해야 기간이 어떻게 채워질지 미리 보여줄 수 있다.
+  const inAlbum = useAlbumPhotos(album.id);
+  const period = albumPeriod(album, [...inAlbum, ...items]);
+  // 촬영 시각이 적혀 있지 않아 파일 시각으로 갈음한 사진 — 몇 장인지 밝혀 둔다.
+  const guessed = items.filter((photo) => photo.takenAtFrom !== "exif").length;
+
+  async function add(files: File[]) {
     const images = files.filter((f) => f.type.startsWith("image/"));
     if (images.length === 0) return;
+    setReading(true);
+    // 촬영 시각과 좌표는 사진 안에 적혀 있다 — 파일에서 바로 읽어 먼저 줄을 세운다.
+    const picked = await Promise.all(images.map(photoFromFile));
     // 고르는 순서와 상관없이 촬영 시각순으로 줄을 세운다 — 기록도 이 순서로 한다.
-    setItems((old) => byTakenAt([...old, ...images.map(photoFromFile)]));
+    setItems((old) => byTakenAt([...old, ...picked]));
+    // 좌표를 지명으로 바꾸는 일만 시간이 걸린다 — 도착하는 사진부터 한 장씩 채운다.
+    await Promise.all(
+      picked.map(async (photo) => {
+        if (!photo.coords) return;
+        const named = await withPlace(photo);
+        setItems((old) => old.map((item) => (item.src === photo.src ? named : item)));
+      }),
+    );
+    setReading(false);
   }
 
   /** 데스크톱은 다운로드 폴더부터 연다. 그 외에는 기기의 기본 사진 선택기로 넘긴다. */
@@ -92,36 +120,55 @@ export function UploadScreen({
         }}
       />
 
-      {items.length > 0 && (
-        <p className="mt-5 text-xs text-body">
-          촬영이 이른 사진부터 정렬했어요. 이 순서대로 기록을 남기게 돼요.
-        </p>
+      {(items.length > 0 || reading) && (
+        <div className="mt-5 flex flex-col gap-1 text-xs text-body">
+          <p>
+            {reading
+              ? "사진에 적힌 촬영 날짜와 장소를 읽고 있어요…"
+              : "사진에 적힌 촬영 날짜와 장소를 읽어 이른 순서로 정렬했어요. 이 순서대로 기록을 남기게 돼요."}
+          </p>
+          {!reading && guessed > 0 && (
+            <p className="text-body-mid">
+              {guessed}장은 촬영 정보가 없어 파일에 적힌 시각으로 정리했어요. 날짜는 나중에 고칠 수
+              있어요.
+            </p>
+          )}
+          {/* 날짜를 비워 둔 앨범이면, 이 사진들로 기간이 어떻게 채워지는지 미리 보여준다. */}
+          {!reading && (period.auto.start || period.auto.end) && (
+            <p className="text-body-mid">
+              앨범 기간도 사진 날짜에 맞춰 <b className="font-semibold text-body">{formatAlbumPeriod(period)}</b>
+              로 채워져요.
+            </p>
+          )}
+        </div>
       )}
 
       {items.length > 0 && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {items.map((photo, i) => (
-            <div
-              key={photo.src}
-              className="relative aspect-square overflow-hidden rounded-lg bg-muted"
-            >
-              <img
-                src={photo.src}
-                alt={photo.title || `선택한 사진 ${i + 1}`}
-                className="size-full object-cover"
-              />
-              <Button
-                variant="secondary"
-                size="icon-xs"
-                className="absolute top-1.5 right-1.5 rounded-full"
-                onClick={() => setItems(items.filter((_, n) => n !== i))}
-                aria-label={`${photo.title || `사진 ${i + 1}`} 선택 해제`}
-              >
-                <X className="size-3.5" />
-              </Button>
-              <Badge variant="glass" className="absolute bottom-1.5 left-1.5 h-5 px-2 text-[10px]">
-                업로드 준비
-              </Badge>
+            <div key={photo.src} className="flex flex-col gap-1">
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+                <img
+                  src={photo.src}
+                  alt={photo.title || `선택한 사진 ${i + 1}`}
+                  className="size-full object-cover"
+                />
+                <Button
+                  variant="secondary"
+                  size="icon-xs"
+                  className="absolute top-1.5 right-1.5 rounded-full"
+                  onClick={() => setItems(items.filter((_, n) => n !== i))}
+                  aria-label={`${photo.title || `사진 ${i + 1}`} 선택 해제`}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+              {/* 읽어 온 촬영 정보를 바로 확인시켜 준다 — 앨범 상세에도 이 값이 그대로 간다.
+                  해가 다른 사진이 섞일 수 있어 날짜는 연도까지 적고, 장소는 아랫줄에 둔다. */}
+              <small className="flex flex-col px-0.5 text-[10.5px] leading-tight text-body-mid">
+                <span className="truncate">{formatDate(photo.takenAt)}</span>
+                <span className="truncate">{photo.shortPlace}</span>
+              </small>
             </div>
           ))}
         </div>
@@ -130,7 +177,7 @@ export function UploadScreen({
       <Button
         size="lg"
         className="mt-6 w-full"
-        disabled={!items.length}
+        disabled={!items.length || reading}
         onClick={() => {
           addPhotos(album.id, items);
           notify(`사진 ${items.length}장을 촬영 시간순으로 정리했어요`);
@@ -138,7 +185,11 @@ export function UploadScreen({
           go("interview");
         }}
       >
-        {items.length ? `사진 ${items.length}장 추가하고 기록 시작` : "사진을 먼저 골라주세요"}
+        {reading
+          ? "촬영 정보를 읽고 있어요…"
+          : items.length
+            ? `사진 ${items.length}장 추가하고 기록 시작`
+            : "사진을 먼저 골라주세요"}
       </Button>
     </>
   );

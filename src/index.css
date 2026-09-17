@@ -336,6 +336,142 @@ html {
   max-height: 46cqh;
 }
 
+/* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
+   기본 창(window)은 위의 규칙 그대로다. 아래는 나머지 넷만 덮어쓴다. */
+
+/* 고전 액자 — 금박 몰딩을 두르고 모서리는 진짜 액자처럼 45도로 맞물린다 */
+.album-book[data-frame="baroque"] .album-cover-window {
+  padding: 5cqw;
+  border-radius: 2px;
+  background-color: #b78f4a;
+  background-image:
+    /* 네 모서리의 이음선 */
+    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
+    /* 금박의 결 */
+    repeating-linear-gradient(140deg, rgb(255 255 255 / 0.1) 0 1px, rgb(0 0 0 / 0.07) 1px 3px),
+    /* 몰딩에 닿는 빛 */
+    linear-gradient(150deg, #f1dcab 0%, #c39a52 34%, #8e6a30 58%, #e0c489 78%, #9c7638 100%);
+  background-repeat: no-repeat;
+  background-position:
+    top left,
+    top right,
+    bottom left,
+    bottom right,
+    0 0,
+    0 0;
+  background-size:
+    5cqw 5cqw,
+    5cqw 5cqw,
+    5cqw 5cqw,
+    5cqw 5cqw,
+    auto,
+    auto;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.38),
+    inset 0 0 0 1px rgb(255 255 255 / 0.4),
+    4px 7px 14px -6px rgb(0 0 0 / 0.5);
+}
+/* 안쪽 몰딩 한 단 — 액자 특유의 층 */
+.album-book[data-frame="baroque"] .album-cover-window::before {
+  content: "";
+  position: absolute;
+  inset: 2.4cqw;
+  border-radius: 1px;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.42),
+    inset 0 0 0 1px rgb(0 0 0 / 0.34);
+}
+/* 사진 가장자리에만 그늘 — 액자 안쪽으로 한 겹 들어간 자리 */
+.album-book[data-frame="baroque"] .album-cover-window::after {
+  inset: 5cqw;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.45),
+    inset 2px 3px 6px rgb(0 0 0 / 0.35);
+}
+
+/* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */
+.album-book[data-frame="square"] .album-cover-window {
+  width: 62cqw;
+  aspect-ratio: 1;
+  padding: 2.6cqw;
+  border-radius: 1px;
+  background: #f4efe6;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.14),
+    3px 5px 10px -5px rgb(0 0 0 / 0.4);
+}
+.album-book[data-frame="square"] .album-cover-window img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  background: #e6ded1;
+}
+.album-book[data-frame="square"] .album-cover-window::after {
+  inset: 2.6cqw;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.2),
+    inset 1px 2px 4px rgb(0 0 0 / 0.22);
+}
+
+/* 타원 창 — 가로로 긴 타원에 금색 테를 두른 카메오 */
+.album-book[data-frame="oval"] .album-cover-window {
+  width: 68cqw;
+  aspect-ratio: 16 / 10;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px rgb(199 162 90 / 0.65),
+    0 0 0 3px rgb(0 0 0 / 0.28),
+    3px 6px 12px -6px rgb(0 0 0 / 0.45);
+}
+.album-book[data-frame="oval"] .album-cover-window img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
+.album-book[data-frame="oval"] .album-cover-window::after {
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.35),
+    inset 1px 2px 6px rgb(0 0 0 / 0.3);
+}
+
+/* 사진 표지 — 표지를 사진이 가득 채운다. 책등만 사진 위로 남는다 */
+.album-book[data-frame="photo"] .album-cover-well {
+  padding-left: 0;
+}
+.album-book[data-frame="photo"] .album-cover-spine {
+  z-index: 1;
+}
+.album-book[data-frame="photo"] .album-cover-window {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  box-shadow: none;
+}
+.album-book[data-frame="photo"] .album-cover-window img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
+/* 표지 가장자리의 얕은 그늘과 아래쪽 어둠 — 사진만 얹어도 하드커버로 읽히게 */
+.album-book[data-frame="photo"] .album-cover-window::after {
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.22),
+    inset 0 -18cqh 26cqh -18cqh rgb(0 0 0 / 0.38);
+}
+
 /* 앨범 열림 오버레이 — 스크림 위에서 앨범 한 권이 커지고 표지가 넘어간다 */
 .album-opening {
   position: fixed;

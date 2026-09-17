@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from "react";
+import { readPhotoMeta } from "@/lib/exif";
+import { NO_PLACE, coordsName, placeOf } from "@/lib/geocode";
 
 export type PhotoStatus = "기록 중" | "기록 완료";
 
@@ -10,6 +12,10 @@ export type Photo = {
   place: string;
   /** 사진 위에 짧게 붙일 장소 이름 */
   shortPlace: string;
+  /** 사진에 적혀 있던 촬영 좌표(EXIF GPS) — 장소 이름이 여기서 나온다. 없는 사진도 많다. */
+  coords?: { lat: number; lon: number };
+  /** 촬영 시각을 어디서 읽었는지 — EXIF 가 없으면 파일 시각으로 갈음한 것이다. */
+  takenAtFrom?: "exif" | "file";
   /** 사진 한 장의 기록 상태 — 앨범 상태와 같은 두 가지만 쓴다 */
   status: PhotoStatus;
   /** 대체 텍스트 — 비워두면 제목을 읽는다 */
@@ -297,19 +303,34 @@ export function addPhotos(albumId: string, added: Photo[]) {
 
 /**
  * 고른 파일 한 장을 사진으로 바꾼다.
- * 촬영 시각은 파일의 수정 시각으로 갈음하고, 위치는 알 수 없다(EXIF 는 읽지 않는다).
+ * 촬영 시각과 촬영 위치는 사진 안에 적혀 있는 EXIF 에서 읽는다.
+ * 시각이 없는 사진은 파일 시각으로 갈음하고, 위치가 없으면 '위치 없음'으로 둔다.
+ * 좌표를 지명으로 바꾸는 데는 시간이 걸리므로 그 일은 withPlace() 가 맡는다.
  */
-export function photoFromFile(file: File): Photo {
-  const takenAt = new Date(file.lastModified || Date.now());
-  const offset = takenAt.getTimezoneOffset() * 60000;
+export async function photoFromFile(file: File): Promise<Photo> {
+  const meta = await readPhotoMeta(file);
   return {
     src: URL.createObjectURL(file),
     title: file.name.replace(/\.[^.]+$/, ""),
-    takenAt: new Date(takenAt.getTime() - offset).toISOString().slice(0, 19),
-    place: "위치 없음",
-    shortPlace: "위치 없음",
+    takenAt: meta.takenAt ?? localIso(file.lastModified || Date.now()),
+    takenAtFrom: meta.takenAt ? "exif" : "file",
+    coords: meta.coords,
+    // 지명이 도착하기 전에는 좌표를 그대로 적어 둔다 — 빈칸도, 지어낸 이름도 아니다.
+    ...(meta.coords ? coordsName(meta.coords.lat, meta.coords.lon) : NO_PLACE),
     status: "기록 중",
   };
+}
+
+/** 좌표를 지명으로 바꿔 채운 사진 — 좌표가 없거나 이름을 못 찾으면 들어온 그대로 돌려준다. */
+export async function withPlace(photo: Photo): Promise<Photo> {
+  if (!photo.coords) return photo;
+  return { ...photo, ...(await placeOf(photo.coords.lat, photo.coords.lon)) };
+}
+
+/** 로컬 시계 기준 ISO(초까지) — 촬영 시각은 사진을 찍은 곳의 시계를 그대로 쓴다. */
+function localIso(ms: number) {
+  const at = new Date(ms);
+  return new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
 }
 
 /** 앨범에 도착한 목소리 — 어느 사진에 달렸는지까지 함께 넘긴다. */

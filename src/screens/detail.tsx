@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatAlbumPeriod } from "@/data/album";
+import { albumPeriod, coverShapeOf, formatAlbumPeriod } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { type Participant, useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -155,19 +155,21 @@ export function DetailScreen({
   const others = participants.filter((p) => p.name !== session?.name);
   const iAmOwner = useMyAlbums()[album.id]?.role !== "member";
   const pending = photos.filter((p) => p.status === "기록 중").length;
+  // 기간을 비워 둔 앨범은 사진의 촬영 날짜가 곧 기간이다 — 사진이 없으면 아직 기간도 없다.
+  const period = formatAlbumPeriod(albumPeriod(album, photos));
 
   return (
     <>
       {/* hero — 좌우 여백과 상단 여백을 무시하고 꽉 채우는 4:5 사진. 앨범 커버와 같은 비율이라 열림 모션이 그대로 이어진다 */}
       <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))]">
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink">
+        <div className={cn("relative w-full overflow-hidden bg-ink", coverShapeOf(album).cls)}>
           <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
           {/* 아래쪽은 제목이, 위쪽은 상단 버튼이 읽히도록 각각 어둡게 */}
           <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/55 to-transparent" />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
-            <p className="text-sm font-medium text-canvas-soft/80">{formatAlbumPeriod(album)}</p>
+            {period && <p className="text-sm font-medium text-canvas-soft/80">{period}</p>}
             <h1 className="font-heading text-display-xl font-bold">
               {first}
               {rest.length > 0 && (

@@ -25,6 +25,9 @@ export const initialAlbums: AlbumCardData[] = [
     inviteIssuedAt: daysAgo(23),
     title: "제주 가족여행",
     coverColor: "blue",
+    // 정사각 판형에 가로로 긴 타원 창 — 만들 때 고를 수 있는 판형·창의 예
+    coverShape: "square",
+    coverFrame: "oval",
     startDate: "2024-05-03",
     endDate: "2024-05-06",
     description: "사촌들까지 다 모인 3박 4일. 바다와 오름을 돌아다닌 기록이에요.",
@@ -37,6 +40,8 @@ export const initialAlbums: AlbumCardData[] = [
     inviteIssuedAt: daysAgo(1),
     title: "할머니와 보낸 여름",
     coverColor: "green",
+    // 금박 몰딩을 두른 고전 액자 창
+    coverFrame: "baroque",
     startDate: "2024-08-02",
     endDate: "2024-08-11",
     description: "방학 내내 할머니 댁에서 지낸 여름의 기록이에요.",
@@ -65,6 +70,9 @@ export const initialAlbums: AlbumCardData[] = [
     endDate: "2025-12-31",
     description: "입학식부터 종업식까지, 1학년 한 해를 사진 50장으로 모았어요.",
     coverColor: "red",
+    // 가로 판형에 표지를 사진으로 가득 채운 예
+    coverShape: "landscape",
+    coverFrame: "photo",
     cover: photosOf("school1")[0].src,
     coverAlt: "입학식 아침의 아이",
   },

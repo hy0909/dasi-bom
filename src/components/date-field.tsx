@@ -54,6 +54,7 @@ export function DateField({
   label,
   value,
   onChange,
+  auto = "",
   compact = false,
   className,
 }: {
@@ -62,18 +63,24 @@ export function DateField({
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /**
+   * 고르지 않아도 대신 쓰이는 날짜(yyyy-mm-dd) — 앨범 기간을 사진에서 채울 때처럼.
+   * 값은 여전히 비어 있고, 자리에만 연하게 보여준다.
+   */
+  auto?: string;
   /** 좁은 칸에 들어갈 때 — 날짜를 짧게 적어 아이콘과 부딪히지 않게 한다. */
   compact?: boolean;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const selected = parseValue(value);
-  // 모달을 다시 열면 고른 달부터 보여준다.
-  const [month, setMonth] = useState(selected ?? new Date());
+  const format = compact ? formatPickedDateShort : formatPickedDate;
+  // 모달을 다시 열면 고른 달부터, 고른 날이 없으면 자동으로 채워질 달부터 보여준다.
+  const [month, setMonth] = useState(selected ?? parseValue(auto) ?? new Date());
   useEffect(() => {
-    if (open) setMonth(selected ?? new Date());
+    if (open) setMonth(selected ?? parseValue(auto) ?? new Date());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, value]);
+  }, [open, value, auto]);
 
   return (
     <div className={cn("relative", className)}>
@@ -88,7 +95,7 @@ export function DateField({
         )}
       >
         <span className={cn("min-w-0 flex-1 truncate", !value && "text-body-mid")}>
-          {(compact ? formatPickedDateShort(value) : formatPickedDate(value)) || "날짜 선택"}
+          {format(value) || format(auto) || "날짜 선택"}
         </span>
         <CalendarIcon className="size-4 shrink-0 text-body-mid" />
       </button>
@@ -99,7 +106,10 @@ export function DateField({
           <DialogHeader className="gap-1 text-left">
             <DialogTitle className="font-heading text-display-sm font-bold">{label}</DialogTitle>
             <DialogDescription className="text-sm text-body">
-              {formatPickedDate(value) || "날짜를 골라주세요."}
+              {formatPickedDate(value) ||
+                (auto
+                  ? `지금은 사진 날짜로 ${formatPickedDate(auto)}을 쓰고 있어요.`
+                  : "날짜를 골라주세요.")}
             </DialogDescription>
           </DialogHeader>
 
