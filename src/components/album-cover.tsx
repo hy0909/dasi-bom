@@ -110,7 +110,7 @@ function CoverLettering() {
         </textPath>
       </text>
       {/* 글줄 아래 얇고 연한 가로선 */}
-      <line x1="36" y1="29" x2="64" y2="29" stroke="#dcb0a0" strokeWidth="0.35" opacity="0.7" />
+      <line x1="38" y1="19" x2="62" y2="19" stroke="#dcb0a0" strokeWidth="0.3" opacity="0.7" />
     </svg>
   );
 }
