@@ -1,8 +1,8 @@
-import { ChevronRight } from "lucide-react";
+import { AudioLines, ChevronRight, PenLine } from "lucide-react";
 import { Topbar } from "@/components/topbar";
 import { StatusFilter, useStatusFilter } from "@/components/status-filter";
 import type { AlbumCardData } from "@/data/albums";
-import { formatDate, photoStatus, useAlbumPhotos } from "@/data/photos";
+import { formatDate, photoStatus, useAlbumPhotos, type Photo } from "@/data/photos";
 import type { Go } from "@/types";
 
 /** 앨범의 사진을 상태별로 모아, 남은 사진은 바로 이어서 기록하도록 돕는 화면. */
@@ -56,6 +56,8 @@ export function RecordListScreen({
                   </span>{" "}
                   · {formatDate(photo.takenAt)} · {photo.shortPlace}
                 </small>
+                {/* 기록이 끝난 사진은 목소리·글 중 무엇이 들어왔는지 함께 보인다 */}
+                <RecordMarks photo={photo} />
               </span>
               <ChevronRight className="size-4 shrink-0 text-body-mid" />
             </button>
@@ -63,5 +65,27 @@ export function RecordListScreen({
         </section>
       )}
     </>
+  );
+}
+
+/** 이 사진에 들어온 기록 — 목소리와 글 중 있는 것만 상세 요약과 같은 아이콘으로 보인다. */
+function RecordMarks({ photo }: { photo: Photo }) {
+  const voices = photo.voices?.length ?? 0;
+  const story = Boolean(photo.story?.trim());
+  if (voices === 0 && !story) return null;
+  return (
+    <span className="mt-1 flex items-center gap-2.5 text-xs text-body">
+      {voices > 0 && (
+        <span className="flex items-center gap-1">
+          <AudioLines className="size-3.5 text-body-mid" aria-hidden />
+          목소리 {voices}
+        </span>
+      )}
+      {story && (
+        <span className="flex items-center gap-1">
+          <PenLine className="size-3.5 text-body-mid" aria-hidden />글
+        </span>
+      )}
+    </span>
   );
 }
