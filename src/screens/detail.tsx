@@ -32,7 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { albumPeriod, coverShapeOf, formatAlbumPeriod } from "@/data/album";
+import { albumPeriod, coverShapeOf, formatAlbumPeriod, formatKoreanDate } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { type Participant, useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -427,7 +427,7 @@ function AlbumReader({
           ) : (
             <div className="flex flex-col items-start gap-2 rounded-lg bg-muted p-4">
               <p className="text-sm leading-relaxed text-body">
-                아직 글이 없어요. 가족의 기록이 모이면 이 자리에 이야기가 채워져요.
+                우리만의 이야기를 기록해요.
               </p>
               <Button variant="outline" size="sm" onClick={() => go("interview")}>
                 기록하기
@@ -450,8 +450,9 @@ function AlbumReader({
         </section>
       ))}
 
-      <p className="border-t border-border pt-6 text-center text-sm text-body-mid">
-        여기까지가 지금까지의 기록이에요.
+      {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
+      <p className="border-t border-border pt-6 text-center font-serif text-[15px] italic text-body-mid">
+        {formatKoreanDate(new Date())} 기록하다
       </p>
     </article>
   );
