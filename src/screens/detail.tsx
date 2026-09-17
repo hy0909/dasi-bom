@@ -457,19 +457,22 @@ function AlbumReader({
   );
 }
 
-/** 목소리 한 줄 — 재생과 길이만 보여준다 */
+/** 목소리 한 줄 — 재생과 길이, 그리고 어느 사진에 남긴 목소리인지 */
 function VoiceRow({
   name,
   seconds,
   notify,
   trailing,
   caption,
+  thumb,
 }: {
   name: string;
   seconds: number;
   notify: Notify;
   trailing?: React.ReactNode;
   caption?: string;
+  /** 이 목소리가 붙어 있는 사진 — 목록에서는 어느 사진인지 바로 보여준다 */
+  thumb?: string;
 }) {
   const [playing, setPlaying] = useState(false);
   return (
@@ -490,6 +493,9 @@ function VoiceRow({
           <Play className="size-4 fill-current" />
         )}
       </Button>
+      {thumb && (
+        <img src={thumb} alt="" className="size-9 shrink-0 rounded-md object-cover" />
+      )}
       <div className="min-w-0 flex-1">
         <b className="block truncate text-sm font-semibold">{name}의 목소리</b>
         {caption && <span className="block truncate text-xs text-body-mid">{caption}</span>}
@@ -538,19 +544,19 @@ function RecordSection({
   );
 }
 
-/** 기록 중 / 기록 완료로 나눠 보는 필터 */
+/** 기록 전 / 기록 완료로 나눠 보는 필터 */
 function StatusFilter({
   value,
   onChange,
   counts,
 }: {
-  value: "전체" | "기록 중" | "기록 완료";
-  onChange: (next: "전체" | "기록 중" | "기록 완료") => void;
-  counts: Record<"전체" | "기록 중" | "기록 완료", number>;
+  value: "전체" | "기록 전" | "기록 완료";
+  onChange: (next: "전체" | "기록 전" | "기록 완료") => void;
+  counts: Record<"전체" | "기록 전" | "기록 완료", number>;
 }) {
   return (
     <div className="flex gap-2" role="radiogroup" aria-label="상태로 보기">
-      {(["전체", "기록 중", "기록 완료"] as const).map((item) => (
+      {(["전체", "기록 전", "기록 완료"] as const).map((item) => (
         <button
           key={item}
           type="button"
@@ -572,10 +578,10 @@ function StatusFilter({
 }
 
 function useStatusFilter(photos: Photo[]) {
-  const [status, setStatus] = useState<"전체" | "기록 중" | "기록 완료">("전체");
+  const [status, setStatus] = useState<"전체" | "기록 전" | "기록 완료">("전체");
   const counts = {
     전체: photos.length,
-    "기록 중": photos.filter((p) => p.status === "기록 중").length,
+    "기록 전": photos.filter((p) => p.status === "기록 전").length,
     "기록 완료": photos.filter((p) => p.status === "기록 완료").length,
   };
   const list = status === "전체" ? photos : photos.filter((p) => p.status === status);
@@ -609,7 +615,7 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
                 />
                 {/* 기록이 끝난 사진에는 표시를 붙이지 않는다 — 남은 사진만 눈에 띄면 된다. */}
-                {photo.status === "기록 중" && (
+                {photo.status === "기록 전" && (
                   <Badge variant="glass" className="absolute top-2 right-2">
                     {photo.status}
                   </Badge>
@@ -630,8 +636,9 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
 }
 
 function VoiceTab({ go, photos, notify }: { go: Go; photos: Photo[]; notify: Notify }) {
-  const rows = photos.flatMap((photo) =>
-    (photo.voices ?? []).map((voice) => ({ ...voice, photo })),
+  // 목소리는 사진에 딸려 있다 — 앨범에서 몇 번째 사진인지 함께 들고 다닌다.
+  const rows = photos.flatMap((photo, i) =>
+    (photo.voices ?? []).map((voice) => ({ ...voice, photo, order: i + 1 })),
   );
 
   if (rows.length === 0)
@@ -646,7 +653,8 @@ function VoiceTab({ go, photos, notify }: { go: Go; photos: Photo[]; notify: Not
             key={`${row.photo.title}-${row.name}`}
             name={row.name}
             seconds={row.seconds}
-            caption={row.photo.title}
+            thumb={row.photo.src}
+            caption={`${row.order}번째 사진 · ${row.photo.title}`}
             notify={notify}
             trailing={
               <Button
@@ -672,10 +680,7 @@ function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
 
   return (
     <section className="flex flex-col gap-4">
-      <SectionHeading
-        title={<span className="text-lg">완성된 글 {counts["기록 완료"]}편</span>}
-        description="AI가 가족의 기록을 모아 정리했어요"
-      />
+      <p className="text-sm text-body">전체 {counts["전체"]}개</p>
       <StatusFilter value={status} onChange={setStatus} counts={counts} />
 
       {list.length === 0 ? (
@@ -725,7 +730,7 @@ function TimelineTab({ go, photos }: { go: Go; photos: Photo[] }) {
     <section className="flex flex-col gap-4">
       <SectionHeading
         title={<span className="text-lg">우리 여행 연대표</span>}
-        description="사진이 찍힌 시각을 따라 자동으로 정리돼요"
+        description="사진을 찍은 날짜 순서대로 정리했어요"
       />
       <ol className="relative ml-[58px] flex flex-col border-l border-border">
         {photos.map((photo, i) => (

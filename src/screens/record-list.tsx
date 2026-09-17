@@ -4,7 +4,7 @@ import type { AlbumCardData } from "@/data/albums";
 import { formatDate, formatTime, useAlbumPhotos } from "@/data/photos";
 import type { Go } from "@/types";
 
-/** 아직 기록이 끝나지 않은 사진만 모아 바로 이어서 기록하도록 돕는 화면. */
+/** 아직 기록 전인 사진만 모아 바로 이어서 기록하도록 돕는 화면. */
 export function RecordListScreen({
   go,
   album,
@@ -15,7 +15,7 @@ export function RecordListScreen({
   back: () => void;
 }) {
   const photos = useAlbumPhotos(album.id);
-  const pending = photos.filter((photo) => photo.status === "기록 중");
+  const pending = photos.filter((photo) => photo.status === "기록 전");
 
   return (
     <>

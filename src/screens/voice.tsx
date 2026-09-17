@@ -20,7 +20,7 @@ export function VoiceScreen({
   notify: Notify;
 }) {
   const albumPhotos = photosOf(album.id);
-  const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
+  const photo = albumPhotos.find((p) => p.status === "기록 전") ?? albumPhotos[0];
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);

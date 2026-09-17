@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { readPhotoMeta } from "@/lib/exif";
 import { NO_PLACE, coordsName, placeOf } from "@/lib/geocode";
 
-export type PhotoStatus = "기록 중" | "기록 완료";
+export type PhotoStatus = "기록 전" | "기록 완료";
 
 export type Photo = {
   src: string;
@@ -57,7 +57,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
       takenAt: "2023-07-11T19:40:00",
       place: "Paris, France",
       shortPlace: "파리",
-      status: "기록 중",
+      status: "기록 전",
       alt: "조명 아래에서 다 함께한 저녁 식사",
       voices: [{ name: "엄마", seconds: 21 }],
     },
@@ -67,7 +67,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
       takenAt: "2023-07-17T09:23:00",
       place: "Rome, Italy",
       shortPlace: "로마",
-      status: "기록 중",
+      status: "기록 전",
       alt: "여행 마지막 날 아침의 거리",
     },
   ],
@@ -158,7 +158,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
       takenAt: "2024-08-09T09:15:00",
       place: "충남 서산",
       shortPlace: "서산",
-      status: "기록 중",
+      status: "기록 전",
       alt: "마당에서 꽃을 건네는 할머니",
       voices: [{ name: "할머니", seconds: 17 }],
     },
@@ -182,7 +182,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
       takenAt: "2024-09-21T17:05:00",
       place: "강원 양양",
       shortPlace: "양양",
-      status: "기록 중",
+      status: "기록 전",
       alt: "파도 앞에 선 가족의 뒷모습",
     },
     {
@@ -191,7 +191,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
       takenAt: "2024-09-21T18:40:00",
       place: "강원 양양",
       shortPlace: "양양",
-      status: "기록 중",
+      status: "기록 전",
       alt: "노을을 배경으로 손을 잡고 선 가족의 실루엣",
     },
   ],
@@ -235,7 +235,7 @@ function firstGradePhotos(): Photo[] {
       takenAt: iso,
       place: "서울 성북구",
       shortPlace: "성북",
-      status: i % 3 === 0 ? "기록 완료" : "기록 중",
+      status: i % 3 === 0 ? "기록 완료" : "기록 전",
       voices: i % 4 === 0 ? [{ name: "엄마", seconds: 12 + ((i * 7) % 40) }] : undefined,
       story:
         i % 3 === 0
@@ -314,7 +314,7 @@ export async function photoFromFile(file: File): Promise<Photo> {
     coords: meta.coords,
     // 지명이 도착하기 전에는 좌표를 그대로 적어 둔다 — 빈칸도, 지어낸 이름도 아니다.
     ...(meta.coords ? coordsName(meta.coords.lat, meta.coords.lon) : NO_PLACE),
-    status: "기록 중",
+    status: "기록 전",
   };
 }
 

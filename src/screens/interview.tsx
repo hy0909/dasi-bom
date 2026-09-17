@@ -29,9 +29,9 @@ export function InterviewScreen({
   const [question, setQuestion] = useState(0);
   const [textMode, setTextMode] = useState(false);
   const [answer, setAnswer] = useState("");
-  // 기록을 기다리는 사진 — 앨범 상세에서 이어하기로 들어오는 대상
+  // 아직 기록 전인 사진 — 앨범 상세에서 이어하기로 들어오는 대상
   const albumPhotos = useAlbumPhotos(album.id);
-  const photo = albumPhotos.find((p) => p.status === "기록 중") ?? albumPhotos[0];
+  const photo = albumPhotos.find((p) => p.status === "기록 전") ?? albumPhotos[0];
 
   if (!photo) {
     return (
