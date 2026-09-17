@@ -56,7 +56,10 @@ function NoAlbumInvite({ go, back }: Pick<InviteProps, "go" | "back">) {
     <>
       {back && <Topbar back={back} title="초대" />}
       <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-2.5")}>
-        <h1 className="font-heading text-display-lg font-bold">우리의 추억을 기록해요</h1>
+        {/* 탭으로 들어오면 알림·내 설정과 같은 짧은 제목. 앨범에서 들어오면 상단 바가 이미 '초대'다. */}
+        <h1 className="font-heading text-display-lg font-bold">
+          {back ? "우리의 추억을 기록해요" : "초대하기"}
+        </h1>
         <p className="text-base leading-relaxed text-body">
           아직 참여 중인 앨범이 없어요.
           <br />
@@ -163,7 +166,10 @@ function InviteBody({
         </>
       ) : (
         <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-2.5")}>
-          <h1 className="font-heading text-display-lg font-bold">우리의 추억을 기록해요</h1>
+          {/* 탭으로 들어오면 알림·내 설정과 같은 짧은 제목. 앨범에서 들어오면 상단 바가 이미 '초대'다. */}
+          <h1 className="font-heading text-display-lg font-bold">
+            {back ? "우리의 추억을 기록해요" : "초대하기"}
+          </h1>
           <p className="text-base leading-relaxed text-body">
             링크를 공유하면 회원가입 없이
             <br />
