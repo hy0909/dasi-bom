@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import { coverColorOf, coverFabricTone, coverFrameOf, coverShapeOf, type Album } from "@/data/album";
 import { coverVariant } from "@/lib/variant";
 import { cn } from "@/lib/utils";
@@ -59,11 +59,58 @@ export function AlbumCover({
               <img src={album.cover} alt="" draggable={false} />
             </span>
           </span>
-          {/* 레터링 표지 — 사진 대신 표지 한가운데 눌러 찍은 글자 */}
-          {frame.id === "lettering" && <span className="album-cover-letter">Our Story</span>}
+          {/* 레터링 표지 — 사진 대신 표지 위쪽에 무지개처럼 휜 박 글자 */}
+          {frame.id === "lettering" && <CoverLettering />}
         </div>
         <span className="album-book-side" />
       </div>
     </div>
+  );
+}
+
+/**
+ * 레터링 표지의 글자 — 무지개처럼 휜 반원 위에 얹은 'Our Happiest Days'.
+ * 휜 글줄은 CSS 로 만들 수 없어 SVG textPath 를 쓴다.
+ * 색은 무광 로즈골드 박 — 금속 그라데이션 위에 아주 가는 결을 덮고, 눌린 자국만큼의 그늘을 준다.
+ * 글줄 바로 아래에는 같은 박으로 얇고 연한 가로선을 한 줄 긋는다.
+ */
+function CoverLettering() {
+  // 한 화면에 앨범이 여럿이라 id 가 겹치면 안 된다
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  const arc = `arc-${uid}`;
+  const foil = `foil-${uid}`;
+  const grain = `grain-${uid}`;
+  return (
+    <svg className="album-cover-letter" viewBox="0 0 100 34" aria-hidden>
+      <defs>
+        {/* 글자가 앉는 반원 */}
+        <path id={arc} d="M 5 26 A 75 75 0 0 1 95 26" fill="none" />
+        <linearGradient id={foil} x1="0%" y1="0%" x2="70%" y2="100%">
+          <stop offset="0%" stopColor="#f2d2c6" />
+          <stop offset="24%" stopColor="#d79e8c" />
+          <stop offset="42%" stopColor="#f6ddd2" />
+          <stop offset="60%" stopColor="#c98878" />
+          <stop offset="78%" stopColor="#eab9a8" />
+          <stop offset="100%" stopColor="#bb7a68" />
+        </linearGradient>
+        {/* 무광 박의 아주 가는 결 */}
+        <pattern id={grain} width="1.2" height="1.2" patternTransform="rotate(115)" patternUnits="userSpaceOnUse">
+          <rect width="1.2" height="1.2" fill="#ffffff" opacity="0.16" />
+          <rect width="0.5" height="1.2" fill="#000000" opacity="0.2" />
+        </pattern>
+      </defs>
+      <text className="album-cover-letter-text" fill={`url(#${foil})`}>
+        <textPath href={`#${arc}`} startOffset="50%" textAnchor="middle">
+          Our Happiest Days
+        </textPath>
+      </text>
+      <text className="album-cover-letter-text" fill={`url(#${grain})`} opacity="0.32">
+        <textPath href={`#${arc}`} startOffset="50%" textAnchor="middle">
+          Our Happiest Days
+        </textPath>
+      </text>
+      {/* 글줄 아래 얇고 연한 가로선 */}
+      <line x1="36" y1="29" x2="64" y2="29" stroke="#dcb0a0" strokeWidth="0.35" opacity="0.7" />
+    </svg>
   );
 }

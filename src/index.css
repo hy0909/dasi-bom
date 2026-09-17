@@ -339,44 +339,28 @@ html {
 /* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
    기본 창(window)은 위의 규칙 그대로다. 아래는 나머지 넷만 덮어쓴다. */
 
-/* 레터링 표지 — 사진 창을 두지 않고, 표지 한가운데에 글자만 눌러 찍는다 */
+/* 레터링 표지 — 사진 창을 두지 않고, 표지 위쪽에 휜 글줄과 가로선만 남긴다.
+   휜 글줄은 SVG textPath 로 그린다(CSS 로는 글줄을 휘게 할 수 없다). */
 .album-book[data-frame="lettering"] .album-cover-well {
   display: none;
 }
 .album-cover-letter {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 18%;
   /* 책등만큼 살짝 오른쪽으로 — 표지의 시각적 가운데에 앉게 */
-  padding-left: 4%;
-  font-family: "Pinyon Script", "Apple Chancery", cursive;
-  font-size: 9.8cqw;
-  line-height: 1;
-  white-space: nowrap;
-  /* 필기체가 이미 누운 데서 조금 더 오른쪽으로 */
-  transform: skewX(-6deg);
-  /* 무광 로즈골드 박 — 반짝이는 하이라이트 없이 아주 가는 결만 남긴 금속 */
-  background-image:
-    repeating-linear-gradient(115deg, rgb(255 255 255 / 0.1) 0 1px, rgb(0 0 0 / 0.075) 1px 3px),
-    linear-gradient(
-      118deg,
-      #f2d2c6 0%,
-      #d79e8c 24%,
-      #f6ddd2 42%,
-      #c98878 60%,
-      #eab9a8 78%,
-      #bb7a68 100%
-    );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  /* 천에 눌러 찍힌 자국 — 위는 그늘, 아래는 아주 옅은 빛 */
-  text-shadow:
-    0 -1px 1px rgb(0 0 0 / 0.3),
-    0 1px 0 rgb(255 255 255 / 0.12);
+  left: 51%;
+  width: 72%;
+  transform: translateX(-50%);
+  overflow: visible;
   pointer-events: none;
+}
+.album-cover-letter text {
+  font-family: "Pinyon Script", "Apple Chancery", cursive;
+  font-size: 13px;
+}
+/* 천에 눌러 찍힌 자국 — 박 아래로 아주 얕은 그늘 */
+.album-cover-letter text:first-of-type {
+  filter: drop-shadow(0 -0.3px 0.35px rgb(0 0 0 / 0.42));
 }
 
 /* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */
@@ -405,10 +389,11 @@ html {
     inset 1px 2px 4px rgb(0 0 0 / 0.22);
 }
 
-/* 타원 창 — 가로로 긴 타원에 무광 실버 테를 두른 카메오 */
+/* 원형 창 — 한쪽으로 늘이지 않은 정원에 무광 실버 테를 두른 카메오.
+   세로가 짧은 판형에서도 표지 안에 들어오도록 높이로도 한 번 잡아 준다. */
 .album-book[data-frame="oval"] .album-cover-window {
-  width: 68cqw;
-  aspect-ratio: 16 / 10;
+  width: min(80cqw, 70cqh);
+  aspect-ratio: 1;
   padding: 1.6cqw;
   border-radius: 50%;
   /* 반짝이지 않는 은색 — 밝은 쪽과 어두운 쪽의 차이를 좁게 둔다 */

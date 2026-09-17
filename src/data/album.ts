@@ -38,7 +38,7 @@ export const COVER_FRAMES = [
   { id: "window", label: "기본 창", hint: "사진 비율 그대로 파인 창" },
   { id: "lettering", label: "레터링 표지", hint: "사진 없이 로즈골드 박 레터링만" },
   { id: "square", label: "정사각 창", hint: "정사각 안에 사진 전체" },
-  { id: "oval", label: "타원 창", hint: "가로로 긴 타원" },
+  { id: "oval", label: "원형 창", hint: "표지 가운데에 둥근 창" },
   { id: "photo", label: "사진 표지", hint: "표지를 사진으로 가득" },
 ] as const;
 export type CoverFrameId = (typeof COVER_FRAMES)[number]["id"];
