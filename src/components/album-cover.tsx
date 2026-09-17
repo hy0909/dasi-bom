@@ -39,7 +39,15 @@ export function AlbumCover({
     <div
       className={cn("album-book relative w-full select-none", shape.cls, className)}
       data-frame={coverFrameOf(album).id}
-      style={{ ...style, "--cover": tone, "--depth": `${albumDepth(photoCount)}cqw` } as CSSProperties}
+      style={
+        {
+          ...style,
+          "--cover": tone,
+          // 사진 표지는 책등 옆면까지 이 사진이 감싼다
+          "--photo": `url("${album.cover}")`,
+          "--depth": `${albumDepth(photoCount)}cqw`,
+        } as CSSProperties
+      }
       aria-hidden
     >
       <div className="album-book-body">
