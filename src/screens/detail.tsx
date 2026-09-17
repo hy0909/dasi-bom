@@ -590,6 +590,8 @@ function useStatusFilter(photos: Photo[]) {
 
 function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
   const { status, setStatus, counts, list } = useStatusFilter(photos);
+  // 걸러 봐도 번호는 앨범에서의 순서 그대로다 — 목소리·글·연대표가 부르는 번호와 같아야 한다.
+  const orderOf = (photo: Photo) => photos.indexOf(photo) + 1;
 
   if (photos.length === 0) return <Empty>아직 사진이 없어요.</Empty>;
 
@@ -614,6 +616,10 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   alt={photo.alt ?? photo.title}
                   className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
                 />
+                {/* 앨범에서 몇 번째 사진인지 — 목소리·글·연대표가 부르는 번호와 같다. */}
+                <Badge variant="glass" className="absolute top-2 left-2 tabular-nums">
+                  {orderOf(photo)}번째
+                </Badge>
                 {/* 기록이 끝난 사진에는 표시를 붙이지 않는다 — 남은 사진만 눈에 띄면 된다. */}
                 {photo.status === "기록 전" && (
                   <Badge variant="glass" className="absolute top-2 right-2">
@@ -675,6 +681,7 @@ function VoiceTab({ go, photos, notify }: { go: Go; photos: Photo[]; notify: Not
 
 function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
   const { status, setStatus, counts, list } = useStatusFilter(photos);
+  const orderOf = (photo: Photo) => photos.indexOf(photo) + 1;
 
   if (photos.length === 0) return <Empty>사진을 추가하면 글을 쓸 수 있어요.</Empty>;
 
@@ -697,7 +704,10 @@ function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
                 />
                 <span className="min-w-0 flex-1">
                   <small className="block text-xs text-body-mid">
-                    {formatDate(photo.takenAt)} · {photo.shortPlace}
+                    <span className="font-semibold text-body tabular-nums">
+                      {orderOf(photo)}번째 사진
+                    </span>{" "}
+                    · {formatDate(photo.takenAt)} · {photo.shortPlace}
                   </small>
                   <b className="mt-0.5 block text-[15px] font-semibold">{photo.title}</b>
                   <p className="mt-1 line-clamp-2 text-sm leading-snug text-body">
@@ -756,7 +766,8 @@ function TimelineTab({ go, photos }: { go: Go; photos: Photo[] }) {
               />
               <span className="min-w-0">
                 <b className="block truncate text-[15px] font-semibold">{photo.title}</b>
-                <small className="block text-xs text-body-mid">
+                <small className="block truncate text-xs text-body-mid">
+                  <span className="font-semibold text-body tabular-nums">{i + 1}번째 사진</span> ·{" "}
                   {formatTime(photo.takenAt)} · {photo.place}
                 </small>
               </span>
