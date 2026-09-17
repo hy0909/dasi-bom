@@ -192,6 +192,58 @@ export const photosByAlbum: Record<string, Photo[]> = {
 };
 
 /**
+ * 사진을 많이 넣은 앨범의 예 — 50장. 책등 두께·긴 목록·연대표가 어떻게 보이는지 확인하는 목업이다.
+ * 이미지는 위 앨범들의 사진을 돌려 쓰고, 날짜는 하루에 한두 장씩 3개월에 걸쳐 흩어 둔다.
+ */
+const POOL = [
+  "photo-1638290046742-b5030c6b56b4",
+  "photo-1747409729637-646f000b9bf9",
+  "photo-1777466966234-ed84dd087a94",
+  "photo-1621352973597-a53f65a96336",
+  "photo-1610997999027-681b320cee66",
+  "photo-1628411848698-e3b3249a272a",
+  "photo-1612977512598-3b8d6a498bbb",
+  "photo-1539093180677-52c07443275b",
+  "photo-1593100126453-19b562a800c1",
+  "photo-1541848756149-e3843fcbbde0",
+  "photo-1685326480610-90023e19220d",
+  "photo-1475503572774-15a45e5d60b9",
+  "photo-1496275068113-fff8c90750d1",
+];
+const FIRST_GRADE_TITLES = [
+  "입학식 아침", "교문 앞에서", "첫 등굣길", "새 친구와", "급식 첫날", "운동장 한 바퀴",
+  "받아쓰기 100점", "비 오는 하굣길", "학교 앞 문방구", "체육복 입은 날", "봄 소풍", "벚꽃 아래에서",
+  "도서관 첫 방문", "미술 시간 그림", "짝꿍과 함께", "우산 두 개", "학예회 연습", "할머니가 데리러 온 날",
+  "줄넘기 연습", "생일 파티", "어린이날", "현장학습 버스", "동물원에서", "아빠와 축구",
+  "받아온 상장", "시험 전날 밤", "장기자랑", "친구 집 놀이", "학교 텃밭", "방울토마토 수확",
+  "여름 방학식", "물놀이", "할머니 댁 여름", "일기 쓰는 밤", "개학 전날", "2학기 첫날",
+  "가을 운동회", "이어달리기", "단풍 주워 오기", "학교 축제", "합창 무대", "첫 발표",
+  "친구 생일", "김장하는 날", "첫눈", "눈사람", "크리스마스 트리", "종업식", "겨울 방학 첫날", "1학년을 마치며",
+];
+function firstGradePhotos(): Photo[] {
+  return FIRST_GRADE_TITLES.map((title, i) => {
+    const day = new Date(2025, 2, 3 + Math.floor(i * 1.9)); // 3월 3일부터 3개월 남짓
+    const hh = String(8 + (i % 9)).padStart(2, "0");
+    const mm = String((i * 17) % 60).padStart(2, "0");
+    const iso = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}T${hh}:${mm}:00`;
+    return {
+      src: `https://images.unsplash.com/${POOL[i % POOL.length]}?auto=format&fit=crop&w=1200&q=85`,
+      title,
+      takenAt: iso,
+      place: "서울 성북구",
+      shortPlace: "성북",
+      status: i % 3 === 0 ? "기록 완료" : "기록 중",
+      voices: i % 4 === 0 ? [{ name: "엄마", seconds: 12 + ((i * 7) % 40) }] : undefined,
+      story:
+        i % 3 === 0
+          ? "그날 있었던 일을 가족이 한 마디씩 남겼어요. 나중에 다시 읽으면 그때 표정이 떠오르는 기록이에요."
+          : undefined,
+    };
+  });
+}
+photosByAlbum.school1 = firstGradePhotos();
+
+/**
  * 사진은 업로드로 늘어난다 — 참여자·멤버십과 같은 방식의 작은 스토어를 둔다.
  * 앨범 상세의 사진·기록 탭과 홈의 사진 수가 같은 목록을 본다.
  */

@@ -17,6 +17,8 @@ export type Membership = {
 const initialMembership: Record<string, Membership> = {
   eu23: { role: "owner" },
   summer: { role: "owner" },
+  // 사진 50장짜리 예시 앨범
+  school1: { role: "owner" },
   // 엄마가 보낸 링크를 타고 들어간 앨범 — 내가 만들지 않았어도 내 앨범이다.
   jeju: { role: "member", invitedBy: "엄마" },
   // seaside 는 아직 내 앨범이 아니다 — ?invite=SEA 링크를 타야 목록에 들어온다.
