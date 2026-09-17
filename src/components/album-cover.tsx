@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
  */
 /** 사진 장수 → 책등 두께(커버 폭 대비 %). 0장은 가장 얇은 빈 껍데기, 100장에서 가장 두껍고 그 위로는 더 두꺼워지지 않는다. */
 export const MAX_PHOTOS = 100;
-const DEPTH_MIN = 3;
-const DEPTH_MAX = 22;
+const DEPTH_MIN = 6;
+const DEPTH_MAX = 44;
 export function albumDepth(photoCount: number) {
   const fill = Math.min(1, Math.max(0, photoCount) / MAX_PHOTOS);
   return Math.round((DEPTH_MIN + (DEPTH_MAX - DEPTH_MIN) * fill) * 10) / 10;
