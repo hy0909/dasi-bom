@@ -171,9 +171,9 @@ function InviteBody({
             {back ? "우리의 추억을 기록해요" : "초대하기"}
           </h1>
           <p className="text-base leading-relaxed text-body">
-            링크를 공유하면 회원가입 없이
+            앨범 구성원은 누구나
             <br />
-            사진을 추가할 수 있어요.
+            새 구성원을 초대할 수 있어요.
           </p>
         </section>
       )}
@@ -359,7 +359,6 @@ function InviteBody({
       <section className="mt-9 flex flex-col gap-2">
         <SectionHeading
           title={<span className="text-lg">기록 중인 사람 {participants.length}명</span>}
-          description="앨범 구성원은 누구나 새 구성원을 초대할 수 있어요"
         />
         <div className="flex flex-col">
           {participants.length === 0 && (
