@@ -538,22 +538,27 @@ html {
   background-image:
     /* 안쪽으로 접힌 면의 그늘 — 책등 쪽이 가장 어둡다 */
     linear-gradient(90deg, rgb(0 0 0 / 0.34), rgb(0 0 0 / 0.16) 45%, rgb(0 0 0 / 0.26)),
-    /* 앞표지와 같은 가로 실 */
-    repeating-linear-gradient(180deg, rgb(255 255 255 / 0.03) 0 1px, rgb(0 0 0 / 0.03) 1px 2px);
+    /* 세로 실 — 펼친 면은 코앞에서 보는 자리라 올이 하나하나 읽힌다 */
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, rgb(0 0 0 / 0.06) 1px 3px),
+    /* 가로 실 — 앞표지보다 한 올 굵고 또렷하게 */
+    repeating-linear-gradient(180deg, rgb(255 255 255 / 0.07) 0 1.5px, rgb(0 0 0 / 0.07) 1.5px 3px);
   box-shadow:
     inset 1px 1px 0 rgb(255 255 255 / 0.08),
-    inset -1px -1px 0 rgb(0 0 0 / 0.12);
+    inset -1px -1px 0 rgb(0 0 0 / 0.12),
+    /* 가장자리로 갈수록 어두워지는 면 — 평평한 색면으로 보이지 않게 */
+    inset 0 0 36px rgb(0 0 0 / 0.22);
 }
-/* 앞표지와 같은 리넨 올 — .album-cover::before 와 같은 노이즈를 같은 방식으로 얹는다 */
+/* 앞표지와 같은 리넨이되 올이 더 굵게 보이는 면 — 노이즈를 키우고 더 진하게 얹는다 */
 .album-opening-inside::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0.32;
+  opacity: 0.6;
   mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45 0.95' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.3 0.62' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
 }
 /* 오버레이 안의 커버는 평면 한 장이다 — 3D 옆면이 비치거나 따로 돌면 안 된다 */
 .album-opening .album-book {
