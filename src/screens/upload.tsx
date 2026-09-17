@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { FolderOpen, Images, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Topbar } from "@/components/topbar";
+import { MAX_PHOTOS } from "@/components/album-cover";
 import { albumPeriod, formatAlbumPeriod } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import {
@@ -47,12 +48,24 @@ export function UploadScreen({
   // 촬영 시각이 적혀 있지 않아 파일 시각으로 갈음한 사진 — 몇 장인지 밝혀 둔다.
   const guessed = items.filter((photo) => photo.takenAtFrom !== "exif").length;
 
+  // 한 앨범은 MAX_PHOTOS 장까지 — 이미 담긴 사진과 지금 고른 사진을 함께 세어 남은 자리를 구한다.
+  const room = MAX_PHOTOS - inAlbum.length - items.length;
+
   async function add(files: File[]) {
     const images = files.filter((f) => f.type.startsWith("image/"));
     if (images.length === 0) return;
+    if (room <= 0) {
+      notify(`한 앨범에는 사진을 ${MAX_PHOTOS}장까지 담을 수 있어요`);
+      return;
+    }
+    // 남은 자리보다 많이 골랐으면 담기는 만큼만 받고, 몇 장만 받았는지 알린다.
+    const taking = images.slice(0, room);
+    if (taking.length < images.length) {
+      notify(`${MAX_PHOTOS}장까지 담을 수 있어 ${taking.length}장만 받았어요`);
+    }
     setReading(true);
     // 촬영 시각과 좌표는 사진 안에 적혀 있다 — 파일에서 바로 읽어 먼저 줄을 세운다.
-    const picked = await Promise.all(images.map(photoFromFile));
+    const picked = await Promise.all(taking.map(photoFromFile));
     // 고르는 순서와 상관없이 촬영 시각순으로 줄을 세운다 — 기록도 이 순서로 한다.
     setItems((old) => byTakenAt([...old, ...picked]));
     // 좌표를 지명으로 바꾸는 일만 시간이 걸린다 — 도착하는 사진부터 한 장씩 채운다.
@@ -103,7 +116,9 @@ export function UploadScreen({
           {touch ? "폰에 저장된 사진 불러오기" : "내 컴퓨터에서 사진 고르기"}
         </b>
         <small className="text-sm text-body-mid">
-          {folder ? "다운로드 폴더부터 열려요 · 여러 장 선택 가능" : "JPG, PNG, WebP · 여러 장 선택 가능"}
+          {folder
+            ? `다운로드 폴더부터 열려요 · 최대 ${MAX_PHOTOS}장`
+            : `JPG, PNG, WebP · 최대 ${MAX_PHOTOS}장`}
         </small>
       </button>
 
