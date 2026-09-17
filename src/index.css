@@ -245,13 +245,13 @@ html {
     transform: translateX(5%) rotateY(26deg);
   }
 }
-/* 책등 옆면 — 앞표지 왼쪽 모서리에서 뒤로 뻗는 두께 */
+/* 책등 옆면 — 앞표지 왼쪽 모서리에서 뒤로 뻗는 두께. 폭은 사진 장수(--depth)를 따른다 */
 .album-book-side {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 12cqw;
+  width: var(--depth, 12cqw);
   transform-origin: 0% 50%;
   transform: rotateY(90deg);
   border-radius: 3px 0 0 3px;

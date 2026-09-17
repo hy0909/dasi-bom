@@ -74,7 +74,11 @@ export function HomeScreen({
 
       {/* 앨범 배너 — 한 장씩 크게, 옆으로 넘긴다. 아래 목록은 그대로 둔다. */}
       {albums.length > 0 && (
-        <AlbumBanner albums={albums} onOpen={(id, from) => onOpenAlbum(id, "detail", from)} />
+        <AlbumBanner
+          albums={albums}
+          photoCountOf={(id) => photoStore[id]?.length ?? 0}
+          onOpen={(id, from) => onOpenAlbum(id, "detail", from)}
+        />
       )}
 
       <div className="mt-7">
@@ -279,7 +283,7 @@ function AlbumCard({
       {/* 패브릭 앨범 — 그림자가 잘리지 않게 옆과 아래에 숨 쉴 공간을 둔다 */}
       <div className="relative px-2 pt-1 pb-3">
         <div ref={coverRef}>
-          <AlbumCover album={album} />
+          <AlbumCover album={album} photoCount={photoCount} />
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
@@ -323,9 +327,11 @@ function AlbumCard({
 /** 앨범 배너 — 쨍한 배경 위에 앨범 한 권을 크게. 옆으로 밀어 다음 앨범으로. */
 function AlbumBanner({
   albums,
+  photoCountOf,
   onOpen,
 }: {
   albums: AlbumCardData[];
+  photoCountOf: (id: string) => number;
   onOpen: (id: string, from: DOMRect) => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -362,7 +368,7 @@ function AlbumBanner({
               className="album-3d-hover relative flex aspect-square w-full shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-2xl p-6 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
               style={{ backgroundColor: bg, color: fg }}
             >
-              <AlbumCover album={album} className="-mt-8 h-64 w-auto" />
+              <AlbumCover album={album} photoCount={photoCountOf(album.id)} className="-mt-8 h-64 w-auto" />
               <span className="absolute inset-x-6 bottom-5 flex items-end justify-between gap-3">
                 <span className="min-w-0">
                   <b className="block truncate font-heading text-lg font-bold">{album.title}</b>
