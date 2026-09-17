@@ -18,14 +18,13 @@ export type Album = {
 };
 
 /**
- * 앨범 판형 — 만들 때 고르는 네 가지 표지 비율.
+ * 앨범 판형 — 만들 때 고르는 세 가지 표지 비율.
  * aspect 는 세로/가로 — 열림 모션과 상세 hero 가 이 값으로 앨범의 자리를 잡는다.
  */
 export const COVER_SHAPES = [
   { id: "portrait", label: "세로형", ratio: "4:5", aspect: 5 / 4, cls: "aspect-[4/5]" },
   { id: "square", label: "정사각형", ratio: "1:1", aspect: 1, cls: "aspect-square" },
   { id: "landscape", label: "가로형", ratio: "4:3", aspect: 3 / 4, cls: "aspect-[4/3]" },
-  { id: "tall", label: "긴 세로형", ratio: "3:5", aspect: 5 / 3, cls: "aspect-[3/5]" },
 ] as const;
 export type CoverShapeId = (typeof COVER_SHAPES)[number]["id"];
 
@@ -37,7 +36,7 @@ export function coverShapeOf(album: Pick<Album, "coverShape">) {
 /** 표지에서 사진이 보이는 자리 — 만들 때 고르는 다섯 가지. */
 export const COVER_FRAMES = [
   { id: "window", label: "기본 창", hint: "사진 비율 그대로 파인 창" },
-  { id: "baroque", label: "고전 액자", hint: "금박 몰딩을 두른 액자" },
+  { id: "gallery", label: "갤러리 액자", hint: "무광 몰딩과 매트지를 두른 액자" },
   { id: "square", label: "정사각 창", hint: "정사각 안에 사진 전체" },
   { id: "oval", label: "타원 창", hint: "가로로 긴 타원" },
   { id: "photo", label: "사진 표지", hint: "표지를 사진으로 가득" },

@@ -341,7 +341,6 @@ function AlbumCard({
  */
 const BANNER_FIT: Record<CoverShapeId, string> = {
   portrait: "-mt-3 h-[146%] w-auto",
-  tall: "-mt-4 h-[152%] w-auto",
   square: "mt-4 h-auto w-[70%]",
   landscape: "mt-8 h-auto w-[86%]",
 };

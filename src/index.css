@@ -339,23 +339,32 @@ html {
 /* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
    기본 창(window)은 위의 규칙 그대로다. 아래는 나머지 넷만 덮어쓴다. */
 
-/* 고전 액자 — 금박 몰딩을 두르고 모서리는 진짜 액자처럼 45도로 맞물린다 */
-.album-book[data-frame="baroque"] .album-cover-window {
-  padding: 5cqw;
-  border-radius: 2px;
-  background-color: #b78f4a;
+/* 갤러리 액자 — 무광 몰딩 안에 매트지를 깔고 사진을 한 겹 안으로 앉힌다.
+   몰딩은 결이 아주 가는 무광 목재, 모서리는 실제 액자처럼 45도로 맞물린다. */
+.album-book[data-frame="gallery"] .album-cover-window {
+  padding: 8cqw;
+  border-radius: 1px;
+  background-color: #262220;
   background-image:
-    /* 네 모서리의 이음선 */
-    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.3) 50%, transparent calc(50% + 0.5px)),
-    /* 금박의 결 */
-    repeating-linear-gradient(140deg, rgb(255 255 255 / 0.1) 0 1px, rgb(0 0 0 / 0.07) 1px 3px),
-    /* 몰딩에 닿는 빛 */
-    linear-gradient(150deg, #f1dcab 0%, #c39a52 34%, #8e6a30 58%, #e0c489 78%, #9c7638 100%);
-  background-repeat: no-repeat;
+    /* 매트지 — 몰딩 안쪽에 깔리는 종이 */
+    linear-gradient(#f6f1e7, #efe8dc),
+    /* 모서리 이음선 */
+    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
+    /* 아주 가는 나뭇결 */
+    repeating-linear-gradient(
+      92deg,
+      rgb(255 255 255 / 0.022) 0 1px,
+      rgb(0 0 0 / 0.028) 1px 3px,
+      rgb(255 255 255 / 0.008) 3px 7px
+    ),
+    /* 무광 몰딩에 닿는 아주 완만한 빛 */
+    linear-gradient(145deg, #3a3330 0%, #241f1d 42%, #322b28 62%, #1d1917 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat;
   background-position:
+    center,
     top left,
     top right,
     bottom left,
@@ -363,33 +372,35 @@ html {
     0 0,
     0 0;
   background-size:
-    5cqw 5cqw,
-    5cqw 5cqw,
-    5cqw 5cqw,
-    5cqw 5cqw,
+    calc(100% - 9cqw) calc(100% - 9cqw),
+    4.5cqw 4.5cqw,
+    4.5cqw 4.5cqw,
+    4.5cqw 4.5cqw,
+    4.5cqw 4.5cqw,
     auto,
     auto;
   box-shadow:
-    0 0 0 1px rgb(0 0 0 / 0.38),
-    inset 0 0 0 1px rgb(255 255 255 / 0.4),
-    4px 7px 14px -6px rgb(0 0 0 / 0.5);
+    0 0 0 1px rgb(0 0 0 / 0.4),
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    4px 8px 16px -8px rgb(0 0 0 / 0.55);
 }
-/* 안쪽 몰딩 한 단 — 액자 특유의 층 */
-.album-book[data-frame="baroque"] .album-cover-window::before {
+/* 몰딩과 매트지가 만나는 자리 — 종이가 한 단 들어간 그늘 */
+.album-book[data-frame="gallery"] .album-cover-window::before {
   content: "";
   position: absolute;
-  inset: 2.4cqw;
-  border-radius: 1px;
+  inset: 4.5cqw;
   box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.42),
-    inset 0 0 0 1px rgb(0 0 0 / 0.34);
+    inset 0 0 0 1px rgb(0 0 0 / 0.16),
+    inset 0 1px 3px rgb(0 0 0 / 0.22);
 }
-/* 사진 가장자리에만 그늘 — 액자 안쪽으로 한 겹 들어간 자리 */
-.album-book[data-frame="baroque"] .album-cover-window::after {
-  inset: 5cqw;
+/* 사진 둘레 — 매트지가 비스듬히 잘린 사면과 사진 가장자리의 얕은 그늘 */
+.album-book[data-frame="gallery"] .album-cover-window::after {
+  inset: 8cqw;
   box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.45),
-    inset 2px 3px 6px rgb(0 0 0 / 0.35);
+    0 0 0 0.9cqw #fdfaf3,
+    0 0 0 calc(0.9cqw + 1px) rgb(0 0 0 / 0.16),
+    inset 0 0 0 1px rgb(0 0 0 / 0.3),
+    inset 1px 2px 5px rgb(0 0 0 / 0.26);
 }
 
 /* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */
@@ -418,15 +429,16 @@ html {
     inset 1px 2px 4px rgb(0 0 0 / 0.22);
 }
 
-/* 타원 창 — 가로로 긴 타원에 금색 테를 두른 카메오 */
+/* 타원 창 — 가로로 긴 타원에 무광 실버 테를 두른 카메오 */
 .album-book[data-frame="oval"] .album-cover-window {
   width: 68cqw;
   aspect-ratio: 16 / 10;
+  padding: 1.6cqw;
   border-radius: 50%;
-  overflow: hidden;
+  /* 반짝이지 않는 은색 — 밝은 쪽과 어두운 쪽의 차이를 좁게 둔다 */
+  background-image: linear-gradient(160deg, #dcdfe2 0%, #b3b7bc 36%, #ced1d5 58%, #9a9ea3 100%);
   box-shadow:
-    0 0 0 2px rgb(199 162 90 / 0.65),
-    0 0 0 3px rgb(0 0 0 / 0.28),
+    0 0 0 1px rgb(0 0 0 / 0.22),
     3px 6px 12px -6px rgb(0 0 0 / 0.45);
 }
 .album-book[data-frame="oval"] .album-cover-window img {
