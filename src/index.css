@@ -376,8 +376,14 @@ html {
 }
 
 /* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */
+/* 가운데가 아니라 표지 위쪽에 앉는다 */
+.album-book[data-frame="square"] .album-cover-well {
+  align-items: flex-start;
+  padding-top: 11cqh;
+}
 .album-book[data-frame="square"] .album-cover-window {
-  width: 62cqw;
+  /* 세로가 짧은 판형에서도 표지 안에 들어오도록 높이로도 한 번 잡아 준다 */
+  width: min(74cqw, 64cqh);
   aspect-ratio: 1;
   padding: 2.6cqw;
   border-radius: 1px;
@@ -404,7 +410,7 @@ html {
 /* 타원 창 — 좌우로 긴 타원에 무광 실버 테를 두른 카메오.
    가로 반경을 세로 반경 가까이 키워 둔다 — 덜 주면 위아래가 평평해져 모서리만 둥근 네모로 보인다. */
 .album-book[data-frame="oval"] .album-cover-window {
-  width: 84cqw;
+  width: 67cqw;
   aspect-ratio: 16 / 10;
   padding: 1.6cqw;
   border-radius: 46% / 50%;
