@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from "react";
 import {
   ArrowLeft,
   AudioLines,
+  EllipsisVertical,
   Image,
   Pause,
   Pencil,
@@ -12,6 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
@@ -198,37 +205,48 @@ export function DetailScreen({
           >
             <ArrowLeft className="size-5" />
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-canvas bg-transparent text-canvas hover:bg-canvas/15 hover:text-canvas"
-            onClick={() => go("invite")}
-          >
-            <UserPlus className="size-4" />
-            초대
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-canvas bg-transparent text-canvas hover:bg-canvas/15 hover:text-canvas"
+              onClick={() => go("invite")}
+            >
+              <UserPlus className="size-4" />
+              초대
+            </Button>
+            {/* 앨범에 손대는 일은 여기 모은다 — 바깥을 누르면 닫힌다 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="-mr-2 text-canvas hover:bg-canvas/15 hover:text-canvas aria-expanded:bg-canvas/15"
+                  aria-label="앨범 메뉴"
+                >
+                  <EllipsisVertical className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => go("albumEdit")}>앨범 수정</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
       </section>
 
       {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 남은 일 */}
       <Card size="sm" className="mt-4">
         <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <span className="flex min-w-0 flex-1 items-center gap-3 text-sm text-body">
-              <span className="flex items-center gap-1.5">
-                <Image className="size-4 text-body-mid" aria-hidden />
-                <span className="sr-only">사진</span>
-                {photos.length}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <AudioLines className="size-4 text-body-mid" aria-hidden />
-                <span className="sr-only">목소리</span>
-                {voices.length}
-              </span>
+          <div className="flex items-center gap-4 text-sm text-body">
+            <span className="flex items-center gap-1.5">
+              <Image className="size-4 text-body-mid" aria-hidden />
+              사진 {photos.length}
             </span>
-            <Button variant="outline" size="sm" onClick={() => go("albumEdit")}>
-              앨범 정보
-            </Button>
+            <span className="flex items-center gap-1.5">
+              <AudioLines className="size-4 text-body-mid" aria-hidden />
+              목소리 {voices.length}
+            </span>
           </div>
           {pending > 0 && (
             <Button
