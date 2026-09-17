@@ -210,6 +210,16 @@ export function DetailScreen({
               <UserPlus className="size-4" />
               초대
             </Button>
+            {/* 사진 추가도 같은 자리에 같은 모양으로 — 아래 떠 있던 버튼을 여기로 올렸다 */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-canvas bg-transparent text-canvas hover:bg-canvas/15 hover:text-canvas"
+              onClick={() => go("upload")}
+            >
+              <Plus className="size-4" strokeWidth={2.5} />
+              사진 추가
+            </Button>
             {/* 앨범에 손대는 일은 여기 모은다 — 바깥을 누르면 닫힌다 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -279,13 +289,6 @@ export function DetailScreen({
           <RecordSection go={go} photos={photos} notify={notify} />
         </TabsContent>
       </Tabs>
-
-      <div className="pointer-events-none fixed bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-20 -translate-x-1/2">
-        <Button size="lg" className="pointer-events-auto shadow-float" onClick={() => go("upload")}>
-          <Plus className="size-5" strokeWidth={2.5} />
-          사진 추가
-        </Button>
-      </div>
     </>
   );
 }
@@ -370,7 +373,7 @@ function AlbumReader({
   const [ratios, setRatios] = useState<Record<string, number>>({});
 
   if (photos.length === 0)
-    return <Empty>아직 사진이 없어요. 아래 ‘사진 추가’로 시작해보세요.</Empty>;
+    return <Empty>아직 사진이 없어요. 위 ‘사진 추가’로 시작해보세요.</Empty>;
 
   return (
     <article className="flex flex-col gap-10">
@@ -609,7 +612,8 @@ function VoiceTab({ go, photos, notify }: { go: Go; photos: Photo[]; notify: Not
   return (
     <section className="flex flex-col gap-3">
       <p className="text-sm text-body">전체 {rows.length}개</p>
-      <div className="flex flex-col divide-y divide-border">
+      {/* 앨범 읽기의 목소리 묶음과 같은 배경 — 종이 위에 얹힌 한 덩어리로 보이게 */}
+      <div className="flex flex-col divide-y divide-border rounded-lg bg-accent/70 px-3">
         {rows.map((row) => (
           <VoiceRow
             key={`${row.photo.title}-${row.name}`}
