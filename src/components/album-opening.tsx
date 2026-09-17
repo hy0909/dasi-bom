@@ -141,7 +141,8 @@ export function AlbumOpening({
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
 
   return createPortal(
-    <div ref={root} className="album-opening" aria-hidden>
+    // 표지 천 색은 오버레이 전체가 물려받는다 — 스크림도 이 색을 머금은 어둠이라 검게 뜨지 않는다
+    <div ref={root} className="album-opening" style={{ "--cover": tone } as CSSProperties} aria-hidden>
       {/* 나머지 화면을 가리는 스크림 — 이 뒤에서 상세로 바뀐다 */}
       <div className="album-opening-scrim" />
       <div
@@ -152,7 +153,6 @@ export function AlbumOpening({
             top: from.top,
             width: from.width,
             height: from.height,
-            "--cover": tone,
           } as CSSProperties
         }
       >
@@ -160,7 +160,7 @@ export function AlbumOpening({
         <div className="album-opening-page">
           <img className="album-opening-photo" src={album.cover} alt="" draggable={false} />
         </div>
-        {/* 앞표지 — 바깥은 리넨 커버, 안쪽은 같은 천의 어두운 면. 왼쪽 책등을 축으로 넘어간다 */}
+        {/* 앞표지 — 바깥도 안쪽도 같은 리넨, 같은 빛을 받는다. 왼쪽 책등을 축으로 넘어간다 */}
         <div className="album-opening-front">
           <AlbumCover album={album} className="album-opening-face absolute inset-0 aspect-auto h-full" />
           <span className="album-opening-face album-opening-inside" />
