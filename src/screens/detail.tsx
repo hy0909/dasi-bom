@@ -427,11 +427,16 @@ function AlbumReader({
           {photo.story ? (
             <p className="text-[15px] leading-relaxed text-body">{photo.story}</p>
           ) : (
-            <div className="flex flex-col items-start gap-2 rounded-lg bg-muted p-4">
-              <p className="text-sm leading-relaxed text-body">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-muted p-4">
+              <p className="min-w-0 text-sm leading-relaxed text-body">
                 우리만의 이야기를 기록해요.
               </p>
-              <Button variant="outline" size="sm" onClick={() => go("interview")}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => go("interview")}
+              >
                 기록하기
               </Button>
             </div>
@@ -454,7 +459,7 @@ function AlbumReader({
 
       {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
       <p className="border-t border-border pt-6 text-center font-serif text-[15px] italic text-body-mid">
-        {formatKoreanDate(new Date())} 기록하다
+        {formatKoreanDate(new Date())} 기록
       </p>
     </article>
   );

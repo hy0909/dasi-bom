@@ -599,3 +599,16 @@ html {
 .album-opening .album-book-side {
   display: none;
 }
+
+/* 앨범 상세 — 종이 위에 얹힌 화면.
+   잔 섬유결과 그보다 훨씬 큰 결의 얼룩을 겹쳐, 한 장의 종이처럼 고르지 않게 만든다.
+   결의 색은 검정이 아니라 종이가 머금은 따뜻한 갈색이라 회색으로 죽지 않는다. */
+[data-screen="detail"] {
+  background-color: var(--canvas);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.36 0 0 0 0 0.26 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.013' numOctaves='4' seed='12' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.44 0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0.055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size:
+    170px 170px,
+    440px 440px;
+}
