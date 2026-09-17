@@ -35,10 +35,11 @@ export function AlbumCover({
 }) {
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
   const shape = coverShapeOf(album);
+  const frame = coverFrameOf(album);
   return (
     <div
       className={cn("album-book relative w-full select-none", shape.cls, className)}
-      data-frame={coverFrameOf(album).id}
+      data-frame={frame.id}
       style={
         {
           ...style,
@@ -58,6 +59,8 @@ export function AlbumCover({
               <img src={album.cover} alt="" draggable={false} />
             </span>
           </span>
+          {/* 레터링 표지 — 사진 대신 표지 한가운데 눌러 찍은 글자 */}
+          {frame.id === "lettering" && <span className="album-cover-letter">Our Story</span>}
         </div>
         <span className="album-book-side" />
       </div>

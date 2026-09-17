@@ -339,68 +339,44 @@ html {
 /* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
    기본 창(window)은 위의 규칙 그대로다. 아래는 나머지 넷만 덮어쓴다. */
 
-/* 갤러리 액자 — 무광 몰딩 안에 매트지를 깔고 사진을 한 겹 안으로 앉힌다.
-   몰딩은 결이 아주 가는 무광 목재, 모서리는 실제 액자처럼 45도로 맞물린다. */
-.album-book[data-frame="gallery"] .album-cover-window {
-  padding: 8cqw;
-  border-radius: 1px;
-  background-color: #262220;
-  background-image:
-    /* 매트지 — 몰딩 안쪽에 깔리는 종이 */
-    linear-gradient(#f6f1e7, #efe8dc),
-    /* 모서리 이음선 */
-    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(-45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(45deg, transparent calc(50% - 0.5px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 0.5px)),
-    /* 아주 가는 나뭇결 */
-    repeating-linear-gradient(
-      92deg,
-      rgb(255 255 255 / 0.022) 0 1px,
-      rgb(0 0 0 / 0.028) 1px 3px,
-      rgb(255 255 255 / 0.008) 3px 7px
-    ),
-    /* 무광 몰딩에 닿는 아주 완만한 빛 */
-    linear-gradient(145deg, #3a3330 0%, #241f1d 42%, #322b28 62%, #1d1917 100%);
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat;
-  background-position:
-    center,
-    top left,
-    top right,
-    bottom left,
-    bottom right,
-    0 0,
-    0 0;
-  background-size:
-    calc(100% - 9cqw) calc(100% - 9cqw),
-    4.5cqw 4.5cqw,
-    4.5cqw 4.5cqw,
-    4.5cqw 4.5cqw,
-    4.5cqw 4.5cqw,
-    auto,
-    auto;
-  box-shadow:
-    0 0 0 1px rgb(0 0 0 / 0.4),
-    inset 0 0 0 1px rgb(255 255 255 / 0.09),
-    4px 8px 16px -8px rgb(0 0 0 / 0.55);
+/* 레터링 표지 — 사진 창을 두지 않고, 표지 한가운데에 글자만 눌러 찍는다 */
+.album-book[data-frame="lettering"] .album-cover-well {
+  display: none;
 }
-/* 몰딩과 매트지가 만나는 자리 — 종이가 한 단 들어간 그늘 */
-.album-book[data-frame="gallery"] .album-cover-window::before {
-  content: "";
+.album-cover-letter {
   position: absolute;
-  inset: 4.5cqw;
-  box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.16),
-    inset 0 1px 3px rgb(0 0 0 / 0.22);
-}
-/* 사진 둘레 — 매트지가 비스듬히 잘린 사면과 사진 가장자리의 얕은 그늘 */
-.album-book[data-frame="gallery"] .album-cover-window::after {
-  inset: 8cqw;
-  box-shadow:
-    0 0 0 0.9cqw #fdfaf3,
-    0 0 0 calc(0.9cqw + 1px) rgb(0 0 0 / 0.16),
-    inset 0 0 0 1px rgb(0 0 0 / 0.3),
-    inset 1px 2px 5px rgb(0 0 0 / 0.26);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 책등만큼 살짝 오른쪽으로 — 표지의 시각적 가운데에 앉게 */
+  padding-left: 4%;
+  font-family: "Pinyon Script", "Apple Chancery", cursive;
+  font-size: 14cqw;
+  line-height: 1;
+  white-space: nowrap;
+  /* 필기체가 이미 누운 데서 조금 더 오른쪽으로 */
+  transform: skewX(-6deg);
+  /* 무광 로즈골드 박 — 반짝이는 하이라이트 없이 아주 가는 결만 남긴 금속 */
+  background-image:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 0.1) 0 1px, rgb(0 0 0 / 0.075) 1px 3px),
+    linear-gradient(
+      118deg,
+      #f2d2c6 0%,
+      #d79e8c 24%,
+      #f6ddd2 42%,
+      #c98878 60%,
+      #eab9a8 78%,
+      #bb7a68 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* 천에 눌러 찍힌 자국 — 위는 그늘, 아래는 아주 옅은 빛 */
+  text-shadow:
+    0 -1px 1px rgb(0 0 0 / 0.3),
+    0 1px 0 rgb(255 255 255 / 0.12);
+  pointer-events: none;
 }
 
 /* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */

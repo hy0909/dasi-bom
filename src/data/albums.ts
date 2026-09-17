@@ -40,8 +40,8 @@ export const initialAlbums: AlbumCardData[] = [
     inviteIssuedAt: daysAgo(1),
     title: "할머니와 보낸 여름",
     coverColor: "green",
-    // 무광 몰딩과 매트지를 두른 갤러리 액자
-    coverFrame: "gallery",
+    // 사진 창 없이 로즈골드 박 레터링만 있는 표지
+    coverFrame: "lettering",
     startDate: "2024-08-02",
     endDate: "2024-08-11",
     description: "방학 내내 할머니 댁에서 지낸 여름의 기록이에요.",

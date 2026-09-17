@@ -36,7 +36,7 @@ export function coverShapeOf(album: Pick<Album, "coverShape">) {
 /** 표지에서 사진이 보이는 자리 — 만들 때 고르는 다섯 가지. */
 export const COVER_FRAMES = [
   { id: "window", label: "기본 창", hint: "사진 비율 그대로 파인 창" },
-  { id: "gallery", label: "갤러리 액자", hint: "무광 몰딩과 매트지를 두른 액자" },
+  { id: "lettering", label: "레터링 표지", hint: "사진 없이 로즈골드 박 레터링만" },
   { id: "square", label: "정사각 창", hint: "정사각 안에 사진 전체" },
   { id: "oval", label: "타원 창", hint: "가로로 긴 타원" },
   { id: "photo", label: "사진 표지", hint: "표지를 사진으로 가득" },
