@@ -238,8 +238,8 @@ export function DetailScreen({
         </header>
       </section>
 
-      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 기록으로 가는 길 */}
-      <Card size="sm" className="mt-4">
+      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 기록으로 가는 길. 바탕은 한 단계 짙은 면 */}
+      <Card size="sm" className="mt-4 bg-accent">
         <CardContent className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-4 text-sm text-body">
             <span className="flex items-center gap-1.5">
@@ -427,7 +427,7 @@ function AlbumReader({
           {photo.story ? (
             <p className="text-[15px] leading-relaxed text-body">{photo.story}</p>
           ) : (
-            <div className="flex items-center justify-between gap-3 rounded-lg bg-muted p-4">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-accent p-4">
               <p className="min-w-0 text-sm leading-relaxed text-body">
                 우리만의 이야기를 기록해요.
               </p>
