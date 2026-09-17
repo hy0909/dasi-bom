@@ -6,6 +6,7 @@ import {
   Image,
   Pause,
   Pencil,
+  PenLine,
   Play,
   Plus,
   UserPlus,
@@ -161,7 +162,7 @@ export function DetailScreen({
   // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 프로필을 두 번 세지 않는다.
   const others = participants.filter((p) => p.name !== session?.name);
   const iAmOwner = useMyAlbums()[album.id]?.role !== "member";
-  const pending = photos.filter((p) => p.status === "기록 중").length;
+  const stories = photos.filter((p) => p.story).length;
   // 기간을 비워 둔 앨범은 사진의 촬영 날짜가 곧 기간이다 — 사진이 없으면 아직 기간도 없다.
   const period = formatAlbumPeriod(albumPeriod(album, photos));
 
@@ -235,10 +236,10 @@ export function DetailScreen({
         </header>
       </section>
 
-      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 남은 일 */}
+      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 기록으로 가는 길 */}
       <Card size="sm" className="mt-4">
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-4 text-sm text-body">
+        <CardContent className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-4 text-sm text-body">
             <span className="flex items-center gap-1.5">
               <Image className="size-4 text-body-mid" aria-hidden />
               사진 {photos.length}
@@ -247,19 +248,19 @@ export function DetailScreen({
               <AudioLines className="size-4 text-body-mid" aria-hidden />
               목소리 {voices.length}
             </span>
+            <span className="flex items-center gap-1.5">
+              <PenLine className="size-4 text-body-mid" aria-hidden />
+              글 {stories}
+            </span>
           </div>
-          {pending > 0 && (
-            <Button
-              variant="secondary"
-              className="h-auto w-full flex-col items-start gap-0.5 py-3"
-              onClick={() => go("recordList")}
-            >
-              <span className="text-[15px] font-semibold">이어서 기록 남기기</span>
-              <span className="text-xs font-medium text-canvas-soft/70">
-                전체 {photos.length}장 · 기록 완료 {photos.length - pending}장 · 기록 중 {pending}장
-              </span>
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => go("recordList")}
+          >
+            기록하기
+          </Button>
         </CardContent>
       </Card>
 
@@ -429,7 +430,7 @@ function AlbumReader({
                 아직 글이 없어요. 가족의 기록이 모이면 이 자리에 이야기가 채워져요.
               </p>
               <Button variant="outline" size="sm" onClick={() => go("interview")}>
-                기록 이어가기
+                기록하기
               </Button>
             </div>
           )}
@@ -707,7 +708,7 @@ function StoryTab({ go, photos }: { go: Go; photos: Photo[] }) {
                 onClick={() => go(photo.story ? "story" : "interview")}
               >
                 <Pencil className="size-3.5" />
-                {photo.story ? "글 수정" : "기록 이어가기"}
+                {photo.story ? "글 수정" : "기록하기"}
               </Button>
             </CardContent>
           </Card>
