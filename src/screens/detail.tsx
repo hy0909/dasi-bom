@@ -154,7 +154,6 @@ export function DetailScreen({
   notify: Notify;
 }) {
   const [section, setSection] = useState<Section>("앨범");
-  const [first, ...rest] = album.title.split(" ");
   const session = useSession();
 
   // 화면에 보이는 숫자는 모두 이 앨범의 사진·참여자에서 나온다.
@@ -178,17 +177,10 @@ export function DetailScreen({
           <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/55 to-transparent" />
 
-          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-canvas">
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 p-6 text-center text-canvas">
             {period && <p className="text-sm font-medium text-canvas-soft/80">{period}</p>}
-            <h1 className="font-heading text-display-xl font-bold">
-              {first}
-              {rest.length > 0 && (
-                <>
-                  <br />
-                  {rest.join(" ")}
-                </>
-              )}
-            </h1>
+            {/* 제목은 한 줄로 둔다 — 폭을 넘길 때만 저절로 다음 줄로 넘어간다 */}
+            <h1 className="font-heading text-display-xl font-bold text-balance">{album.title}</h1>
             <MemberSummary
               session={session}
               others={others}
@@ -388,7 +380,7 @@ function AlbumReader({
 
       {photos.map((photo, i) => (
         <section key={photo.title} className="flex flex-col gap-3">
-          <header className="flex items-baseline gap-2">
+          <header className="flex items-baseline justify-center gap-2">
             <span className="font-heading text-sm font-bold text-primary tabular-nums">
               {String(i + 1).padStart(2, "0")}
             </span>
@@ -422,10 +414,10 @@ function AlbumReader({
             </figure>
           </div>
 
-          <h2 className="mt-1 font-heading text-display-sm font-bold">{photo.title}</h2>
+          <h2 className="mt-1 text-center font-heading text-display-sm font-bold">{photo.title}</h2>
 
           {photo.story ? (
-            <p className="text-[15px] leading-relaxed text-body">{photo.story}</p>
+            <p className="text-center text-[15px] leading-relaxed text-body">{photo.story}</p>
           ) : (
             <div className="flex items-center justify-between gap-3 rounded-lg bg-accent p-4">
               <p className="min-w-0 text-sm leading-relaxed text-body">
@@ -443,7 +435,7 @@ function AlbumReader({
           )}
 
           {(photo.voices ?? []).length > 0 && (
-            <div className="mt-1 flex flex-col divide-y divide-border rounded-lg bg-muted/60 px-3">
+            <div className="mt-1 flex flex-col divide-y divide-border rounded-lg bg-accent/70 px-3">
               {(photo.voices ?? []).map((voice) => (
                 <VoiceRow
                   key={`${photo.title}-${voice.name}`}
