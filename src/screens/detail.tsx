@@ -94,7 +94,7 @@ function MemberSummary({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="-mx-1 mt-1 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
+          className="-mx-1 mt-3 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
         >
           <span className="flex shrink-0 -space-x-2">
             {faces.map((f) => (
