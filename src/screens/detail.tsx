@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionHeading } from "@/components/section-heading";
+import { StatusFilter, useStatusFilter } from "@/components/status-filter";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { MemberRow } from "@/components/member-row";
 import {
@@ -43,6 +44,7 @@ import {
   formatShortDate,
   formatTime,
   byTakenAt,
+  photoStatus,
   useAlbumPhotos,
   voicesOf,
 } from "@/data/photos";
@@ -545,50 +547,6 @@ function RecordSection({
   );
 }
 
-/** 기록 전 / 기록 완료로 나눠 보는 필터 */
-function StatusFilter({
-  value,
-  onChange,
-  counts,
-}: {
-  value: "전체" | "기록 전" | "기록 완료";
-  onChange: (next: "전체" | "기록 전" | "기록 완료") => void;
-  counts: Record<"전체" | "기록 전" | "기록 완료", number>;
-}) {
-  return (
-    <div className="flex gap-2" role="radiogroup" aria-label="상태로 보기">
-      {(["전체", "기록 전", "기록 완료"] as const).map((item) => (
-        <button
-          key={item}
-          type="button"
-          role="radio"
-          aria-checked={item === value}
-          onClick={() => onChange(item)}
-          className={cn(
-            "rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40",
-            item === value
-              ? "border-ink bg-ink text-canvas"
-              : "border-border text-body hover:bg-muted",
-          )}
-        >
-          {item} {counts[item]}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function useStatusFilter(photos: Photo[]) {
-  const [status, setStatus] = useState<"전체" | "기록 전" | "기록 완료">("전체");
-  const counts = {
-    전체: photos.length,
-    "기록 전": photos.filter((p) => p.status === "기록 전").length,
-    "기록 완료": photos.filter((p) => p.status === "기록 완료").length,
-  };
-  const list = status === "전체" ? photos : photos.filter((p) => p.status === status);
-  return { status, setStatus, counts, list };
-}
-
 function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
   const { status, setStatus, counts, list } = useStatusFilter(photos);
   // 걸러 봐도 번호는 앨범에서의 순서 그대로다 — 목소리·글·연대표가 부르는 번호와 같아야 한다.
@@ -608,7 +566,7 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
               type="button"
               key={photo.title}
               // 기록이 끝난 사진은 완성된 글로, 남은 사진은 질문으로 간다.
-              onClick={() => go(photo.status === "기록 완료" ? "story" : "interview")}
+              onClick={() => go(photoStatus(photo) === "기록 완료" ? "story" : "interview")}
               className="group/tile flex flex-col gap-2 rounded-lg text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
             >
               <span className="relative block aspect-square overflow-hidden rounded-lg bg-muted">
@@ -622,9 +580,9 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   {orderOf(photo)}번째
                 </Badge>
                 {/* 기록이 끝난 사진에는 표시를 붙이지 않는다 — 남은 사진만 눈에 띄면 된다. */}
-                {photo.status === "기록 전" && (
+                {photoStatus(photo) === "기록 전" && (
                   <Badge variant="glass" className="absolute top-2 right-2">
-                    {photo.status}
+                    기록 전
                   </Badge>
                 )}
               </span>
@@ -748,7 +706,7 @@ function TimelineTab({ go, photos }: { go: Go; photos: Photo[] }) {
           <li key={photo.title} className="relative">
             <button
               type="button"
-              onClick={() => go(photo.status === "기록 완료" ? "story" : "interview")}
+              onClick={() => go(photoStatus(photo) === "기록 완료" ? "story" : "interview")}
               className="flex w-full items-center gap-3 rounded-md py-3 pl-5 text-left outline-none hover:bg-muted/70 focus-visible:ring-3 focus-visible:ring-ring/40"
             >
               <time className="absolute -left-[58px] w-[46px] text-right text-xs font-semibold tabular-nums text-body">

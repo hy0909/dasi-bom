@@ -26,6 +26,15 @@ export type Photo = {
   story?: string;
 };
 
+/**
+ * 사진 한 장의 기록 상태.
+ * 목소리든 글이든 하나라도 남았으면 기록 완료다 — 화면마다 다르게 세지 않도록 여기 한 곳에서 정한다.
+ */
+export function photoStatus(photo: Pick<Photo, "voices" | "story">): PhotoStatus {
+  const recorded = (photo.voices?.length ?? 0) > 0 || Boolean(photo.story?.trim());
+  return recorded ? "기록 완료" : "기록 전";
+}
+
 export type PhotoVoice = {
   /** 목소리를 남긴 가족 */
   name: string;
