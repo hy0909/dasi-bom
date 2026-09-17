@@ -173,11 +173,13 @@ export function DetailScreen({
       <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))]">
         <div className={cn("relative w-full overflow-hidden bg-ink", coverShapeOf(album).cls)}>
           <img src={album.cover} alt={album.coverAlt} className="size-full object-cover" />
-          {/* 아래쪽은 제목이, 위쪽은 상단 버튼이 읽히도록 각각 어둡게 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
+          {/* 제목이 사진 한가운데로 올라왔다 — 가운데를 눌러 글씨를 읽히게 하고,
+              아래는 이어지는 카드로 녹아들게, 위는 상단 버튼이 읽히게 어둡게 둔다 */}
+          <div className="absolute inset-0 bg-[radial-gradient(78%_52%_at_50%_50%,rgb(32_21_21/0.66)_0%,rgb(32_21_21/0.3)_58%,rgb(32_21_21/0)_100%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent" />
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/55 to-transparent" />
 
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 p-6 text-center text-canvas">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center text-canvas">
             {period && <p className="text-sm font-medium text-canvas-soft/80">{period}</p>}
             {/* 제목은 한 줄로 둔다 — 폭을 넘길 때만 저절로 다음 줄로 넘어간다 */}
             <h1 className="font-heading text-display-xl font-bold text-balance">{album.title}</h1>
@@ -378,7 +380,7 @@ function AlbumReader({
   return (
     <article className="flex flex-col gap-10">
       {album.description && (
-        <p className="text-[15px] leading-relaxed text-body">{album.description}</p>
+        <p className="text-center text-[15px] leading-relaxed text-body">{album.description}</p>
       )}
 
       {photos.map((photo, i) => (
