@@ -344,6 +344,10 @@ html {
   /* 진행 중에는 아래를 누를 수 없다 — 다른 앨범을 눌러 순서가 꼬이지 않게 */
   pointer-events: auto;
 }
+/* 스크림이 다 걷힌 뒤 — 앨범이 제자리로 돌아가 사라지는 동안에는 상세 화면을 바로 쓸 수 있다 */
+.album-opening.album-opening-releasing {
+  pointer-events: none;
+}
 /* 아래 화면을 완전히 가리는 불투명 스크림 — 이 뒤에서 상세로 바뀐다 */
 .album-opening-scrim {
   position: absolute;
@@ -356,7 +360,7 @@ html {
   perspective: 1600px;
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
-  will-change: left, top, width, height;
+  will-change: left, top, width, height, opacity;
 }
 /* 표지 아래 — 어두운 바탕 위의 사진. 밝은 종이색은 두지 않는다 */
 .album-opening-page {

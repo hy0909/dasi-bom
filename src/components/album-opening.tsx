@@ -5,22 +5,36 @@ import { coverColorOf, coverFabricTone } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { coverVariant } from "@/lib/variant";
 
-/** 1) 앨범이 그 자리에서 화면 폭까지 커지는 시간 */
+/** 1) 눌린 그 자리에서 커지며 화면 정중앙으로 옮겨 앉는 시간 — 천천히 풀리는 ease */
 const GROW_MS = 900;
 /** 아래 화면을 완전히 가리는 스크림이 차오르는 시간 */
 const SCRIM_MS = 520;
 /** 2) 표지가 넘어가기 시작하는 시점(= 확대가 끝난 뒤)과 넘어가는 데 드는 시간 — 무게 있게 천천히 */
 const FLIP_START_MS = GROW_MS;
 const FLIP_MS = 1300;
-/** 3) 표지가 다 넘어간 뒤 오버레이가 상세 화면으로 녹아드는 시간 */
-const FADE_MS = 520;
+/** 3) 다 펼쳐진 채로 잠깐 머무는 시간 */
+const HOLD_MS = 180;
+/** 4) 위로 떠올라 제자리로 돌아가는 시간 — 그동안 표지가 다시 덮이고 스크림이 걷힌다 */
+const RETURN_START_MS = FLIP_START_MS + FLIP_MS + HOLD_MS;
+const RETURN_MS = 820;
+const CLOSE_MS = 520;
+const SCRIM_OUT_MS = 420;
+/** 제자리로 향하기 전에 먼저 떠오르는 높이 — 들어 올렸다가 도로 꽂아 넣는 손짓처럼 */
+const LIFT_PX = 76;
+/** 5) 제자리에 놓인 뒤 서서히 사라지는 시간 */
+const FADE_START_MS = RETURN_START_MS + RETURN_MS;
+const FADE_MS = 480;
+
+type Box = { left: number; top: number; width: number; height: number };
 
 /**
  * 앨범 열림 — 순서가 곧 의미다.
- * 1) 눌린 앨범 한 권이 4:5 그대로 화면 폭까지 커진다. 그동안 나머지 화면은 불투명한 스크림에 완전히 가려진다.
+ * 1) 눌린 앨범 한 권이 그 자리에서 4:5 그대로 커지며 화면 정중앙으로 옮겨 앉는다.
+ *    그동안 나머지 화면은 불투명한 스크림에 완전히 가려진다.
  * 2) 확대와 스크림이 모두 끝난 뒤, 가려진 채로 아래 화면이 상세로 바뀐다. 표지는 아직 닫혀 있어 사진은 보이지 않는다.
- * 3) 표지가 왼쪽 책등을 축으로 천천히 넘어가고, 그 아래 사진(= 상세 hero 와 같은 사진·같은 자리)이 드러난다.
- * 4) 표지가 다 넘어간 뒤 오버레이가 녹아 사라지면 상세 화면만 남는다.
+ * 3) 표지가 왼쪽 책등을 축으로 천천히 넘어가고, 그 아래 사진이 드러난다.
+ * 4) 다시 표지가 덮이면서 앨범은 위로 한 번 떠올랐다가 눌렸던 제자리로 돌아간다. 그 사이 스크림이 걷혀 상세 화면이 드러난다.
+ * 5) 제자리에 놓인 앨범이 서서히 사라지면 상세 화면만 남는다.
  * 앞·뒷면을 처음부터 함께 두고 backface-visibility 로만 가르므로 중간에 면을 갈아끼우는 번쩍임이 없다.
  */
 export function AlbumOpening({
@@ -30,7 +44,7 @@ export function AlbumOpening({
   onDone,
 }: {
   album: AlbumCardData;
-  /** 눌린 앨범 커버가 화면에서 차지하던 자리 */
+  /** 눌린 앨범 커버가 화면에서 차지하던 자리 — 돌아갈 곳이기도 하다 */
   from: DOMRect;
   onReveal: () => void;
   onDone: () => void;
@@ -49,36 +63,90 @@ export function AlbumOpening({
     const front = el.querySelector<HTMLElement>(".album-opening-front");
     if (!book || !scrim || !front) return;
 
-    // 상세 hero 는 폰 캔버스 폭의 4:5 이고 페이지 맨 위에 붙는다 — 앨범이 거기까지 커진다.
+    // 앨범이 가 앉을 곳은 화면 정중앙 — 폰 캔버스 폭 안에서 4:5 를 지키고, 세로로도 화면에 다 들어오게 잡는다.
     const cr = document.querySelector<HTMLElement>("[data-screen]")?.getBoundingClientRect();
-    const width = cr?.width ?? window.innerWidth;
-    const target = { left: cr?.left ?? 0, top: 0, width, height: width * 1.25 };
+    const canvasWidth = cr?.width ?? window.innerWidth;
+    const centerX = (cr?.left ?? 0) + canvasWidth / 2;
+    const viewport = window.innerHeight;
+    // 화면이 아무리 낮아도 눌린 크기보다 작아지지는 않는다 — 열림은 언제나 커지는 동작이다
+    const width = Math.max(from.width, Math.min(canvasWidth - 48, (viewport - 112) / 1.25));
+    const height = width * 1.25;
+    const target: Box = {
+      left: centerX - width / 2,
+      top: (viewport - height) / 2,
+      width,
+      height,
+    };
+
     const fill = "forwards" as const;
     const px = (v: number) => `${v}px`;
+    const box = (r: Box) => ({
+      left: px(r.left),
+      top: px(r.top),
+      width: px(r.width),
+      height: px(r.height),
+    });
+    const at = (a: number, b: number, t: number) => a + (b - a) * t;
 
-    const grow = book.animate(
-      [
-        { left: px(from.left), top: px(from.top), width: px(from.width), height: px(from.height) },
-        { left: px(target.left), top: px(target.top), width: px(target.width), height: px(target.height) },
-      ],
-      { duration: GROW_MS, easing: "cubic-bezier(.45,0,.2,1)", fill },
-    );
+    // 1) 그 자리에서 커지며 정중앙으로 — 끝에서 천천히 풀린다
+    const grow = book.animate([box(from), box(target)], {
+      duration: GROW_MS,
+      easing: "cubic-bezier(.22,.66,.12,1)",
+      fill,
+    });
     const veil = scrim.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: SCRIM_MS,
       easing: "ease-out",
       fill,
     });
+    // 3) 표지가 넘어간다
     const flip = front.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }], {
       duration: FLIP_MS,
       delay: FLIP_START_MS,
       easing: "cubic-bezier(.5,.05,.2,1)",
       fill,
     });
-    const animations = [grow, veil, flip];
+    // 4) 표지가 덮이고, 위로 한 번 떠올랐다가 제자리로 — 뒤에 시작하는 애니메이션이 앞의 fill 을 덮는다
+    const close = front.animate(
+      [{ transform: "rotateY(-180deg)" }, { transform: "rotateY(0deg)" }],
+      { duration: CLOSE_MS, delay: RETURN_START_MS, easing: "cubic-bezier(.4,.02,.2,1)", fill },
+    );
+    const back = book.animate(
+      [
+        // 먼저 위로 — 있던 자리에서 살짝 떠오르며 크기를 조금 놓는다
+        { ...box(target), easing: "cubic-bezier(.25,.6,.3,1)" },
+        {
+          offset: 0.3,
+          ...box({
+            left: at(target.left, from.left, 0.08),
+            top: target.top - LIFT_PX,
+            width: at(target.width, from.width, 0.1),
+            height: at(target.height, from.height, 0.1),
+          }),
+          easing: "cubic-bezier(.45,0,.2,1)",
+        },
+        // 그다음 제자리로 — 눌렸던 그 자리에 도로 놓인다
+        box(from),
+      ],
+      { duration: RETURN_MS, delay: RETURN_START_MS, easing: "linear", fill },
+    );
+    const unveil = scrim.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: SCRIM_OUT_MS,
+      delay: RETURN_START_MS,
+      easing: "ease-in",
+      fill,
+    });
+    // 5) 제자리에 놓인 뒤 서서히 사라진다
+    const fade = book.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: FADE_MS,
+      delay: FADE_START_MS,
+      easing: "cubic-bezier(.4,0,.6,1)",
+      fill,
+    });
+    const animations = [grow, veil, flip, close, back, unveil, fade];
 
     let revealed = false;
     let finished = false;
-    let fade: Animation | undefined;
     const doReveal = () => {
       if (revealed) return;
       revealed = true;
@@ -88,23 +156,19 @@ export function AlbumOpening({
       if (finished) return;
       finished = true;
       doReveal();
-      fade = el.animate([{ opacity: 1 }, { opacity: 0 }], {
-        duration: FADE_MS,
-        easing: "cubic-bezier(.4,0,.2,1)",
-        fill,
-      });
-      fade.onfinish = () => done.current();
+      done.current();
     };
-    // 전환 시점은 애니메이션 자체에 묶는다 — 확대와 스크림이 다 끝난 뒤에만 상세로 바꾸고, 표지가 다 넘어간 뒤에만 녹아든다
+    // 전환 시점은 애니메이션 자체에 묶는다 — 확대와 스크림이 다 끝난 뒤에만 상세로 바꾼다
     const quiet = () => undefined;
     Promise.all([grow.finished, veil.finished]).then(doReveal, quiet);
-    flip.finished.then(finish, quiet);
+    // 스크림이 다 걷히면 상세 화면이 온전히 보인다 — 돌아가는 앨범이 그 뒤로 탭을 막고 있지 않게
+    unveil.finished.then(() => el.classList.add("album-opening-releasing"), quiet);
+    fade.finished.then(finish, quiet);
     // 탭이 뒤로 가 있어 애니메이션이 멈춰도 오버레이가 영영 남지는 않게 — 시계 기준 마지막 안전장치
-    const safety = window.setTimeout(finish, FLIP_START_MS + FLIP_MS + 1500);
+    const safety = window.setTimeout(finish, FADE_START_MS + FADE_MS + 1500);
     return () => {
       window.clearTimeout(safety);
       animations.forEach((a) => a.cancel());
-      fade?.cancel();
     };
   }, [from]);
 
@@ -126,7 +190,7 @@ export function AlbumOpening({
           } as CSSProperties
         }
       >
-        {/* 표지 아래 — 상세 hero 와 같은 사진, 같은 자리 */}
+        {/* 표지 아래 — 앨범의 대표 사진 */}
         <div className="album-opening-page">
           <img className="album-opening-photo" src={album.cover} alt="" draggable={false} />
         </div>
