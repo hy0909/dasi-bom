@@ -24,119 +24,167 @@ export function albumDepth(photoCount: number) {
 /* ── 눌러서 돌려보기 ───────────────────────────────────────────────────────
    목록에서 앨범을 누른 채 손을 움직이면 제자리에서 그 방향으로 돌아선다.
    손을 떼면 원래 각도로 돌아온다.
-   손가락은 목록을 넘기는 데도 쓰이니, 잠깐 누르고 있어야 돌리기로 본다 —
-   바로 밀면 그건 스크롤이다. 마우스는 헷갈릴 일이 없어 누르는 즉시 돈다. */
+
+   손가락은 목록을 넘기는 데도 쓰인다. 그래서 둘 중 하나면 돌리기로 본다 —
+   가로로 먼저 움직였거나, 잠깐 누르고 있었거나. 위아래로 바로 밀면 그건 스크롤이다.
+   세로 스크롤은 touch-action: pan-y 로 브라우저에 맡기고, 돌리기 시작한 뒤부터
+   touchmove 를 막아 화면이 따라 밀리지 않게 한다. 포인터 이벤트 대신 터치·마우스
+   이벤트를 직접 듣는다 — iOS 사파리는 스크롤이 시작되면 포인터를 취소해 버려서,
+   그 위에 올린 제스처는 첫 움직임에 끊긴다. 안드로이드 크롬·카카오 인앱도 같은 길을 탄다.
+
+   마우스는 헷갈릴 일이 없어 누르는 즉시 돈다. */
 /** 좌우로 끝까지 돌아섰을 때의 각도 */
 const TILT_MAX_Y = 40;
 /** 위아래로 끝까지 젖혔을 때의 각도 */
 const TILT_MAX_X = 24;
 /** 이만큼 움직이면 끝까지 돌아선다(px) */
 const TILT_SPAN = 150;
-/** 손가락이 이만큼 머물러야 돌리기로 본다(ms) */
+/** 손가락이 이만큼 머물러 있으면 돌리기로 본다(ms) */
 const HOLD_MS = 160;
-/** 돌리기 전에 이보다 많이 움직였으면 목록을 넘기려는 손짓이다(px) */
+/** 돌리기 전에 이보다 많이 움직인 방향으로 손짓의 뜻을 가른다(px) */
 const SLOP = 10;
+/** 이보다 움직였으면 '눌렀다'가 아니라 '돌려봤다' — 손을 떼도 앨범이 열리지 않는다(px) */
+const TAP_SLOP = 6;
+/** 손가락을 뗀 뒤 따라오는 가짜 마우스 이벤트를 흘려보낼 시간(ms) */
+const GHOST_MS = 700;
 
-type TiltHandlers = Pick<
-  DOMAttributes<HTMLDivElement>,
-  "onPointerDown" | "onPointerMove" | "onPointerUp" | "onPointerCancel" | "onClickCapture"
->;
+type TiltHandlers = Pick<DOMAttributes<HTMLDivElement>, "onClickCapture">;
 
 function useAlbumTilt(enabled: boolean) {
   const ref = useRef<HTMLDivElement>(null);
-  /** 누르기 시작한 지점 — 여기서 얼마나 움직였는지로 각도를 정한다 */
-  const from = useRef<{ id: number; x: number; y: number } | null>(null);
-  const turning = useRef(false);
   /** 돌려본 손짓인가 — 그랬다면 손을 뗄 때 앨범이 열리지 않아야 한다 */
   const turned = useRef(false);
-  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const stopHold = () => {
-    if (hold.current) clearTimeout(hold.current);
-    hold.current = null;
-  };
-
-  const turnTo = (dx: number, dy: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const y = Math.max(-1, Math.min(1, dx / TILT_SPAN)) * TILT_MAX_Y;
-    const x = Math.max(-1, Math.min(1, -dy / TILT_SPAN)) * TILT_MAX_X;
-    el.style.setProperty("--tilt-y", `${y.toFixed(1)}deg`);
-    el.style.setProperty("--tilt-x", `${x.toFixed(1)}deg`);
-  };
-
-  const begin = () => {
-    const el = ref.current;
-    if (!el || !from.current) return;
-    turning.current = true;
-    el.dataset.tilting = "on";
-    // 손끝이 앨범 밖으로 나가도 계속 따라 돈다
-    try {
-      el.setPointerCapture(from.current.id);
-    } catch {
-      // 이미 놓친 포인터 — 그대로 둔다
-    }
-  };
-
-  const end = () => {
-    stopHold();
-    from.current = null;
-    if (!turning.current) return;
-    turning.current = false;
-    const el = ref.current;
-    if (!el) return;
-    // 각도를 지우면 전환이 다시 살아나 제자리로 돌아간다
-    delete el.dataset.tilting;
-    el.style.removeProperty("--tilt-x");
-    el.style.removeProperty("--tilt-y");
-  };
-
-  // 돌리는 동안에는 화면이 같이 밀리지 않게 막는다 — 리액트의 touchmove 는 막을 수 없어 직접 단다.
   useEffect(() => {
     const el = ref.current;
     if (!el || !enabled) return;
-    const block = (e: TouchEvent) => {
-      if (turning.current) e.preventDefault();
+
+    /** 누르기 시작한 지점 — 여기서 얼마나 움직였는지로 각도를 정한다 */
+    let x0 = 0;
+    let y0 = 0;
+    /** 지금 돌아서고 있는가 */
+    let turning = false;
+    /** 눌려 있긴 한가 — 아직 돌릴지 넘길지 정해지지 않은 사이 */
+    let watching = false;
+    let hold: ReturnType<typeof setTimeout> | null = null;
+    /** 마지막으로 손가락이 닿은 때 — 뒤따라오는 가짜 마우스 이벤트를 가려낸다 */
+    let touchedAt = 0;
+
+    const clearHold = () => {
+      if (hold) clearTimeout(hold);
+      hold = null;
     };
-    el.addEventListener("touchmove", block, { passive: false });
+
+    const turnTo = (dx: number, dy: number) => {
+      const y = Math.max(-1, Math.min(1, dx / TILT_SPAN)) * TILT_MAX_Y;
+      const x = Math.max(-1, Math.min(1, -dy / TILT_SPAN)) * TILT_MAX_X;
+      el.style.setProperty("--tilt-y", `${y.toFixed(1)}deg`);
+      el.style.setProperty("--tilt-x", `${x.toFixed(1)}deg`);
+    };
+
+    const begin = () => {
+      clearHold();
+      turning = true;
+      el.dataset.tilting = "on";
+    };
+
+    const rest = () => {
+      clearHold();
+      watching = false;
+      if (!turning) return;
+      turning = false;
+      // 각도를 지우면 전환이 다시 살아나 제자리로 돌아간다
+      delete el.dataset.tilting;
+      el.style.removeProperty("--tilt-x");
+      el.style.removeProperty("--tilt-y");
+    };
+
+    const press = (x: number, y: number) => {
+      x0 = x;
+      y0 = y;
+      watching = true;
+      turned.current = false;
+    };
+
+    const track = (x: number, y: number) => {
+      const dx = x - x0;
+      const dy = y - y0;
+      if (Math.hypot(dx, dy) > TAP_SLOP) turned.current = true;
+      turnTo(dx, dy);
+    };
+
+    // ── 손가락 ──
+    const onTouchStart = (e: TouchEvent) => {
+      touchedAt = Date.now();
+      if (e.touches.length !== 1) return rest(); // 두 손가락은 확대·축소다
+      press(e.touches[0].clientX, e.touches[0].clientY);
+      hold = setTimeout(begin, HOLD_MS);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!watching || !t) return;
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      if (!turning) {
+        // 가로로 먼저 움직였으면 돌리기 — 세로로 먼저 움직였으면 목록 넘기기
+        if (Math.abs(dx) > SLOP && Math.abs(dx) > Math.abs(dy)) begin();
+        else if (Math.abs(dy) > SLOP) return rest();
+        else return;
+      }
+      if (e.cancelable) e.preventDefault(); // 돌리는 동안 화면이 같이 밀리지 않게
+      track(t.clientX, t.clientY);
+    };
+    const onTouchEnd = () => {
+      touchedAt = Date.now();
+      rest();
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+
+    // ── 마우스 ──
+    const onMouseMove = (e: MouseEvent) => {
+      if (turning) track(e.clientX, e.clientY);
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      rest();
+    };
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0 || Date.now() - touchedAt < GHOST_MS) return;
+      press(e.clientX, e.clientY);
+      begin();
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    };
+    el.addEventListener("mousedown", onMouseDown);
+
     return () => {
-      el.removeEventListener("touchmove", block);
-      stopHold();
+      rest();
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+      el.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
     };
   }, [enabled]);
 
-  if (!enabled) return { ref, handlers: {} as TiltHandlers };
-
-  const handlers: TiltHandlers = {
-    onPointerDown: (e) => {
-      if (e.button !== 0) return;
-      from.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
-      turned.current = false;
-      if (e.pointerType === "mouse") begin();
-      else hold.current = setTimeout(begin, HOLD_MS);
-    },
-    onPointerMove: (e) => {
-      const at = from.current;
-      if (!at) return;
-      const dx = e.clientX - at.x;
-      const dy = e.clientY - at.y;
-      if (!turning.current) {
-        if (Math.hypot(dx, dy) > SLOP) end();
-        return;
+  const handlers: TiltHandlers = enabled
+    ? {
+        onClickCapture: (e) => {
+          // 돌려보기만 한 것이면 앨범을 열지 않는다
+          if (!turned.current) return;
+          turned.current = false;
+          e.preventDefault();
+          e.stopPropagation();
+        },
       }
-      if (Math.hypot(dx, dy) > 6) turned.current = true;
-      turnTo(dx, dy);
-    },
-    onPointerUp: end,
-    onPointerCancel: end,
-    onClickCapture: (e) => {
-      // 돌려보기만 한 것이면 앨범을 열지 않는다
-      if (!turned.current) return;
-      turned.current = false;
-      e.preventDefault();
-      e.stopPropagation();
-    },
-  };
+    : {};
 
   return { ref, handlers };
 }
@@ -166,6 +214,7 @@ export function AlbumCover({
       {...tilt.handlers}
       className={cn("album-book relative w-full select-none", shape.cls, className)}
       data-frame={frame.id}
+      data-tiltable={tiltable ? "on" : undefined}
       style={
         {
           ...style,
