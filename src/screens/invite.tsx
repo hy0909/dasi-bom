@@ -3,7 +3,6 @@ import {
   Check,
   ChevronDown,
   Copy,
-  ImagePlus,
   Info,
   Plus,
   RefreshCw,
@@ -164,7 +163,7 @@ function InviteBody({
             </Button>
           </header>
           <section className="mt-4 flex flex-col gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full bg-primary text-canvas">
+            <span className="flex size-12 items-center justify-center rounded-full bg-muted text-ink">
               <Check className="size-6" strokeWidth={2.5} />
             </span>
             <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
@@ -312,9 +311,9 @@ function InviteBody({
               </span>
             )}
             <Button
-              variant="secondary"
+              variant="ghost"
               size="sm"
-              className="-my-1 ml-auto shrink-0"
+              className="-my-1 ml-auto shrink-0 bg-muted text-ink hover:bg-accent hover:text-ink"
               onClick={copy}
               disabled={expired}
             >
@@ -362,12 +361,18 @@ function InviteBody({
         </Button>
       )}
 
-      {/* 만든 직후에는 빈 앨범이다 — 초대 다음 할 일은 사진을 채우는 것. */}
+      {/* 만든 직후에는 빈 앨범이다 — 초대 다음 할 일은 사진을 채우는 것.
+          나중에 채울 수도 있으니 홈으로 가는 길도 같은 무게로 나란히 둔다. */}
       {justCreated && (
-        <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("upload")}>
-          <ImagePlus className="size-5" />
-          앨범에 사진 추가
-        </Button>
+        <>
+          <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("upload")}>
+            <Plus className="size-5" strokeWidth={2.5} />
+            앨범에 사진 추가
+          </Button>
+          <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("home")}>
+            홈으로 이동
+          </Button>
+        </>
       )}
 
       <section className="mt-9 flex flex-col gap-2">
@@ -376,7 +381,7 @@ function InviteBody({
         />
         <div className="flex flex-col">
           {participants.length === 0 && (
-            <p className="py-6 text-sm text-body-mid">아직 초대한 가족이 없어요.</p>
+            <p className="pb-6 text-sm text-body-mid">아직 초대한 사람이 없어요.</p>
           )}
           {participants.map(({ character, color, name, note, status }) => (
             <MemberRow
