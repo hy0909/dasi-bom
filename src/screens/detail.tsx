@@ -92,13 +92,14 @@ function MemberSummary({
           type="button"
           className="-mx-1 mt-3 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
         >
-          <span className="flex shrink-0 -space-x-2">
-            {faces.map((f) => (
+          {/* 맨 앞 한 명만 온전히 보이고, 나머지는 그 뒤에서 오른쪽으로 조금씩만 내민다 */}
+          <span className="flex shrink-0 -space-x-6">
+            {faces.map((f, i) => (
               <CharacterAvatar
                 key={f.key}
                 index={f.character}
                 color={f.color}
-                className="size-8 ring-2 ring-ink/50"
+                className={cn("size-8 ring-2 ring-ink/50", i === 0 ? "z-20" : i === 1 ? "z-10" : "z-0")}
               />
             ))}
           </span>
