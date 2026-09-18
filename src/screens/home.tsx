@@ -299,7 +299,7 @@ export function HomeScreen({
           </CardContent>
         </Card>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-7">
+        <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-7">
           {list.map((item) => (
             <AlbumCard
               key={item.id}
@@ -399,7 +399,7 @@ function AlbumCard({
       {/* 패브릭 앨범 — 좌우 여백 없이 칸을 꽉 채운다. 그림자는 바깥으로 번져도 잘리지 않는다 */}
       <div className="relative pt-1 pb-2">
         <div ref={coverRef}>
-          <AlbumCover album={album} photoCount={photoCount} tiltable />
+          <AlbumCover album={album} photoCount={photoCount} tiltable className="mx-auto w-[97%]" />
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
