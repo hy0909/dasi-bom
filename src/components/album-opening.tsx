@@ -20,6 +20,8 @@ const RISE_MS = 700;
 /** 5) 제자리에 닿은 뒤 오버레이가 통째로 녹아 사라지는 시간 */
 const FADE_START_MS = RISE_START_MS + RISE_MS;
 const FADE_MS = 500;
+/** 보는 사람이 화면을 눌러 건너뛸 때 녹는 시간 — 끊기지 않게, 그러나 기다리게 하지 않게 */
+const SKIP_FADE_MS = 260;
 
 type Box = { left: number; top: number; width: number; height: number };
 
@@ -33,6 +35,7 @@ type Box = { left: number; top: number; width: number; height: number };
  * 4) 드러난 사진이 그 크기 그대로 위로 올라가, 상세 hero 사진이 있어야 할 화면 맨 위에 가 닿는다.
  * 5) 거기서 오버레이가 통째로 녹아 사라지면, 같은 자리·같은 크기의 상세 hero 만 남는다.
  * 앞·뒷면을 처음부터 함께 두고 backface-visibility 로만 가르므로 중간에 면을 갈아끼우는 번쩍임이 없다.
+ * 중간에 화면을 누르면 그 자리에서 멈춘 채 0.26초에 걸쳐 녹고, 곧바로 상세가 남는다.
  */
 export function AlbumOpening({
   album,
@@ -47,6 +50,9 @@ export function AlbumOpening({
   onDone: () => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
+  /* 판형 비율만 있으면 되는데 album 객체를 의존성에 두면, 홈이 다시 그려질 때마다 새 객체가 와서
+     모션이 처음부터 다시 돈다 — 값 하나만 본다 */
+  const aspect = coverShapeOf(album).aspect;
   const reveal = useRef(onReveal);
   const done = useRef(onDone);
   reveal.current = onReveal;
@@ -63,7 +69,7 @@ export function AlbumOpening({
     // 상세 hero 는 폰 캔버스 폭에 앨범 판형 그대로이고 페이지 맨 위에 붙는다 — 펼친 사진이 가 닿을 제자리다.
     const cr = document.querySelector<HTMLElement>("[data-screen]")?.getBoundingClientRect();
     const width = cr?.width ?? window.innerWidth;
-    const height = width * coverShapeOf(album).aspect;
+    const height = width * aspect;
     const hero: Box = { left: cr?.left ?? 0, top: 0, width, height };
     // 앨범은 그 크기 그대로 화면 정중앙에서 펼쳐진다 — 자리만 다르고 크기는 hero 와 같다.
     const target: Box = { ...hero, top: (window.innerHeight - height) / 2 };
@@ -130,13 +136,33 @@ export function AlbumOpening({
     // 녹기 시작하면 아래 상세 화면이 보인다 — 사라지는 오버레이가 탭을 막고 있지 않게
     rise.finished.then(() => el.classList.add("album-opening-releasing"), quiet);
     fade.finished.then(finish, quiet);
+    // 보는 사람이 화면을 누르면 기다리지 않고 건너뛴다 — 모션을 그 자리에 세운 채 부드럽게 녹인다
+    let skipping: Animation | null = null;
+    const skip = () => {
+      if (finished || skipping) return;
+      // 아래 화면부터 상세로 바꿔 둔다 — 녹고 나면 그 화면이 그대로 남는다
+      doReveal();
+      animations.forEach((a) => a.pause());
+      // 녹는 동안에는 아래를 바로 누를 수 있게
+      el.classList.add("album-opening-releasing");
+      skipping = el.animate([{ opacity: getComputedStyle(el).opacity }, { opacity: 0 }], {
+        duration: SKIP_FADE_MS,
+        easing: "cubic-bezier(.4,0,.2,1)",
+        fill,
+      });
+      skipping.finished.then(finish, quiet);
+    };
+    el.addEventListener("pointerdown", skip);
+
     // 탭이 뒤로 가 있어 애니메이션이 멈춰도 오버레이가 영영 남지는 않게 — 시계 기준 마지막 안전장치
     const safety = window.setTimeout(finish, FADE_START_MS + FADE_MS + 1500);
     return () => {
       window.clearTimeout(safety);
+      el.removeEventListener("pointerdown", skip);
+      skipping?.cancel();
       animations.forEach((a) => a.cancel());
     };
-  }, [from, album]);
+  }, [from, aspect]);
 
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
 
