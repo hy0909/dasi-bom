@@ -162,7 +162,7 @@ export function HomeScreen({
                   e.key === "Enter" &&
                   onOpenAlbum(heroAlbum.id, "detail", heroCover.current!.getBoundingClientRect())
                 }
-                className="hero-turn max-w-[78%] cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
+                className="hero-turn max-w-[78%] cursor-pointer rounded-sm transition-transform duration-300 ease-out outline-none hover:scale-110 focus-visible:ring-3 focus-visible:ring-canvas/50 motion-reduce:transition-none motion-reduce:hover:scale-100"
               >
                 <AlbumCover
                   album={heroAlbum}
