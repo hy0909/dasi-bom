@@ -7,6 +7,7 @@ import { Field } from "@/components/field";
 import { StickyBar } from "@/components/sticky-bar";
 import {
   COVER_COLORS,
+  coverShapeOf,
   type CoverColorId,
   type CoverFrameId,
   type CoverShapeId,
@@ -106,17 +107,21 @@ export function CreateScreen({
         </header>
 
         <div className="relative z-10 flex flex-col items-center gap-4 px-5 pt-3 pb-10">
-          {/* 고른 색·판형·사진 자리가 실제 표지로 어떻게 보이는지 여기서 바로 보인다 */}
-          <AlbumCover
-            album={{
-              id: "preview",
-              coverColor,
-              coverShape,
-              coverFrame,
-              cover: cover ?? PLACEHOLDER_COVER,
-            }}
-            className="w-44 drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
-          />
+          {/* 고른 색·비율·디자인이 실제 표지로 어떻게 보이는지 여기서 바로 보인다.
+              자리 높이는 세로형(4:5) 기준으로 고정한다 — 비율을 바꿔도 아래 화면이 들썩이지 않는다. */}
+          <div className="flex h-[154px] items-center justify-center">
+            <AlbumCover
+              album={{
+                id: "preview",
+                coverColor,
+                coverShape,
+                coverFrame,
+                cover: cover ?? PLACEHOLDER_COVER,
+              }}
+              style={{ width: Math.round(154 / coverShapeOf({ coverShape }).aspect) }}
+              className="drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
+            />
+          </div>
           {/* 표지 색은 표지 바로 아래 — 고르는 순간 위 표지가 그 색이 된다 */}
           <CoverColorPicker
             value={coverColor}
