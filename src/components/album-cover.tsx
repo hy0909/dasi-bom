@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 export const MAX_PHOTOS = 20;
 /** 책등 두께(커버 폭 대비 %) — 1장이 가장 얇고 MAX_PHOTOS 장이 가장 두껍다.
     한 장만 담아도 책은 책이다 — 가장 얇은 앨범도 손에 잡히는 두께로 둔다.
-    1장이 예전 20장 두께(30%)에서 시작하고, 20장은 그보다 1.4배 두껍다. */
-const DEPTH_MIN = 30;
+    한 장짜리도 책으로 보이되 벽돌처럼 두껍지는 않게. */
+const DEPTH_MIN = 22;
 const DEPTH_MAX = 42;
 export function albumDepth(photoCount: number) {
   // 1장과 MAX_PHOTOS 장 사이를 고르게 나눈다 — 한 장 늘 때마다 같은 폭씩 두꺼워진다.

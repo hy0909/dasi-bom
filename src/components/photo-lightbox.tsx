@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { X } from "lucide-react";
  * 여백 없이 긴 쪽이 화면에 꽉 차고, 짧은 쪽은 비율대로 남는다(contain).
  * 손가락 두 개로 벌리면 커지고, 커진 뒤에는 한 손가락으로 끌어 볼 수 있다.
  * 두 번 두드리면(데스크톱은 두 번 누르거나 휠) 커졌다 작아졌다 한다.
- * 닫기는 오른쪽 위 ✕ 이거나, 사진 바깥의 어두운 자리를 누르는 것.
+ * 닫기는 오른쪽 위 ✕ 이거나, 사진 바깥의 어두운 자리를 누르는 것. 여닫을 때는 0.2초 동안 스르륵 뜨고 진다.
  *
  * 확대는 직접 다룬다 — 브라우저의 핀치 줌은 화면 전체를 키우지 이 사진만 키우지 못한다.
  * 그래서 사진 자리에는 touch-action: none 을 주고 손짓을 우리가 받는다.
@@ -80,12 +80,30 @@ export function PhotoLightbox({
     [apply, hold],
   );
 
+  /** 화면에 그려 두는 사진 — 닫는 동안에도 사라지지 않게 따로 잡아 둔다 */
+  const [shown, setShown] = useState<{ src: string; alt?: string } | null>(photo);
+  /** 열리는 중인가 닫히는 중인가 — 여닫는 모션을 이 값으로 가른다 */
+  const [state, setState] = useState<"open" | "closed">(photo ? "open" : "closed");
+
+  useEffect(() => {
+    if (photo) {
+      setShown(photo);
+      setState("open");
+      return;
+    }
+    if (!shown) return;
+    setState("closed");
+    // 사라지는 모션이 끝난 뒤에 지운다
+    const t = window.setTimeout(() => setShown(null), 200);
+    return () => window.clearTimeout(t);
+  }, [photo, shown]);
+
   // 새 사진을 열 때마다 처음 크기로 돌아간다
   useEffect(() => {
-    if (!photo) return;
+    if (!shown) return;
     view.current = { scale: 1, x: 0, y: 0 };
     apply();
-  }, [photo, apply]);
+  }, [shown, apply]);
 
   // 열려 있는 동안에는 뒤 화면이 따라 움직이지 않게 하고, Esc 로도 닫는다
   useEffect(() => {
@@ -102,7 +120,7 @@ export function PhotoLightbox({
     };
   }, [photo, onClose]);
 
-  if (!photo) return null;
+  if (!shown) return null;
 
   const zoomAt = (clientX: number, clientY: number) => {
     const el = imgRef.current;
@@ -244,7 +262,8 @@ export function PhotoLightbox({
         }
         onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-md"
+      data-state={state}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-md duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
     >
       <button
         type="button"
@@ -257,8 +276,8 @@ export function PhotoLightbox({
 
       <img
         ref={imgRef}
-        src={photo.src}
-        alt={photo.alt ?? ""}
+        src={shown.src}
+        alt={shown.alt ?? ""}
         draggable={false}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={onTouchStart}
