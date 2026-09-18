@@ -15,7 +15,7 @@ export function NoticesScreen({ go }: { go: Go }) {
           leading={<CharacterAvatar index={0} color={5} size="lg" />}
           title="엄마가 새 목소리를 남겼어요"
           description="‘파리에 도착한 첫날’ · 방금 전"
-          trailing={<span className="size-2 rounded-full bg-primary" aria-label="새 알림" />}
+          trailing={<span className="size-2 rounded-full bg-ink" aria-label="새 알림" />}
         />
         {/* 앨범 단위 알림이라 앨범 상세로 보낸다 — 사진 한 장이 아니라 앨범이 다 채워진 경우 */}
         <ListRow

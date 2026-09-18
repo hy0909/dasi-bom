@@ -351,7 +351,7 @@ html {
   position: absolute;
   inset: 0;
   transform: translateZ(calc(-1 * var(--depth, 12cqw)));
-  border-radius: 2px 4px 4px 2px;
+  border-radius: 3px 6px 6px 3px;
   background-color: var(--cover);
   background-image:
     linear-gradient(135deg, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0) 45%, rgb(0 0 0 / 0.24)),
@@ -361,8 +361,10 @@ html {
    표지 판이 종이를 앞뒤에서 물고 있어 양 끝에 천 색이 얇게 남는다. */
 .album-book-fore {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  /* 표지의 둥근 모서리보다 안쪽에서 시작한다 — 각진 끝이 모서리 밖으로 삐져나오면
+     꼭지점에 흰 점처럼 비친다 */
+  top: 6px;
+  bottom: 6px;
   right: 0;
   width: var(--depth, 12cqw);
   transform-origin: 100% 50%;
@@ -377,9 +379,11 @@ html {
 .album-book-top,
 .album-book-bottom {
   position: absolute;
-  left: 0;
-  right: 0;
+  /* 좌우도 같은 이유로 모서리 안쪽부터 */
+  left: 6px;
+  right: 6px;
   height: var(--depth, 12cqw);
+  border-radius: 2px;
   background-color: #f2ece1;
   background-image:
     linear-gradient(180deg, var(--cover) 0 6%, rgb(0 0 0 / 0) 6% 94%, var(--cover) 94% 100%),
@@ -400,7 +404,7 @@ html {
 .album-cover {
   position: absolute;
   inset: 0;
-  border-radius: 2px 4px 4px 2px;
+  border-radius: 3px 6px 6px 3px;
   background-color: var(--cover);
   /* 왼쪽 위에서 오는 아주 완만한 빛 하나. 결은 아래 노이즈가 만든다 —
      1px 줄무늬를 깔면 크기가 바뀔 때 무아레가 생겨 골판지처럼 보인다. */

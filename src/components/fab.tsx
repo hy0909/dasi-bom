@@ -23,7 +23,10 @@ export function Fab({
       <div className="flex justify-end">
         <Button
           size="icon-lg"
-          className={cn("pointer-events-auto size-14 rounded-full shadow-float", className)}
+          className={cn(
+            "pointer-events-auto size-14 rounded-full bg-ink text-canvas shadow-float hover:bg-ink-soft",
+            className,
+          )}
           {...props}
         />
       </div>
