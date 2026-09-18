@@ -22,6 +22,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { StatusFilter, useStatusFilter } from "@/components/status-filter";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { MemberRow } from "@/components/member-row";
+import { PhotoLightbox } from "@/components/photo-lightbox";
 import {
   Dialog,
   DialogContent,
@@ -341,6 +342,8 @@ function AlbumReader({
   const tilts = frameTilts(album.id, photos.length);
   // 사진 비율은 로드된 뒤 알 수 있다 — 그때 폭과 여유를 다시 맞춘다. 그전엔 4:3으로 본다.
   const [ratios, setRatios] = useState<Record<string, number>>({});
+  /** 크게 보고 있는 사진 — 누르면 화면을 덮고 열린다 */
+  const [zoomed, setZoomed] = useState<Photo | null>(null);
 
   if (photos.length === 0)
     return <Empty>아직 사진이 없어요. 위 ‘사진 추가’로 시작해보세요.</Empty>;
@@ -371,18 +374,26 @@ function AlbumReader({
               style={tiltLayout(tilts[i], ratios[photo.src] ?? 4 / 3).frame}
             >
               <div className="polaroid-photo">
-                <img
-                  src={photo.src}
-                  alt={photo.alt ?? photo.title}
-                  className="block h-auto w-full"
-                  onLoad={(e) => {
-                    const { naturalWidth, naturalHeight } = e.currentTarget;
-                    if (naturalWidth && naturalHeight)
-                      setRatios((m) =>
-                        m[photo.src] ? m : { ...m, [photo.src]: naturalWidth / naturalHeight },
-                      );
-                  }}
-                />
+                {/* 누르면 화면 가득 크게 본다 */}
+                <button
+                  type="button"
+                  onClick={() => setZoomed(photo)}
+                  aria-label={`${photo.title} 크게 보기`}
+                  className="block w-full cursor-zoom-in outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt ?? photo.title}
+                    className="block h-auto w-full"
+                    onLoad={(e) => {
+                      const { naturalWidth, naturalHeight } = e.currentTarget;
+                      if (naturalWidth && naturalHeight)
+                        setRatios((m) =>
+                          m[photo.src] ? m : { ...m, [photo.src]: naturalWidth / naturalHeight },
+                        );
+                    }}
+                  />
+                </button>
               </div>
             </figure>
           </div>
@@ -421,6 +432,11 @@ function AlbumReader({
           )}
         </section>
       ))}
+
+      <PhotoLightbox
+        photo={zoomed ? { src: zoomed.src, alt: zoomed.alt ?? zoomed.title } : null}
+        onClose={() => setZoomed(null)}
+      />
 
       {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
       <p className="border-t border-border pt-6 text-center font-serif text-[15px] italic text-body-mid">
