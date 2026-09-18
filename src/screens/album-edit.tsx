@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { albumPeriod, coverColorOf, coverFrameOf, coverShapeOf, type Album } from "@/data/album";
+import { albumPeriod, coverColorOf, coverFrameOf, coverShapeOf } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumPhotos } from "@/data/photos";
 import { AlbumCover } from "@/components/album-cover";
@@ -21,11 +21,25 @@ export function AlbumEditScreen({
   notify,
 }: {
   album: AlbumCardData;
-  onSave: (album: Album) => void;
+  onSave: (album: AlbumCardData) => void;
   back: () => void;
   notify: Notify;
 }) {
-  const [draft, setDraft] = useState<Album>(album);
+  // 표지 사진까지 고칠 수 있으므로 카드 데이터 전체를 들고 고친다.
+  const [draft, setDraft] = useState<AlbumCardData>(album);
+
+  function chooseFile(file?: File) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return notify("이미지 파일만 선택해주세요");
+    const reader = new FileReader();
+    reader.onload = () =>
+      setDraft((d) => ({
+        ...d,
+        cover: String(reader.result),
+        coverAlt: `${d.title.trim() || "앨범"} 대표 사진`,
+      }));
+    reader.readAsDataURL(file);
+  }
   // 날짜를 비워 두면 사진의 촬영 날짜가 앨범 기간이 된다 — 그 값을 칸에 미리 보여준다.
   const photos = useAlbumPhotos(album.id);
   const period = albumPeriod(draft, photos);
@@ -71,7 +85,7 @@ export function AlbumEditScreen({
                 coverColor: coverColorOf(draft).id,
                 coverShape: coverShapeOf(draft).id,
                 coverFrame: coverFrameOf(draft).id,
-                cover: album.cover,
+                cover: draft.cover,
               }}
               style={{ width: 123 }}
               className="drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
@@ -92,6 +106,24 @@ export function AlbumEditScreen({
       </p>
 
       <form className="mt-6 flex flex-col gap-6 pb-20" onSubmit={submit}>
+        <Field label="대표 사진">
+          <label className="relative flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-mute px-4 py-3 transition-colors hover:bg-muted has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-ink">
+              <ImagePlus className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <b className="block text-[15px] font-semibold">대표 사진 변경</b>
+              <small className="block text-xs text-body-mid">JPG, PNG · 최대 10MB</small>
+            </span>
+            <input
+              className="visually-hidden"
+              type="file"
+              accept="image/*"
+              onChange={(e) => chooseFile(e.target.files?.[0])}
+            />
+          </label>
+        </Field>
+
         <Field label="앨범 비율">
           <CoverShapePicker
             value={coverShapeOf(draft).id}
@@ -105,7 +137,7 @@ export function AlbumEditScreen({
             onChange={(coverFrame) => setDraft({ ...draft, coverFrame })}
             shape={coverShapeOf(draft).id}
             color={coverColorOf(draft).id}
-            cover={album.cover}
+            cover={draft.cover}
           />
         </Field>
 
