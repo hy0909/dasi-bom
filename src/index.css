@@ -93,7 +93,8 @@ html {
   --body: #605d52;
   --body-mid: #939084;
   --mute: #c5c0b1;
-  --primary-deep: #e64700;
+  /* 포인트색의 눌린 상태 — 먹색보다 한 단계 더 어둡다 */
+  --primary-deep: #120d0c;
 
   /* 시맨틱 */
   --background: var(--canvas);
@@ -102,7 +103,8 @@ html {
   --card-foreground: var(--ink);
   --popover: var(--canvas);
   --popover-foreground: var(--ink);
-  --primary: #ff4f00;
+  /* 포인트색 — 주황 대신 먹색. 강조는 색이 아니라 짙기로 준다 */
+  --primary: var(--ink);
   --primary-foreground: #fffefb;
   --secondary: var(--ink);
   --secondary-foreground: #fffefb;
@@ -113,7 +115,7 @@ html {
   --destructive: #b42318;
   --border: #dcd7cb; /* mute 60% */
   --input: var(--ink);
-  --ring: #ff4f00;
+  --ring: var(--ink);
   --radius: 12px;
 }
 
