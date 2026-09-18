@@ -32,22 +32,18 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
         <Wordmark />
       </div>
 
-      <MediaFrame
-        className="mt-2"
-        src={photos[0].src}
-        alt="가족과 함께 본 유럽여행 사진"
-        caption="사진 한 장에서 시작하는 가족 앨범"
-      />
+      <MediaFrame className="mt-2" src={photos[0].src} alt="가족과 함께 본 유럽여행 사진" />
 
       <section className="mt-6 flex flex-col gap-3">
         <Eyebrow>시작하기</Eyebrow>
         <h1 className="font-heading text-display-xl font-bold">
-          가족의 기억을
+          기억하고 싶은
           <br />
-          함께 모아요
+          순간이 있나요?
         </h1>
         <p className="text-base leading-relaxed text-body">
-          구글이나 카카오 계정으로 바로 시작할 수 있어요. 초대받은 가족은 가입 없이 링크로 참여해요.
+          SNS 계정으로 시작해 보세요. 링크를 공유받았다면 회원가입 없이 앨범에 사진을 첨부할 수도
+          있어요.
         </p>
       </section>
 

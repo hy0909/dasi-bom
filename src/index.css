@@ -1,3 +1,4 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
 @import url("https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -12,7 +13,7 @@
 @theme inline {
   /* 서체: Degular Display 대체 → Inter 500 / 한글은 Pretendard */
   --font-sans:
-    "Inter", "Pretendard Variable", Pretendard, -apple-system,
+    "Pretendard Variable", Pretendard, "Inter", -apple-system,
     "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
   --font-heading: var(--font-sans);
   /* 기록의 맺음말처럼 책에서 온 말투에 쓰는 명조 */
