@@ -228,6 +228,11 @@ export function AlbumCover({
       aria-hidden
     >
       <div className="album-book-body">
+        {/* 책의 나머지 면 — 어느 쪽으로 돌려도 속이 비어 보이지 않게 여섯 면을 다 채운다 */}
+        <span className="album-book-back" />
+        <span className="album-book-fore" />
+        <span className="album-book-top" />
+        <span className="album-book-bottom" />
         <div className="album-cover">
           <span className="album-cover-spine" />
           <span className="album-cover-well">
