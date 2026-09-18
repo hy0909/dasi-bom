@@ -234,7 +234,7 @@ export function DetailScreen({
                   <EllipsisVertical className="size-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="p-4">
+              <DropdownMenuContent align="end" className="p-3">
                 {/* 초대도 자주 쓰는 일은 아니다 — 앨범에 손대는 일끼리 여기 모은다 */}
                 <DropdownMenuItem onSelect={() => go("invite")}>구성원 초대</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => go("albumEdit")}>앨범 수정</DropdownMenuItem>

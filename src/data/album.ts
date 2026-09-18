@@ -132,11 +132,11 @@ export function isLightFabric(tone: string) {
 export function coverStageTone(hex: string) {
   const [h, s, l] = hexToHsl(hex);
   // 흰 표지에는 색이 없다 — 중립적인 따뜻한 어둠으로 둔다
-  if (s < 0.08 && l > 0.9) return "#221d1a";
+  if (s < 0.08 && l > 0.9) return "#2a2320";
   // 표지 천이 얼마나 밝은지부터 구하고, 그 절반 아래로 내린다.
   // 고정값 하나로 두면 이미 어두운 표지(딥그린)에서는 바탕과 표지가 붙어 버린다.
   const fabricL = l > 0.78 ? Math.max(0.85, Math.min(l, 0.92)) : Math.min(0.3, l);
-  return hslToHex(h, Math.min(s, 0.22), Math.min(0.12, fabricL * 0.55));
+  return hslToHex(h, Math.min(s, 0.22), Math.min(0.155, fabricL * 0.62));
 }
 
 /** 배너 배경 — A안은 쨍한 색 그대로, B안은 그 색의 연한 톤. */
