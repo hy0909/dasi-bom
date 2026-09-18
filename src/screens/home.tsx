@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -23,7 +23,7 @@ import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { AlbumCover } from "@/components/album-cover";
-import { albumPeriod, formatAlbumStart } from "@/data/album";
+import { albumPeriod, coverShapeOf, formatAlbumStart } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -55,9 +55,13 @@ export function HomeScreen({
 }) {
   const [recent, setRecent] = useState(true);
   const [filter, setFilter] = useState<AlbumFilter>("all");
-  /** 위쪽 무대에 올려 둔 앨범 — 좌우 화살표로 넘긴다 */
+  /** 위쪽 무대에 올려 둔 앨범 — 좌우 화살표나 스와이프로 넘긴다 */
   const [hero, setHero] = useState(0);
+  /** 마지막으로 넘긴 방향 — 새 표지가 그쪽에서 밀려 들어온다 */
+  const [heroDir, setHeroDir] = useState(1);
   const heroCover = useRef<HTMLDivElement>(null);
+  /** 스와이프를 시작한 손끝 */
+  const swipeFrom = useRef<{ x: number; y: number } | null>(null);
   const session = useSession();
   const participants = useAlbumParticipants();
   const membership = useMyAlbums();
@@ -80,8 +84,14 @@ export function HomeScreen({
   // 앨범이 줄면 무대에 올린 자리도 따라 줄인다.
   const heroAt = albums.length ? Math.min(hero, albums.length - 1) : 0;
   const heroAlbum = albums[heroAt];
-  const turnHero = (step: number) =>
+  const turnHero = (step: number) => {
+    setHeroDir(step);
     setHero((at) => (albums.length ? (at + step + albums.length) % albums.length : 0));
+  };
+  /** 표지가 이 높이로 서고, 판형에 따라 폭이 정해진다 — 브라우저가 폭을 스스로 계산하게
+      두면(w-auto + aspect-ratio) 카카오 인앱처럼 계산이 다른 곳에서 가운데가 틀어진다. */
+  const HERO_H = 272;
+  const heroShape = heroAlbum ? coverShapeOf(heroAlbum) : null;
 
   return (
     <>
@@ -93,21 +103,44 @@ export function HomeScreen({
 
         {heroAlbum ? (
           <>
-            {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다 */}
-            <div className="relative mt-2 flex h-[230px] items-center justify-center">
+            {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다.
+                좌우로 밀면 앨범이 넘어가고, 위아래로 밀면 화면이 그대로 스크롤된다. */}
+            <div
+              className="relative mt-2 flex h-[284px] touch-pan-y items-center justify-center"
+              onTouchStart={(e) => {
+                const t = e.touches[0];
+                swipeFrom.current = { x: t.clientX, y: t.clientY };
+              }}
+              onTouchEnd={(e) => {
+                const from = swipeFrom.current;
+                swipeFrom.current = null;
+                if (!from || albums.length < 2) return;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - from.x;
+                const dy = t.clientY - from.y;
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) turnHero(dx < 0 ? 1 : -1);
+              }}
+            >
               {albums.length > 1 && (
                 <button
                   type="button"
                   onClick={() => turnHero(-1)}
                   aria-label="이전 앨범"
-                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-80 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronLeft className="size-6" />
                 </button>
               )}
               {/* 앨범 — 정면으로 세워 두고 잔잔한 그림자만 깐다 */}
               <div
+                key={heroAlbum.id}
                 ref={heroCover}
+                style={
+                  {
+                    width: heroShape ? Math.round(HERO_H / heroShape.aspect) : undefined,
+                    "--hero-from": heroDir > 0 ? "30px" : "-30px",
+                  } as CSSProperties
+                }
                 role="button"
                 tabIndex={0}
                 aria-label={`${heroAlbum.title} 열기`}
@@ -118,12 +151,12 @@ export function HomeScreen({
                   e.key === "Enter" &&
                   onOpenAlbum(heroAlbum.id, "detail", heroCover.current!.getBoundingClientRect())
                 }
-                className="flex h-full max-w-[64%] cursor-pointer items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
+                className="hero-turn max-w-[62%] cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
               >
                 <AlbumCover
                   album={heroAlbum}
                   photoCount={photoStore[heroAlbum.id]?.length ?? 0}
-                  className="h-full w-auto drop-shadow-[0_18px_26px_rgb(0_0_0/0.32)]"
+                  className="drop-shadow-[0_18px_26px_rgb(0_0_0/0.32)]"
                 />
               </div>
               {albums.length > 1 && (
@@ -131,7 +164,7 @@ export function HomeScreen({
                   type="button"
                   onClick={() => turnHero(1)}
                   aria-label="다음 앨범"
-                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-80 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronRight className="size-6" />
                 </button>
@@ -152,7 +185,7 @@ export function HomeScreen({
       </section>
 
       <div className="mt-7">
-        <h1 className="font-heading text-display-xl font-bold">
+        <h1 className="font-heading text-display-md font-bold">
           함께 기억하고 싶은
           <br />
           순간이 있나요?
