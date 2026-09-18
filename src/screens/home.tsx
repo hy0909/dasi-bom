@@ -216,7 +216,7 @@ export function HomeScreen({
         className="mt-5 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex items-center gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary text-ink">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-ink text-canvas">
             <Plus className="size-6" strokeWidth={2.5} />
           </span>
           <span className="min-w-0 flex-1">

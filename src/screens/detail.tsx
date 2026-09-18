@@ -411,7 +411,7 @@ function AlbumReader({
             // 높이는 아래 목소리 줄과 같게 — 테두리 1px 두 줄만큼 위아래를 덜어낸다(11+36+11+2=60)
             <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-mute px-4 py-[11px]">
               <p className="min-w-0 text-sm leading-relaxed text-body-mid">
-                그 날의 이야기를 기록해요.
+                그날의 이야기를 기록해요.
               </p>
               <Button
                 variant="outline"
@@ -425,7 +425,7 @@ function AlbumReader({
           )}
 
           {(photo.voices ?? []).length > 0 && (
-            <div className="mt-1 flex flex-col divide-y divide-border">
+            <div className="-mt-1 flex flex-col divide-y divide-border">
               {(photo.voices ?? []).map((voice) => (
                 <VoiceRow
                   key={`${photo.title}-${voice.name}`}
