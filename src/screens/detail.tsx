@@ -425,7 +425,7 @@ function AlbumReader({
           )}
 
           {(photo.voices ?? []).length > 0 && (
-            <div className="mt-1 flex flex-col divide-y divide-border rounded-lg bg-accent/70 px-3">
+            <div className="mt-1 flex flex-col divide-y divide-border">
               {(photo.voices ?? []).map((voice) => (
                 <VoiceRow
                   key={`${photo.title}-${voice.name}`}
