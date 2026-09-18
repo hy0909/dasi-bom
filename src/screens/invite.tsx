@@ -163,7 +163,7 @@ function InviteBody({
             </Button>
           </header>
           <section className="mt-4 flex flex-col gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full bg-muted text-ink">
+            <span className="flex size-12 items-center justify-center rounded-full bg-accent text-body-mid">
               <Check className="size-6" strokeWidth={2.5} />
             </span>
             <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
@@ -263,8 +263,10 @@ function InviteBody({
         <CardContent className="flex flex-col gap-3">
           {/* 라벨 · 남은 유효기간(D-n) · 안내 · 복사가 한 줄 — 복사는 오른쪽 끝에 붙는다. */}
           <span className="flex items-center gap-2">
-            <small className="min-w-0 truncate text-xs font-semibold text-body">
-              ‘{album.title}’ 참여 링크
+            {/* 제목이 길면 제목만 줄이고 '참여 링크'는 남긴다 — 줄 전체가 잘리면 무슨 링크인지 사라진다 */}
+            <small className="flex min-w-0 items-baseline text-sm font-semibold text-body">
+              <span className="truncate">‘{album.title}’</span>
+              <span className="shrink-0">&nbsp;참여 링크</span>
             </small>
             {expired ? (
               <Badge variant="destructive">만료됨</Badge>
@@ -313,7 +315,7 @@ function InviteBody({
             <Button
               variant="ghost"
               size="sm"
-              className="-my-1 ml-auto shrink-0 bg-muted text-ink hover:bg-accent hover:text-ink"
+              className="-my-1 ml-auto shrink-0 bg-accent text-ink hover:bg-border hover:text-ink"
               onClick={copy}
               disabled={expired}
             >
@@ -364,15 +366,15 @@ function InviteBody({
       {/* 만든 직후에는 빈 앨범이다 — 초대 다음 할 일은 사진을 채우는 것.
           나중에 채울 수도 있으니 홈으로 가는 길도 같은 무게로 나란히 둔다. */}
       {justCreated && (
-        <>
-          <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("upload")}>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <Button variant="outline" size="lg" className="w-full px-3" onClick={() => go("upload")}>
             <Plus className="size-5" strokeWidth={2.5} />
-            앨범에 사진 추가
+            사진 추가
           </Button>
-          <Button variant="outline" size="lg" className="mt-2 w-full" onClick={() => go("home")}>
+          <Button variant="outline" size="lg" className="w-full px-3" onClick={() => go("home")}>
             홈으로 이동
           </Button>
-        </>
+        </div>
       )}
 
       <section className="mt-9 flex flex-col gap-2">
