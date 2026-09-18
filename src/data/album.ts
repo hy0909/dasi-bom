@@ -47,19 +47,19 @@ export function coverFrameOf(album: Pick<Album, "coverFrame">) {
   return COVER_FRAMES.find((f) => f.id === album.coverFrame) ?? COVER_FRAMES[0];
 }
 
-/** 앨범 커버 색 — 만들 때 고르는 11가지. */
+/** 앨범 커버 색 — 만들 때 고르는 12가지. 진한 색 여덟을 앞에 두고, 옅은 넷을 뒤에 모은다. */
 export const COVER_COLORS = [
   { id: "blue", label: "파랑", hex: "#3C9FFF" },
-  { id: "skyblue", label: "연하늘", hex: "#BFE3F7" },
   { id: "red", label: "빨강", hex: "#FF6769" },
   { id: "violet", label: "보라", hex: "#AE8AFF" },
   { id: "gray", label: "회색", hex: "#9DA1AA" },
   { id: "yellow", label: "노랑", hex: "#F3BE00" },
-  { id: "pink", label: "베이비핑크", hex: "#F8CEDD" },
-  { id: "orange", label: "개나리", hex: "#FBE9A0" },
   { id: "turquoise", label: "청록", hex: "#26C8A2" },
   { id: "brown", label: "갈색", hex: "#CBAD70" },
   { id: "green", label: "딥그린", hex: "#2C4F3B" },
+  { id: "skyblue", label: "연하늘", hex: "#BFE3F7" },
+  { id: "pink", label: "피치", hex: "#FFD8C6" },
+  { id: "orange", label: "개나리", hex: "#FBE9A0" },
   { id: "white", label: "흰색", hex: "#FFFFFF" },
 ] as const;
 export type CoverColorId = (typeof COVER_COLORS)[number]["id"];
@@ -112,7 +112,8 @@ export function coverFabricTone(hex: string, variant: "fabric" | "vivid") {
   // 흰 천은 어둡게 눌러 두면 회색이 된다 — 아주 옅은 미색 천으로 따로 둔다.
   if (s < 0.08 && l > 0.9) return "#f2ece1";
   // 파스텔도 눌러 두면 파스텔이 아니게 된다 — 밝기는 지키고 채도만 조금 걷어낸다.
-  if (l > 0.78) return hslToHex(h, Math.min(s, 0.55), 0.85);
+  // 밝기를 한 값으로 눌러 버리면 밝은 파스텔과 진한 파스텔이 같은 색이 되므로 폭을 둔다.
+  if (l > 0.78) return hslToHex(h, Math.min(s, 0.55), Math.max(0.85, Math.min(l, 0.92)));
   if (variant === "vivid") return hslToHex(h, Math.min(1, s * 0.95), l * 0.88);
   // 고른 색이 이미 더 어두우면 그 어둠을 그대로 쓴다 — 딥한 색을 끌어올리지 않는다.
   return hslToHex(h, Math.min(s, 0.42), Math.min(0.3, l));
