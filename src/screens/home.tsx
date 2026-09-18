@@ -137,7 +137,7 @@ export function HomeScreen({
                   type="button"
                   onClick={() => turnHero(-1)}
                   aria-label="이전 앨범"
-                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-70 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-50 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronLeft className="size-6" />
                 </button>
@@ -175,7 +175,7 @@ export function HomeScreen({
                   type="button"
                   onClick={() => turnHero(1)}
                   aria-label="다음 앨범"
-                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-70 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-50 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronRight className="size-6" />
                 </button>
