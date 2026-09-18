@@ -298,7 +298,8 @@ function AlbumCard({
                 />
               ))}
             </span>
-            {overflow > 0 && <span className="text-xs font-semibold text-body">+{overflow}</span>}
+            {/* 사진 개수와 같은 굵기·같은 색 — 굵게 두면 그쪽만 진해 보인다 */}
+            {overflow > 0 && <span className="text-xs text-body">+{overflow}</span>}
             <span className="sr-only">{members.length}명이 함께해요</span>
           </span>
           <span className="flex items-center gap-1 text-xs text-body">
