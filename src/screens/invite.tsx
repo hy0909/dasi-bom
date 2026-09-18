@@ -1,8 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, ImagePlus, Info, Plus, RefreshCw, RotateCcw, Share2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Check,
+  ChevronDown,
+  Copy,
+  ImagePlus,
+  Info,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Share2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
@@ -95,12 +112,6 @@ function InviteBody({
   /** 기간을 비워 둔 앨범은 사진의 촬영 날짜가 기간이 된다. */
   const periodOf = (item: AlbumCardData) => albumPeriod(item, photoStore[item.id] ?? []);
 
-  // 고른 앨범이 목록 아래쪽이면 처음부터 보이도록 스크롤을 맞춘다.
-  const selectedRow = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    selectedRow.current?.scrollIntoView({ block: "nearest" });
-  }, []);
-
   const [link, setLink] = useState("참여 링크 준비 중…");
   useEffect(() => {
     setLink(`${window.location.origin}${window.location.pathname}?invite=${album.inviteCode}`);
@@ -191,57 +202,60 @@ function InviteBody({
         </div>
       )}
 
-      {/* 초대는 앨범 단위 — 어느 앨범으로 부를지 먼저 고른다. */}
+      {/* 초대는 앨범 단위 — 어느 앨범으로 부를지 먼저 고른다.
+          앨범이 여럿이면 목록을 다 펴 두지 않고 고른 하나만 보여준다. */}
       {!locked && albums.length > 1 && (
         <section className="mt-6 flex flex-col gap-2">
           <span className="text-xs font-semibold text-body">초대할 앨범</span>
-          {/* 행 높이 56 + 경계선 1 = 57. 3개 반(약 200px)까지만 보이고 나머지는 안에서 스크롤한다 —
-              반쯤 잘린 행이 아래에 더 있다는 표시가 된다. */}
-          <div
-            className="max-h-[200px] overflow-y-auto overscroll-contain rounded-lg border border-border"
-            role="radiogroup"
-            aria-label="초대할 앨범"
-          >
-            {albums.map((item) => {
-              const on = item.id === album.id;
-              return (
-                <button
-                  key={item.id}
-                  ref={on ? selectedRow : undefined}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  onClick={() => setSelectedId(item.id)}
-                  className={cn(
-                    "flex h-14 w-full items-center gap-3 border-b border-border px-3 text-left transition-colors outline-none last:border-b-0 focus-visible:ring-3 focus-visible:-outline-offset-2 focus-visible:ring-ring/40",
-                    on ? "bg-muted" : "hover:bg-muted/60",
-                  )}
-                >
-                  <img
-                    src={item.cover}
-                    alt=""
-                    className="size-9 shrink-0 rounded-md object-cover"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <b className="block truncate text-sm font-semibold">{item.title}</b>
-                    <small className="block truncate text-[11.5px] text-body-mid">
-                      {[formatAlbumStart(periodOf(item)), `사진 ${photoStore[item.id]?.length ?? 0}장`]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </small>
-                  </span>
-                  <span
-                    className={cn(
-                      "grid size-[18px] shrink-0 place-items-center rounded-full border transition-colors",
-                      on ? "border-primary" : "border-mute",
-                    )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex h-14 w-full items-center gap-3 rounded-lg border border-border px-3 text-left transition-colors outline-none hover:bg-muted/60 focus-visible:ring-3 focus-visible:ring-ring/40 aria-expanded:bg-muted"
+              >
+                <img src={album.cover} alt="" className="size-9 shrink-0 rounded-md object-cover" />
+                <span className="min-w-0 flex-1">
+                  <b className="block truncate text-sm font-semibold">{album.title}</b>
+                  <small className="block truncate text-[11.5px] text-body-mid">
+                    {[formatAlbumStart(periodOf(album)), `사진 ${photoStore[album.id]?.length ?? 0}장`]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </small>
+                </span>
+                <ChevronDown className="size-4 shrink-0 text-body-mid" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-h-[260px] p-1">
+              {albums.map((item) => {
+                const on = item.id === album.id;
+                return (
+                  <DropdownMenuItem
+                    key={item.id}
+                    onSelect={() => setSelectedId(item.id)}
+                    className="h-14 gap-3 px-2"
                   >
-                    {on && <span className="size-2.5 rounded-full bg-primary" />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <img
+                      src={item.cover}
+                      alt=""
+                      className="size-9 shrink-0 rounded-md object-cover"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <b className="block truncate text-sm font-semibold">{item.title}</b>
+                      <small className="block truncate text-[11.5px] text-body-mid">
+                        {[
+                          formatAlbumStart(periodOf(item)),
+                          `사진 ${photoStore[item.id]?.length ?? 0}장`,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </small>
+                    </span>
+                    {on && <Check className="size-4 shrink-0 text-primary" />}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </section>
       )}
 
