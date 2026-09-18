@@ -61,14 +61,14 @@ export const initialAlbums: AlbumCardData[] = [
     coverAlt: "바닷가를 나란히 걷는 어른과 아이의 뒷모습",
   },
   {
-    // 사진을 많이 넣은 앨범의 예 — 50장. 책등이 두껍게 보인다.
+    // 사진을 많이 넣은 앨범의 예 — 한 앨범에 담을 수 있는 20장. 책등이 가장 두껍게 보인다.
     id: "school1",
     inviteCode: "SCH1",
     inviteIssuedAt: daysAgo(3),
     title: "첫째 초등학교 1학년",
     startDate: "2025-03-03",
     endDate: "2025-12-31",
-    description: "입학식부터 종업식까지, 1학년 한 해를 사진 50장으로 모았어요.",
+    description: "입학식부터 종업식까지, 1학년 한 해를 사진 20장으로 모았어요.",
     coverColor: "red",
     // 가로 판형에 표지를 사진으로 가득 채운 예
     coverShape: "landscape",
