@@ -252,7 +252,7 @@ export function SignupProfile({ go, notify }: { go: Go; notify: Notify }) {
         )}
 
         <Button size="lg" className="w-full" disabled={!name.trim()}>
-          다시, 봄 시작하기
+          시작하기
         </Button>
       </form>
     </>

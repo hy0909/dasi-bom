@@ -19,9 +19,10 @@ import { Eyebrow } from "@/components/eyebrow";
 import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { MediaFrame } from "@/components/media-frame";
+import { AlbumCover } from "@/components/album-cover";
 import { StepProgress } from "@/components/step-progress";
 import { QuestionCard } from "@/components/question-card";
-import { INVITE_DAYS } from "@/data/album";
+import { INVITE_DAYS, coverColorOf, coverShapeOf, coverStageTone } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { formatDate, formatTime, photosOf } from "@/data/photos";
 import type { Go, Notify } from "@/types";
@@ -66,18 +67,26 @@ export function GuestWelcome({
 
   return (
     <>
-      <div className="flex h-14 items-center justify-center">
-        <Wordmark />
-      </div>
+      {/* 초대받은 앨범을 눈앞에 세운다 — 바탕색은 홈 무대와 같은 규칙으로 표지에서 뽑는다 */}
+      <section
+        style={{ backgroundColor: coverStageTone(coverColorOf(album).hex) }}
+        className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8"
+      >
+        <div className="flex h-14 items-center justify-center">
+          <Wordmark className="text-canvas" />
+        </div>
+        <div className="flex h-[230px] items-center justify-center">
+          <AlbumCover
+            album={album}
+            photoCount={photosOf(album.id).length}
+            style={{ width: Math.round(230 / coverShapeOf(album).aspect) }}
+            className="drop-shadow-[0_18px_26px_rgb(0_0_0/0.32)]"
+          />
+        </div>
+        <p className="mt-6 text-center text-sm font-semibold text-canvas">하연님이 초대했어요</p>
+      </section>
 
-      <MediaFrame
-        className="mt-2"
-        src={album.cover}
-        alt={album.coverAlt}
-        caption="하연님이 초대했어요"
-      />
-
-      <section className="mt-6 flex flex-col gap-3">
+      <section className="mt-7 flex flex-col gap-3">
         <Eyebrow>가족 앨범 초대</Eyebrow>
         <h1 className="font-heading text-display-xl font-bold">
           ‘{album.title}’ 앨범에
@@ -110,7 +119,7 @@ export function GuestWelcome({
       </Button>
       <div className="mt-2 flex justify-center">
         <Button variant="link" size="sm" className="text-body" onClick={() => leaveGuest(go)}>
-          나중에 참여
+          나중에 참여하기
         </Button>
       </div>
     </>
