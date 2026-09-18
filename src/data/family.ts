@@ -38,7 +38,7 @@ const initialParticipants: Record<string, Participant[]> = {
     { character: 1, color: 7, name: "아버지", note: "초대 실패", status: "다시 초대" },
     { character: 2, color: 6, name: "동생 민준", note: "기록 없음", status: "초대됨" },
   ],
-  school1: [
+  japan25: [
     { character: 0, color: 5, name: "엄마", note: "사진 17장 · 목소리 8회 · 글 9회", status: "참여 중" },
     { character: 1, color: 3, name: "아버지", note: "사진 6장 · 목소리 2회 · 글 4회", status: "참여 중" },
     { character: 0, color: 2, name: "할머니", note: "사진 3장 · 목소리 2회 · 글 1회", status: "참여 중" },

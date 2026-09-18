@@ -208,7 +208,7 @@ export const photosByAlbum: Record<string, Photo[]> = {
 
 /**
  * 사진을 많이 넣은 앨범의 예 — 상한인 20장. 책등 두께·긴 목록·연대표가 어떻게 보이는지 확인하는 목업이다.
- * 이미지는 위 앨범들의 사진을 돌려 쓰고, 날짜는 하루에 한두 장씩 3개월에 걸쳐 흩어 둔다.
+ * 이미지는 위 앨범들의 사진을 돌려 쓰고, 날짜는 엿새 여행에 하루 서너 장씩 흩어 둔다.
  */
 const POOL = [
   "photo-1638290046742-b5030c6b56b4",
@@ -225,25 +225,42 @@ const POOL = [
   "photo-1475503572774-15a45e5d60b9",
   "photo-1496275068113-fff8c90750d1",
 ];
-/** 한 앨범에 담기는 최대 장수(MAX_PHOTOS)만큼 — 가장 두꺼운 앨범이 어떻게 보이는지 보여주는 예시다. */
-const FIRST_GRADE_TITLES = [
-  "입학식 아침", "교문 앞에서", "첫 등굣길", "새 친구와", "급식 첫날", "운동장 한 바퀴",
-  "받아쓰기 100점", "비 오는 하굣길", "학교 앞 문방구", "체육복 입은 날", "봄 소풍", "벚꽃 아래에서",
-  "도서관 첫 방문", "미술 시간 그림", "짝꿍과 함께", "우산 두 개", "학예회 연습", "할머니가 데리러 온 날",
-  "줄넘기 연습", "생일 파티",
+/** 한 앨범에 담기는 최대 장수(MAX_PHOTOS)만큼 — 가장 두꺼운 앨범이 어떻게 보이는지 보여주는 예시다.
+    도쿄에서 교토를 거쳐 오사카로 내려가는 엿새 — 장소가 날짜를 따라 옮겨 간다. */
+const JAPAN_TRIP: { title: string; place: string; short: string }[] = [
+  { title: "공항 가는 새벽", place: "인천 중구", short: "인천" },
+  { title: "첫 비행기", place: "기내", short: "기내" },
+  { title: "하네다 도착", place: "일본 도쿄", short: "도쿄" },
+  { title: "편의점에서 먹은 첫 끼", place: "일본 도쿄", short: "도쿄" },
+  { title: "시부야 건널목", place: "일본 도쿄", short: "도쿄" },
+  { title: "골목의 라멘집", place: "일본 도쿄", short: "도쿄" },
+  { title: "야경 보러 올라간 밤", place: "일본 도쿄", short: "도쿄" },
+  { title: "아사쿠사 절 앞", place: "일본 도쿄", short: "도쿄" },
+  { title: "신칸센 창가 자리", place: "기내", short: "이동" },
+  { title: "교토 첫 골목", place: "일본 교토", short: "교토" },
+  { title: "붉은 문이 끝없이", place: "일본 교토", short: "교토" },
+  { title: "기모노 입어 본 날", place: "일본 교토", short: "교토" },
+  { title: "말차 아이스크림", place: "일본 교토", short: "교토" },
+  { title: "대나무 숲에서", place: "일본 교토", short: "교토" },
+  { title: "비 오는 기온 거리", place: "일본 교토", short: "교토" },
+  { title: "오사카로 가는 길", place: "일본 오사카", short: "오사카" },
+  { title: "도톤보리의 밤", place: "일본 오사카", short: "오사카" },
+  { title: "다코야키 줄 서서", place: "일본 오사카", short: "오사카" },
+  { title: "오사카성 앞에서", place: "일본 오사카", short: "오사카" },
+  { title: "돌아오는 비행기에서", place: "기내", short: "기내" },
 ];
-function firstGradePhotos(): Photo[] {
-  return FIRST_GRADE_TITLES.map((title, i) => {
-    const day = new Date(2025, 2, 3 + Math.floor(i * 4.8)); // 3월 3일부터 3개월 남짓
-    const hh = String(8 + (i % 9)).padStart(2, "0");
+function japanTripPhotos(): Photo[] {
+  return JAPAN_TRIP.map(({ title, place, short }, i) => {
+    const day = new Date(2025, 1, 12 + Math.floor(i / 3.5)); // 2월 12일부터 엿새
+    const hh = String(8 + (i % 11)).padStart(2, "0");
     const mm = String((i * 17) % 60).padStart(2, "0");
     const iso = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}T${hh}:${mm}:00`;
     return {
       src: `https://images.unsplash.com/${POOL[i % POOL.length]}?auto=format&fit=crop&w=1200&q=85`,
       title,
       takenAt: iso,
-      place: "서울 성북구",
-      shortPlace: "성북",
+      place,
+      shortPlace: short,
       status: i % 3 === 0 ? "기록 완료" : "기록 전",
       voices: i % 4 === 0 ? [{ name: "엄마", seconds: 12 + ((i * 7) % 40) }] : undefined,
       story:
@@ -253,7 +270,7 @@ function firstGradePhotos(): Photo[] {
     };
   });
 }
-photosByAlbum.school1 = firstGradePhotos();
+photosByAlbum.japan25 = japanTripPhotos();
 
 /**
  * 사진은 업로드로 늘어난다 — 참여자·멤버십과 같은 방식의 작은 스토어를 둔다.
