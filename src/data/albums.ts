@@ -72,7 +72,7 @@ export const initialAlbums: AlbumCardData[] = [
     coverColor: "red",
     // 가로 판형에 표지를 사진으로 가득 채운 예
     coverShape: "landscape",
-    coverFrame: "photo",
+    coverFrame: "square",
     cover: photosOf("school1")[0].src,
     coverAlt: "입학식 아침의 아이",
   },

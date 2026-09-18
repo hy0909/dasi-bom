@@ -242,6 +242,25 @@ html {
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* 홈 무대에서 앨범을 넘길 때 — 새 표지가 넘긴 쪽에서 밀려 들어온다 */
+@keyframes hero-turn {
+  from {
+    opacity: 0;
+    transform: translateX(var(--hero-from, 30px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.hero-turn {
+  animation: hero-turn 0.34s cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-turn {
+    animation: none;
+  }
+}
 /* 목록의 앨범은 처음부터 돌아서 있다 — 책등 옆면이 보여야 몇 장이 담겼는지 두께로 읽힌다.
    호버 각도에서 조금 덜 튼 자리가 평소 모습이다. */
 .album-3d-hover .album-book-body {
@@ -524,75 +543,6 @@ html {
   box-shadow:
     inset 0 0 0 1px rgb(0 0 0 / 0.2),
     inset 0 1px 4px rgb(0 0 0 / 0.18);
-}
-
-/* 사진 표지 — 표지를 사진이 가득 채운다. 책등만 사진 위로 남는다 */
-.album-book[data-frame="photo"] .album-cover-well {
-  padding-left: 0;
-}
-/* 표지가 접히는 왼쪽 — 둥글게 말리지 않고 판이 한 번 꺾인 것처럼 각지게 */
-.album-book[data-frame="photo"] .album-cover {
-  border-radius: 1px 3px 3px 1px;
-}
-/* 표지가 꺾이며 지는 그늘 — 왼쪽 끝이 가장 어둡고 안쪽으로 고르게 옅어진다.
-   중간에 더 진해지는 골이나 흰 반사선을 두면 띠가 얹힌 것처럼 보여 두지 않는다. */
-.album-book[data-frame="photo"] .album-cover-spine {
-  z-index: 1;
-  width: 11%;
-  background: linear-gradient(
-    90deg,
-    rgb(0 0 0 / 0.2) 0,
-    rgb(0 0 0 / 0.12) 30%,
-    rgb(0 0 0 / 0.05) 62%,
-    rgb(0 0 0 / 0) 100%
-  );
-}
-/* 인쇄면의 질감 — 매트 라미네이트의 아주 가는 결. 생사진이 아니라 표지로 읽히게 */
-.album-book[data-frame="photo"] .album-cover-window::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.26;
-  mix-blend-mode: soft-light;
-  background-size: 140px 140px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.7' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
-}
-/* 책등 옆면도 같은 사진이 감싼다 — 사진으로 싼 하드커버처럼 왼쪽까지 이어진다 */
-.album-book[data-frame="photo"] .album-book-side {
-  background-color: transparent;
-  background-image:
-    /* 옆면은 빛을 덜 받는다 — 사진 위에 그늘만 얹는다 */
-    linear-gradient(90deg, rgb(0 0 0 / 0.52), rgb(0 0 0 / 0.3) 45%, rgb(0 0 0 / 0.44)),
-    var(--photo);
-  background-size:
-    auto,
-    cover;
-  background-position:
-    center,
-    left center;
-}
-.album-book[data-frame="photo"] .album-cover-window {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-  box-shadow: none;
-}
-.album-book[data-frame="photo"] .album-cover-window img {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: cover;
-}
-/* 표지 가장자리의 얕은 그늘과 아래쪽 어둠 — 사진만 얹어도 하드커버로 읽히게 */
-.album-book[data-frame="photo"] .album-cover-window::after {
-  border-radius: inherit;
-  box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.22),
-    inset 0 -18cqh 26cqh -18cqh rgb(0 0 0 / 0.38);
 }
 
 /* 앨범 열림 오버레이 — 스크림 위에서 앨범 한 권이 커지고 표지가 넘어간다 */
