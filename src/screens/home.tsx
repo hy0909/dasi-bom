@@ -354,7 +354,7 @@ export function HomeScreen({
         </span>
         <p className="text-sm leading-relaxed text-body">
           <b className="block font-semibold text-ink">기록 Tip</b>
-          사진 속 표정보다 그날의 기분을 먼저 물어보세요.
+          사진 찍었던 순간의 기억을 되살려 목소리와 글로 기록해 보세요.
         </p>
       </div>
 
