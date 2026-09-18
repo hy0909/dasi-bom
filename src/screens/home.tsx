@@ -396,14 +396,14 @@ function AlbumCard({
       onKeyDown={(e) => e.key === "Enter" && open()}
       className="group/album album-3d-hover flex cursor-pointer flex-col gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
     >
-      {/* 패브릭 앨범 — 그림자가 잘리지 않게 옆과 아래에 숨 쉴 공간을 둔다 */}
-      <div className="relative px-2 pt-1 pb-3">
+      {/* 패브릭 앨범 — 좌우 여백 없이 칸을 꽉 채운다. 그림자는 바깥으로 번져도 잘리지 않는다 */}
+      <div className="relative pt-1 pb-2">
         <div ref={coverRef}>
           <AlbumCover album={album} photoCount={photoCount} tiltable />
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
-      <div className="flex flex-col gap-[18px] px-1">
+      <div className="flex flex-col gap-[18px]">
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
