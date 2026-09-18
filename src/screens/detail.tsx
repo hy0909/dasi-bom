@@ -515,8 +515,8 @@ function RecordSection({
   const [tab, setTab] = useState<RecordTab>("사진");
   return (
     <Tabs value={tab} onValueChange={(v) => setTab(v as RecordTab)} className="gap-5">
-      {/* 기록 안에서 한 번 더 갈라지는 탭 — 바깥 탭과 구분되게 한 단계 짙은 바탕 */}
-      <TabsList className="w-full bg-accent">
+      {/* 기록 안에서 한 번 더 갈라지는 탭 — 바깥 탭과 구분되게 accent 보다 한 톤 짙은 바탕 */}
+      <TabsList className="w-full bg-[#e7dfd2]">
         {(["사진", "목소리", "글", "연대표"] as RecordTab[]).map((item) => (
           <TabsTrigger key={item} value={item} className="text-sm">
             {item}
@@ -605,8 +605,8 @@ function VoiceTab({ go, photos, notify }: { go: Go; photos: Photo[]; notify: Not
   return (
     <section className="flex flex-col gap-3">
       <p className="text-sm text-body">전체 {rows.length}개</p>
-      {/* 앨범 읽기의 목소리 묶음과 같은 배경 — 종이 위에 얹힌 한 덩어리로 보이게 */}
-      <div className="flex flex-col divide-y divide-border rounded-lg bg-accent/70 px-3">
+      {/* 종이 위에 그대로 — 면을 깔지 않고 줄 사이 경계선만 남긴다 */}
+      <div className="flex flex-col divide-y divide-border">
         {rows.map((row) => (
           <VoiceRow
             key={`${row.photo.title}-${row.name}`}
