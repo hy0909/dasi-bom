@@ -96,7 +96,7 @@ export function HomeScreen({
   };
   /** 표지가 이 높이로 서고, 판형에 따라 폭이 정해진다 — 브라우저가 폭을 스스로 계산하게
       두면(w-auto + aspect-ratio) 카카오 인앱처럼 계산이 다른 곳에서 가운데가 틀어진다. */
-  const HERO_H = 326;
+  const HERO_H = 293;
   const heroShape = heroAlbum ? coverShapeOf(heroAlbum) : null;
   /** 바탕은 지금 올라와 있는 표지의 색을 따라간다 */
   const stageTone = heroAlbum ? coverStageTone(coverColorOf(heroAlbum).hex) : "#2b2521";
@@ -119,7 +119,7 @@ export function HomeScreen({
             {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다.
                 좌우로 밀면 앨범이 넘어가고, 위아래로 밀면 화면이 그대로 스크롤된다. */}
             <div
-              className="relative mt-5 flex h-[338px] touch-pan-y items-center justify-center"
+              className="relative mt-[14px] flex h-[305px] touch-pan-y items-center justify-center"
               onTouchStart={(e) => {
                 const t = e.touches[0];
                 swipeFrom.current = { x: t.clientX, y: t.clientY };
@@ -183,7 +183,7 @@ export function HomeScreen({
                 </button>
               )}
             </div>
-            <p className="mt-6 truncate text-center text-[17px] font-semibold text-canvas">
+            <p className="mt-4 truncate text-center text-[17px] font-semibold text-canvas">
               {heroAlbum.title}
             </p>
             <p className="mt-1 text-center text-xs text-canvas-soft/55">
@@ -356,7 +356,7 @@ export function HomeScreen({
         </span>
         <p className="text-sm leading-relaxed text-body">
           <b className="block font-semibold text-ink">기록 Tip</b>
-          사진 찍었던 순간의 기억을 되살려 목소리와 글로 기록해 보세요.
+          그날의 기억을 되살려 목소리와 글로 기록해 보세요.
         </p>
       </div>
 
