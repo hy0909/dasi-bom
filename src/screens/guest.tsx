@@ -275,7 +275,7 @@ export function GuestDone({ go }: { go: Go }) {
   const name = typeof window !== "undefined" ? localStorage.getItem("dasiBomGuest") || "가족" : "가족";
   return (
     <div className="flex min-h-[calc(100dvh-80px)] flex-col items-center justify-center gap-4 text-center">
-      <span className="mb-2 flex size-16 items-center justify-center rounded-full bg-primary text-canvas">
+      <span className="mb-2 flex size-16 items-center justify-center rounded-full bg-primary text-ink">
         <Check className="size-8" strokeWidth={3} />
       </span>
       <Eyebrow>{name}님의 기록</Eyebrow>

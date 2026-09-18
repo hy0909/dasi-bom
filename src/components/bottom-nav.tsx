@@ -13,7 +13,7 @@ export function BottomNav({ go, active = "home" }: { go: Go; active?: Screen }) 
   return (
     <nav
       aria-label="주요 메뉴"
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-border bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-border bg-canvas/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
     >
       <div className="grid h-[68px] grid-cols-4 items-center px-2">
         {items.map((item) => (
@@ -47,7 +47,7 @@ function NavItem({
       <span className="relative">
         <Icon className="size-[22px]" strokeWidth={active ? 2.4 : 1.9} />
         {item.count ? (
-          <i className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-none font-bold text-canvas not-italic">
+          <i className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] leading-none font-bold text-ink not-italic">
             {item.count}
           </i>
         ) : null}

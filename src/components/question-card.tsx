@@ -16,7 +16,7 @@ export function QuestionCard({
     <Card variant="dark" className="mt-5">
       <CardContent className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-canvas">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-ink">
             <Sparkles className="size-4" />
           </span>
           <p className="text-sm font-medium text-canvas-soft/75">{eyebrow}</p>

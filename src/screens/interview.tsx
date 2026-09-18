@@ -90,7 +90,7 @@ export function InterviewScreen({
         <div className="mt-4 grid grid-cols-2 gap-3">
           <AnswerOption
             icon={<Mic className="size-5" />}
-            iconClass="bg-primary text-canvas"
+            iconClass="bg-primary text-ink"
             title="목소리로 답하기"
             description="실제로 녹음해 남겨보세요"
             onClick={() => go("voice")}
