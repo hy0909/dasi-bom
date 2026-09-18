@@ -184,7 +184,7 @@ export function HomeScreen({
             <p className="mt-6 truncate text-center text-[15px] font-semibold text-canvas">
               {heroAlbum.title}
             </p>
-            <p className="mt-1 text-center text-xs text-canvas-soft/70">
+            <p className="mt-1 text-center text-xs text-canvas-soft/55">
               {formatAlbumStart(heroAlbum)}
             </p>
           </>
