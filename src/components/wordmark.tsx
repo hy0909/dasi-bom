@@ -5,7 +5,7 @@ export function Wordmark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "font-logo text-[22px] leading-none font-bold tracking-[-0.01em] text-ink",
+        "font-logo text-[23px] leading-none font-bold tracking-[-0.01em] text-ink",
         className,
       )}
     >

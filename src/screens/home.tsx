@@ -108,7 +108,9 @@ export function HomeScreen({
         style={{ backgroundColor: stageTone }}
         className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8 transition-colors duration-500 ease-out"
       >
-        <div className="flex h-12 items-center">
+        {/* 줄 높이를 12px 줄여 로고가 6px 위로 올라간다. 줄어든 만큼은 아래 여백으로 돌려줘
+            표지 자리는 그대로 둔다. */}
+        <div className="flex h-9 items-center">
           <Wordmark className="text-canvas" />
         </div>
 
@@ -117,7 +119,7 @@ export function HomeScreen({
             {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다.
                 좌우로 밀면 앨범이 넘어가고, 위아래로 밀면 화면이 그대로 스크롤된다. */}
             <div
-              className="relative mt-2 flex h-[338px] touch-pan-y items-center justify-center"
+              className="relative mt-5 flex h-[338px] touch-pan-y items-center justify-center"
               onTouchStart={(e) => {
                 const t = e.touches[0];
                 swipeFrom.current = { x: t.clientX, y: t.clientY };
