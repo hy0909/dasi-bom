@@ -181,7 +181,7 @@ export function HomeScreen({
                 </button>
               )}
             </div>
-            <p className="mt-6 truncate text-center text-[15px] font-semibold text-canvas">
+            <p className="mt-6 truncate text-center text-[17px] font-semibold text-canvas">
               {heroAlbum.title}
             </p>
             <p className="mt-1 text-center text-xs text-canvas-soft/55">
@@ -297,7 +297,7 @@ export function HomeScreen({
           </CardContent>
         </Card>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-5">
+        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-7">
           {list.map((item) => (
             <AlbumCard
               key={item.id}
@@ -401,7 +401,7 @@ function AlbumCard({
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
-      <div className="flex flex-col gap-6 px-1">
+      <div className="flex flex-col gap-[18px] px-1">
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
