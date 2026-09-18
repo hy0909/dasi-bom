@@ -197,7 +197,7 @@ export function HomeScreen({
 
       <div className="mt-7">
         <h1 className="font-heading text-display-md font-bold">
-          함께 기억하고 싶은
+          기억하고 싶은
           <br />
           순간이 있나요?
         </h1>
