@@ -59,7 +59,7 @@ export const COVER_COLORS = [
   { id: "orange", label: "오렌지", hex: "#F98E2A" },
   { id: "turquoise", label: "청록", hex: "#26C8A2" },
   { id: "brown", label: "갈색", hex: "#CBAD70" },
-  { id: "green", label: "초록", hex: "#36D72E" },
+  { id: "green", label: "초록", hex: "#3D7355" },
   { id: "white", label: "흰색", hex: "#FFFFFF" },
 ] as const;
 export type CoverColorId = (typeof COVER_COLORS)[number]["id"];
