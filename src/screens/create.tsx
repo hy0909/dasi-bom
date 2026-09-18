@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/field";
-import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
 import {
   COVER_COLORS,
@@ -34,9 +33,6 @@ export function CreateScreen({
   onCreate: (album: AlbumCardData) => void;
 }) {
   const [title, setTitle] = useState("");
-  // 날짜는 비워 두고 시작한다 — 적지 않으면 사진의 촬영 날짜에서 채운다.
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [ready, setReady] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
@@ -69,8 +65,9 @@ export function CreateScreen({
           id: code.toLowerCase(),
           inviteCode: code,
           title: title.trim(),
-          startDate,
-          endDate,
+          // 기간은 사진의 촬영 날짜에서 채워진다 — 직접 적는 일은 앨범 정보 수정에서 한다.
+          startDate: "",
+          endDate: "",
           description: description.trim(),
           coverColor,
           coverShape,
@@ -182,22 +179,6 @@ export function CreateScreen({
               placeholder="예: 2023년 유럽여행"
             />
           </Field>
-
-          {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다.
-              둘 다 비워 둬도 된다 — 그러면 사진의 촬영 날짜가 앨범 기간이 된다. */}
-          <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="시작일" htmlFor="start" className="min-w-0">
-                <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
-              </Field>
-              <Field label="종료일" htmlFor="end" className="min-w-0">
-                <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
-              </Field>
-            </div>
-            <p className="text-xs text-body-mid">
-              비워 두면 사진을 넣을 때 가장 이른 촬영 날짜와 가장 늦은 촬영 날짜로 채워져요.
-            </p>
-          </div>
 
           <Field label="짧은 설명" htmlFor="desc">
             <Textarea
