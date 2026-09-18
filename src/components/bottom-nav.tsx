@@ -13,7 +13,7 @@ export function BottomNav({ go, active = "home" }: { go: Go; active?: Screen }) 
   return (
     <nav
       aria-label="주요 메뉴"
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-accent bg-canvas/70 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-accent bg-canvas/60 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
     >
       <div className="grid h-[68px] grid-cols-4 items-center px-2">
         {items.map((item) => (
