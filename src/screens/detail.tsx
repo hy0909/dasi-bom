@@ -204,7 +204,7 @@ export function DetailScreen({
               onClick={() => go("recordList")}
             >
               <PenLine className="size-4" />
-              기록하기
+              기록
             </Button>
             {/* 사진 추가도 같은 자리에 같은 모양으로 — 아래 떠 있던 버튼을 여기로 올렸다 */}
             <Button
@@ -394,7 +394,7 @@ function AlbumReader({
           ) : (
             <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-mute p-4">
               <p className="min-w-0 text-sm leading-relaxed text-body">
-                우리만의 이야기를 기록해요.
+                그 날의 이야기를 기록해요.
               </p>
               <Button
                 variant="outline"

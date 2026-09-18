@@ -19,29 +19,29 @@ export type Participant = {
  */
 const initialParticipants: Record<string, Participant[]> = {
   eu23: [
-    { character: 0, color: 5, name: "엄마", note: "기록 4개", status: "참여 중" },
+    { character: 0, color: 5, name: "엄마", note: "사진 4장 · 목소리 2회 · 글 2회", status: "참여 중" },
     { character: 1, color: 3, name: "아버지", note: "아직 기록 없음", status: "초대됨" },
     { character: 2, color: 6, name: "동생 민준", note: "초대 실패", status: "다시 초대" },
   ],
   jeju: [
-    { character: 0, color: 5, name: "엄마", note: "기록 9개", status: "참여 중" },
-    { character: 1, color: 3, name: "아버지", note: "기록 3개", status: "참여 중" },
-    { character: 3, color: 1, name: "사촌 지우", note: "기록 2개", status: "참여 중" },
+    { character: 0, color: 5, name: "엄마", note: "사진 9장 · 목소리 4회 · 글 5회", status: "참여 중" },
+    { character: 1, color: 3, name: "아버지", note: "사진 3장 · 목소리 1회 · 글 2회", status: "참여 중" },
+    { character: 3, color: 1, name: "사촌 지우", note: "사진 2장 · 목소리 1회 · 글 1회", status: "참여 중" },
   ],
   summer: [
-    { character: 0, color: 2, name: "할머니", note: "기록 5개", status: "참여 중" },
+    { character: 0, color: 2, name: "할머니", note: "사진 5장 · 목소리 3회 · 글 2회", status: "참여 중" },
     { character: 2, color: 6, name: "동생 민준", note: "아직 기록 없음", status: "초대됨" },
   ],
   seaside: [
-    { character: 3, color: 4, name: "딸 서아", note: "기록 2개", status: "참여 중" },
+    { character: 3, color: 4, name: "딸 서아", note: "사진 2장 · 목소리 1회 · 글 1회", status: "참여 중" },
     { character: 0, color: 0, name: "엄마", note: "아직 기록 없음", status: "초대됨" },
     { character: 1, color: 7, name: "아버지", note: "초대 실패", status: "다시 초대" },
     { character: 2, color: 6, name: "동생 민준", note: "아직 기록 없음", status: "초대됨" },
   ],
   school1: [
-    { character: 0, color: 5, name: "엄마", note: "기록 17개", status: "참여 중" },
-    { character: 1, color: 3, name: "아버지", note: "기록 6개", status: "참여 중" },
-    { character: 0, color: 2, name: "할머니", note: "기록 3개", status: "참여 중" },
+    { character: 0, color: 5, name: "엄마", note: "사진 17장 · 목소리 8회 · 글 9회", status: "참여 중" },
+    { character: 1, color: 3, name: "아버지", note: "사진 6장 · 목소리 2회 · 글 4회", status: "참여 중" },
+    { character: 0, color: 2, name: "할머니", note: "사진 3장 · 목소리 2회 · 글 1회", status: "참여 중" },
   ],
 };
 
@@ -80,6 +80,17 @@ export function participantsOf(albumId: string): Participant[] {
 /** 이미 이 앨범에 있는 사람인가 — 이름으로 본다. */
 export function isMemberOf(albumId: string, name: string) {
   return participantsOf(albumId).some((p) => p.name === name);
+}
+
+/** 초대를 다시 보냈다 — 그 사람은 답을 기다리는 '초대됨'이 된다. */
+export function reinvite(albumId: string, name: string) {
+  publish({
+    ...store,
+    [albumId]: participantsOf(albumId).map((p) =>
+      // 전에 '초대 실패'였다면 그 자국도 지운다 — 방금 다시 보냈으니까
+      p.name === name ? { ...p, note: "초대를 다시 보냈어요", status: "초대됨" as const } : p,
+    ),
+  });
 }
 
 /**

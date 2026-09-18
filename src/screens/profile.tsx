@@ -17,7 +17,7 @@ export function ProfileScreen({ go, notify }: { go: Go; notify: Notify }) {
   return (
     <>
       {/* 탭 최상위 화면 — 상단 바 없이 제목을 홈의 워드마크와 같은 높이에서 시작한다. */}
-      <h1 className="mt-2.5 font-heading text-display-lg font-bold">내 설정</h1>
+      <h1 className="mt-2.5 font-heading text-display-lg font-bold">내 정보</h1>
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex items-center gap-4">

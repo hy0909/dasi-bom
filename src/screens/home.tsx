@@ -275,7 +275,7 @@ function AlbumCard({
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
-      <div className="flex flex-col gap-2 px-1">
+      <div className="flex flex-col gap-4 px-1">
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
@@ -284,7 +284,7 @@ function AlbumCard({
             </h3>
             {menu}
           </div>
-          <p className="mt-1 text-xs text-body-mid">{formatAlbumStart(album)}</p>
+          <p className="mt-0.5 text-xs text-body-mid">{formatAlbumStart(album)}</p>
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-1.5">

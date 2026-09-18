@@ -19,7 +19,7 @@ import {
   isInviteExpired,
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { useAlbumParticipants } from "@/data/family";
+import { reinvite, useAlbumParticipants } from "@/data/family";
 import { usePhotoStore } from "@/data/photos";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
@@ -168,7 +168,7 @@ function InviteBody({
         <section className={cn("flex flex-col gap-3", back ? "mt-4" : "mt-2.5")}>
           {/* 탭으로 들어오면 알림·내 설정과 같은 짧은 제목. 앨범에서 들어오면 상단 바가 이미 '초대'다. */}
           <h1 className="font-heading text-display-lg font-bold">
-            {back ? "우리의 추억을 기록해요" : "초대하기"}
+            {back ? "우리의 추억을 기록해요" : "초대"}
           </h1>
           <p className="text-base leading-relaxed text-body">
             앨범 구성원은 누구나
@@ -376,7 +376,11 @@ function InviteBody({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => notify(`${name}에게 초대를 다시 보냈어요`)}
+                    onClick={() => {
+                      // 다시 보냈으면 이 자리도 답을 기다리는 '초대됨'이 된다
+                      reinvite(album.id, name);
+                      notify(`${name}에게 초대를 다시 보냈어요`);
+                    }}
                   >
                     <RotateCcw className="size-3.5" />
                     다시 초대
