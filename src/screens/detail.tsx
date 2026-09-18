@@ -1,15 +1,12 @@
 import { useState, type CSSProperties } from "react";
 import {
   ArrowLeft,
-  AudioLines,
   EllipsisVertical,
-  Image,
   Pause,
   Pencil,
   PenLine,
   Play,
   Plus,
-  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +43,6 @@ import {
   byTakenAt,
   photoStatus,
   useAlbumPhotos,
-  voicesOf,
 } from "@/data/photos";
 import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -158,12 +154,10 @@ export function DetailScreen({
 
   // 화면에 보이는 숫자는 모두 이 앨범의 사진·참여자에서 나온다.
   const photos = byTakenAt(useAlbumPhotos(album.id));
-  const voices = voicesOf(album.id);
   const participants = useAlbumParticipants()[album.id] ?? [];
   // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 프로필을 두 번 세지 않는다.
   const others = participants.filter((p) => p.name !== session?.name);
   const iAmOwner = useMyAlbums()[album.id]?.role !== "member";
-  const stories = photos.filter((p) => p.story).length;
   // 기간을 비워 둔 앨범은 사진의 촬영 날짜가 곧 기간이다 — 사진이 없으면 아직 기간도 없다.
   const period = formatAlbumPeriod(albumPeriod(album, photos));
 
@@ -201,14 +195,15 @@ export function DetailScreen({
             <ArrowLeft className="size-5" />
           </Button>
           <div className="flex items-center gap-1">
+            {/* 기록하기 — 아래 요약 카드에 있던 것을 여기로 올렸다 */}
             <Button
               variant="outline"
               size="sm"
               className="border-canvas bg-transparent text-canvas hover:bg-canvas/15 hover:text-canvas"
-              onClick={() => go("invite")}
+              onClick={() => go("recordList")}
             >
-              <UserPlus className="size-4" />
-              초대
+              <PenLine className="size-4" />
+              기록하기
             </Button>
             {/* 사진 추가도 같은 자리에 같은 모양으로 — 아래 떠 있던 버튼을 여기로 올렸다 */}
             <Button
@@ -233,40 +228,14 @@ export function DetailScreen({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {/* 초대도 자주 쓰는 일은 아니다 — 앨범에 손대는 일끼리 여기 모은다 */}
+                <DropdownMenuItem onSelect={() => go("invite")}>구성원 초대</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => go("albumEdit")}>앨범 수정</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
       </section>
-
-      {/* summary — 앨범에 무엇이 얼마나 쌓였는지와 기록으로 가는 길. 바탕은 한 단계 짙은 면 */}
-      <Card size="sm" className="mt-4 bg-accent">
-        <CardContent className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-4 text-sm text-body">
-            <span className="flex items-center gap-1.5">
-              <Image className="size-4 text-body-mid" aria-hidden />
-              사진 {photos.length}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <AudioLines className="size-4 text-body-mid" aria-hidden />
-              목소리 {voices.length}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <PenLine className="size-4 text-body-mid" aria-hidden />
-              글 {stories}
-            </span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={() => go("recordList")}
-          >
-            기록하기
-          </Button>
-        </CardContent>
-      </Card>
 
       {/* 읽을 때는 ‘앨범’, 고칠 때는 ‘기록’ — 상세의 큰 두 갈래 */}
       <Tabs
