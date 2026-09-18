@@ -117,11 +117,13 @@ export function CreateScreen({
             }}
             className="w-44 drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
           />
-          <p className="text-center text-xs leading-relaxed text-canvas-soft/70">
-            아래에서 고르는 대로 표지가 바뀌어요.
-            <br />
-            사진과 기록은 나중에도 추가할 수 있어요.
-          </p>
+          {/* 표지 색은 표지 바로 아래 — 고르는 순간 위 표지가 그 색이 된다 */}
+          <CoverColorPicker
+            value={coverColor}
+            onChange={setCoverColor}
+            tone="dark"
+            className="mt-1 grid w-fit grid-cols-6 gap-3"
+          />
         </div>
       </section>
 
@@ -147,10 +149,6 @@ export function CreateScreen({
               onChange={(e) => chooseFile(e.target.files?.[0])}
             />
           </label>
-
-          <Field label="앨범 커버 색">
-            <CoverColorPicker value={coverColor} onChange={setCoverColor} />
-          </Field>
 
           <Field label="앨범 판형">
             <CoverShapePicker value={coverShape} onChange={setCoverShape} />
