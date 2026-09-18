@@ -412,7 +412,7 @@ function AlbumCard({
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
-            <h3 className="line-clamp-2 min-w-0 font-heading text-[15px] leading-snug font-bold">
+            <h3 className="line-clamp-2 min-w-0 font-heading text-[17px] leading-snug font-bold">
               {album.title}
             </h3>
             {menu}
