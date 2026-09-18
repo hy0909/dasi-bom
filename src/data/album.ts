@@ -160,6 +160,13 @@ export function formatKoreanDate(date: Date) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+/** 요일까지 붙인 날짜 — 읽은 날을 또렷이 적어 두는 맺음말에 쓴다. */
+export function formatKoreanDateWithDay(date: Date) {
+  return `${formatKoreanDate(date)} ${WEEKDAYS[date.getDay()]}요일`;
+}
+
 /** 링크를 새로 발급할 때 쓰는 코드 — 앨범마다 겹치지 않게 짧게 만든다. */
 export function newInviteCode() {
   return Math.random().toString(36).slice(2, 6).toUpperCase();

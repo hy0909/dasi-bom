@@ -31,7 +31,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { albumPeriod, coverShapeOf, formatAlbumPeriod, formatKoreanDate } from "@/data/album";
+import {
+  albumPeriod,
+  coverShapeOf,
+  formatAlbumPeriod,
+  formatKoreanDateWithDay,
+} from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { type Participant, useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -440,8 +445,8 @@ function AlbumReader({
       />
 
       {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
-      <p className="border-t border-border pt-6 text-center font-serif text-xs italic text-body-mid">
-        {formatKoreanDate(new Date())} 기록
+      <p className="border-t border-border pt-6 text-center font-serif text-sm italic text-body-mid">
+        {formatKoreanDateWithDay(new Date())} 기록
       </p>
     </article>
   );
@@ -510,7 +515,8 @@ function RecordSection({
   const [tab, setTab] = useState<RecordTab>("사진");
   return (
     <Tabs value={tab} onValueChange={(v) => setTab(v as RecordTab)} className="gap-5">
-      <TabsList className="w-full">
+      {/* 기록 안에서 한 번 더 갈라지는 탭 — 바깥 탭과 구분되게 한 단계 짙은 바탕 */}
+      <TabsList className="w-full bg-accent">
         {(["사진", "목소리", "글", "연대표"] as RecordTab[]).map((item) => (
           <TabsTrigger key={item} value={item} className="text-sm">
             {item}
