@@ -88,11 +88,27 @@ export function AlbumEditScreen({
 
       {/* 앨범 정보는 만든 사람만의 것이 아니다 — 참여 중인 가족이면 누구나 고친다. */}
       <p className="mt-6 rounded-lg bg-muted p-3 text-sm leading-relaxed text-body">
-        참여 중인 가족은 누구나 앨범 정보를 고칠 수 있어요. 바꾼 내용은 함께 보는 모두에게 바로
-        보여요.
+        참여 중인 구성원은 누구나 앨범 정보를 고칠 수 있어요. 바꾼 내용은 모두에게 바로 보여요.
       </p>
 
       <form className="mt-6 flex flex-col gap-6 pb-20" onSubmit={submit}>
+        <Field label="앨범 비율">
+          <CoverShapePicker
+            value={coverShapeOf(draft).id}
+            onChange={(coverShape) => setDraft({ ...draft, coverShape })}
+          />
+        </Field>
+
+        <Field label="앨범 디자인">
+          <CoverFramePicker
+            value={coverFrameOf(draft).id}
+            onChange={(coverFrame) => setDraft({ ...draft, coverFrame })}
+            shape={coverShapeOf(draft).id}
+            color={coverColorOf(draft).id}
+            cover={album.cover}
+          />
+        </Field>
+
         <Field label="앨범 제목" htmlFor="album-title" required>
           <Input
             id="album-title"
@@ -156,23 +172,6 @@ export function AlbumEditScreen({
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
-          />
-        </Field>
-
-        <Field label="앨범 비율">
-          <CoverShapePicker
-            value={coverShapeOf(draft).id}
-            onChange={(coverShape) => setDraft({ ...draft, coverShape })}
-          />
-        </Field>
-
-        <Field label="앨범 디자인">
-          <CoverFramePicker
-            value={coverFrameOf(draft).id}
-            onChange={(coverFrame) => setDraft({ ...draft, coverFrame })}
-            shape={coverShapeOf(draft).id}
-            color={coverColorOf(draft).id}
-            cover={album.cover}
           />
         </Field>
 
