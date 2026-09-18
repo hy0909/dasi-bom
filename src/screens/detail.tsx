@@ -285,7 +285,7 @@ function seedOf(text: string) {
 }
 
 /**
- * 사진마다 즉석사진 프레임의 기울기(도) — 좌우 0.5~6도.
+ * 사진마다 즉석사진 프레임의 기울기(도) — 좌우 0.5~4.5도.
  * 대개 왼쪽·오른쪽을 번갈아 가고(80%), 가끔 같은 쪽이 이어진다. 이웃과 같은 각도는 피한다.
  */
 function frameTilts(seed: string, count: number) {
@@ -295,11 +295,11 @@ function frameTilts(seed: string, count: number) {
   let side = rnd() < 0.5 ? -1 : 1;
   for (let i = 0; i < count; i++) {
     if (i > 0 && rnd() < 0.8) side = -side;
-    let mag = 0.5 + rnd() * 5.5;
+    let mag = 0.5 + rnd() * 4;
     const prev = out[i - 1];
     // 같은 쪽으로 이어질 때 각도까지 비슷하면 눈에 띄게 벌린다.
     if (prev !== undefined && Math.sign(prev) === side && Math.abs(Math.abs(prev) - mag) < 1.5) {
-      mag = Math.abs(prev) > 3.5 ? Math.abs(prev) - 2.5 : Math.abs(prev) + 2.5;
+      mag = Math.abs(prev) > 2.5 ? Math.abs(prev) - 2 : Math.abs(prev) + 2;
     }
     out.push(Math.round(side * mag * 10) / 10);
   }
