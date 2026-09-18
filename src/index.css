@@ -485,6 +485,10 @@ html {
 .album-cover-letter text:first-of-type {
   filter: drop-shadow(0 -0.3px 0.35px rgb(0 0 0 / 0.42));
 }
+/* 밝은 천에서는 그늘 대신 눌린 자리의 빛이 보인다 */
+.album-cover-letter[data-deep] text:first-of-type {
+  filter: drop-shadow(0 0.35px 0.4px rgb(255 255 255 / 0.75));
+}
 
 /* 큰 정사각형 — 창을 키워 사진이 정사각을 그대로 채운다 */
 /* 가운데가 아니라 표지 위쪽에 앉는다 */

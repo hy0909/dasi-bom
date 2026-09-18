@@ -52,11 +52,11 @@ export const COVER_COLORS = [
   { id: "blue", label: "파랑", hex: "#3C9FFF" },
   { id: "red", label: "빨강", hex: "#FF6769" },
   { id: "violet", label: "보라", hex: "#AE8AFF" },
-  { id: "gray", label: "회색", hex: "#9DA1AA" },
+  { id: "gray", label: "차콜", hex: "#22262C" },
   { id: "yellow", label: "노랑", hex: "#F3BE00" },
   { id: "turquoise", label: "청록", hex: "#26C8A2" },
   { id: "brown", label: "갈색", hex: "#CBAD70" },
-  { id: "green", label: "딥그린", hex: "#2C4F3B" },
+  { id: "green", label: "딥그린", hex: "#22412F" },
   { id: "skyblue", label: "연하늘", hex: "#BFE3F7" },
   { id: "pink", label: "피치", hex: "#FFD8C6" },
   { id: "orange", label: "개나리", hex: "#FBE9A0" },
@@ -117,6 +117,12 @@ export function coverFabricTone(hex: string, variant: "fabric" | "vivid") {
   if (variant === "vivid") return hslToHex(h, Math.min(1, s * 0.95), l * 0.88);
   // 고른 색이 이미 더 어두우면 그 어둠을 그대로 쓴다 — 딥한 색을 끌어올리지 않는다.
   return hslToHex(h, Math.min(s, 0.42), Math.min(0.3, l));
+}
+
+/** 이 천이 밝은가 — 밝으면 박 글자를 어둡게 찍어야 읽힌다. */
+export function isLightFabric(tone: string) {
+  const [, , l] = hexToHsl(tone);
+  return l > 0.6;
 }
 
 /**
