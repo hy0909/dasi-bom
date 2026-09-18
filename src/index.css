@@ -17,6 +17,8 @@
   --font-heading: var(--font-sans);
   /* 기록의 맺음말처럼 책에서 온 말투에 쓰는 명조 */
   --font-serif: "Nanum Myeongjo", "Apple Myungjo", Batang, serif;
+  /* 로고 전용 — 획이 가늘고 길쭉한 카페24 프로슬림 */
+  --font-logo: "Cafe24 PRO Slim", var(--font-sans);
 
   /* 브랜드 원색 토큰 */
   --color-canvas: var(--canvas);
@@ -117,6 +119,22 @@ html {
   --input: var(--ink);
   --ring: var(--ink);
   --radius: 12px;
+}
+
+/* 로고 서체 — 카페24 PRO 슬림 (상업용 무료). 로고 한 줄에만 쓰므로 두 굵기만 받는다. */
+@font-face {
+  font-family: "Cafe24 PRO Slim";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/Cafe24PROSlim-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cafe24 PRO Slim";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/Cafe24PROSlim-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @layer base {

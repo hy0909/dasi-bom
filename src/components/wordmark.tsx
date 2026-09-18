@@ -1,15 +1,15 @@
 import { cn } from "@/lib/utils";
 
-/** 브랜드 워드마크 — 쉼표 하나에만 오렌지를 허용한다. */
+/** 브랜드 워드마크 — 로고 전용 서체(카페24 프로슬림)로 쓴 서비스 이름. */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "font-heading text-[22px] leading-none font-semibold tracking-[-0.03em] text-ink",
+        "font-logo text-[22px] leading-none font-bold tracking-[-0.01em] text-ink",
         className,
       )}
     >
-      다시<span className="text-primary">,</span> 봄
+      그날을 담다
     </span>
   );
 }
