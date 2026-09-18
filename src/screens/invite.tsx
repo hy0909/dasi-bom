@@ -260,7 +260,7 @@ function InviteBody({
 
       {/* 참여 링크 — 앨범마다 코드가 다르고, 발급일로부터 일주일만 쓴다 */}
       <Card variant="outline" size="sm" className="mt-4">
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-1.5">
           {/* 라벨 · 남은 유효기간(D-n) · 안내 · 복사가 한 줄 — 복사는 오른쪽 끝에 붙는다. */}
           <span className="flex items-center gap-2">
             {/* 제목이 길면 제목만 줄이고 '참여 링크'는 남긴다 — 줄 전체가 잘리면 무슨 링크인지 사라진다 */}

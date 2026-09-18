@@ -41,8 +41,6 @@ export function GuestWelcome({
   /** 링크가 만료된 경우 — 참여를 받지 않고 새 링크를 부탁하게 안내한다. */
   expired?: boolean;
 }) {
-  const [first, ...rest] = album.title.split(" ");
-
   if (expired) {
     return (
       <div className="flex min-h-[calc(100dvh-80px)] flex-col items-center justify-center gap-4 text-center">
@@ -82,23 +80,19 @@ export function GuestWelcome({
       <section className="mt-6 flex flex-col gap-3">
         <Eyebrow>가족 앨범 초대</Eyebrow>
         <h1 className="font-heading text-display-xl font-bold">
-          {first}
-          {rest.length > 0 && (
-            <>
-              <br />
-              {rest.join(" ")}
-            </>
-          )}
+          ‘{album.title}’ 앨범에
+          <br />
+          함께 기록해요
         </h1>
         <p className="text-base leading-relaxed text-body">
-          “사진을 보며 기억나는 순간을 들려주세요. 회원가입 없이 바로 참여할 수 있어요.”
+          링크를 공유받았다면 회원가입 없이 앨범에 사진을 첨부할 수 있어요.
         </p>
       </section>
 
       <Card size="sm" className="mt-6">
         <CardContent className="flex flex-col gap-3">
           <b className="text-[15px] font-semibold">이렇게 참여해요</b>
-          {["사진을 천천히 살펴봐요", "AI 질문에 목소리나 글로 답해요", "가족의 한 편의 기록으로 완성돼요"].map(
+          {["사진을 천천히 살펴봐요", "AI 질문에 목소리나 글로 답해요", "그날의 이야기가 하나의 앨범으로 기록돼요."].map(
             (step, i) => (
               <p key={step} className="flex items-center gap-3 text-sm text-body">
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-canvas">
@@ -116,7 +110,7 @@ export function GuestWelcome({
       </Button>
       <div className="mt-2 flex justify-center">
         <Button variant="link" size="sm" className="text-body" onClick={() => leaveGuest(go)}>
-          지금은 참여하지 않을게요
+          나중에 참여
         </Button>
       </div>
     </>

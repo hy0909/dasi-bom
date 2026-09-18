@@ -2,7 +2,6 @@ import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
-import { Eyebrow } from "@/components/eyebrow";
 import { MediaFrame } from "@/components/media-frame";
 import { GoogleIcon, KakaoIcon } from "@/components/provider-icons";
 import { photos } from "@/data/photos";
@@ -29,22 +28,18 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
   return (
     <>
       <div className="flex h-14 items-center justify-center">
-        <Wordmark />
+        <Wordmark className="text-[26px]" />
       </div>
 
-      <MediaFrame className="mt-2" src={photos[0].src} alt="가족과 함께 본 유럽여행 사진" />
+      <MediaFrame className="mt-1" src={photos[0].src} alt="가족과 함께 본 유럽여행 사진" />
 
       <section className="mt-6 flex flex-col gap-3">
-        <Eyebrow>시작하기</Eyebrow>
         <h1 className="font-heading text-display-xl font-bold">
           기억하고 싶은
           <br />
           순간이 있나요?
         </h1>
-        <p className="text-base leading-relaxed text-body">
-          SNS 계정으로 시작해 보세요. 링크를 공유받았다면 회원가입 없이 앨범에 사진을 첨부할 수도
-          있어요.
-        </p>
+        <p className="text-base leading-relaxed text-body">함께 만드는 앨범 서비스, 그날을 담다</p>
       </section>
 
       <div className="mt-7 flex flex-col gap-3">
