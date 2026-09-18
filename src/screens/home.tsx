@@ -26,7 +26,6 @@ import { AlbumCover } from "@/components/album-cover";
 import {
   albumPeriod,
   coverColorOf,
-  coverShapeOf,
   coverStageTone,
   formatAlbumStart,
 } from "@/data/album";
@@ -97,7 +96,8 @@ export function HomeScreen({
   /** 표지가 이 높이로 서고, 판형에 따라 폭이 정해진다 — 브라우저가 폭을 스스로 계산하게
       두면(w-auto + aspect-ratio) 카카오 인앱처럼 계산이 다른 곳에서 가운데가 틀어진다. */
   const HERO_H = 293;
-  const heroShape = heroAlbum ? coverShapeOf(heroAlbum) : null;
+  /** 판형이 달라도 폭은 세로형(4:5) 한 권과 같다 — 옆으로 넓은 판형이 더 커 보이지 않게 */
+  const HERO_W = Math.round(HERO_H / 1.25);
   /** 바탕은 지금 올라와 있는 표지의 색을 따라간다 */
   const stageTone = heroAlbum ? coverStageTone(coverColorOf(heroAlbum).hex) : "#2b2521";
 
@@ -119,7 +119,7 @@ export function HomeScreen({
             {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다.
                 좌우로 밀면 앨범이 넘어가고, 위아래로 밀면 화면이 그대로 스크롤된다. */}
             <div
-              className="relative mt-[14px] flex h-[305px] touch-pan-y items-center justify-center"
+              className="relative mt-3 flex h-[305px] touch-pan-y items-center justify-center"
               onTouchStart={(e) => {
                 const t = e.touches[0];
                 swipeFrom.current = { x: t.clientX, y: t.clientY };
@@ -153,7 +153,7 @@ export function HomeScreen({
                 ref={heroCover}
                 style={
                   {
-                    width: heroShape ? Math.round(HERO_H / heroShape.aspect) : undefined,
+                    width: HERO_W,
                     "--hero-from": heroDir > 0 ? "30px" : "-30px",
                   } as CSSProperties
                 }
@@ -188,7 +188,7 @@ export function HomeScreen({
                 </button>
               )}
             </div>
-            <p className="mt-4 truncate text-center text-[17px] font-semibold text-canvas">
+            <p className="mt-[14px] truncate text-center text-[17px] font-semibold text-canvas">
               {heroAlbum.title}
             </p>
             <p className="mt-1 text-center text-xs text-canvas-soft/55">
@@ -203,11 +203,7 @@ export function HomeScreen({
       </section>
 
       <div className="mt-7">
-        <h1 className="font-heading text-display-md font-bold">
-          기억하고 싶은
-          <br />
-          순간이 있나요?
-        </h1>
+        <h1 className="font-heading text-display-sm font-bold">기억하고 싶은 순간이 있나요?</h1>
       </div>
 
       {/* 새 앨범 CTA — canvas 표면 + 소프트 섀도, 오렌지는 아이콘에만 */}
@@ -218,7 +214,7 @@ export function HomeScreen({
         tabIndex={0}
         onClick={() => go("create")}
         onKeyDown={(e) => e.key === "Enter" && go("create")}
-        className="mt-5 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+        className="mt-4 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex items-center gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-ink text-canvas">
