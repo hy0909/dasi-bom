@@ -1,5 +1,14 @@
 import { useRef, useState } from "react";
-import { ArrowRight, ChevronDown, EllipsisVertical, Image, Plus, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  EllipsisVertical,
+  Image,
+  Plus,
+  Sparkles,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -8,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Topbar } from "@/components/topbar";
+import { Wordmark } from "@/components/wordmark";
 import { BottomNav } from "@/components/bottom-nav";
 import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
@@ -46,6 +55,9 @@ export function HomeScreen({
 }) {
   const [recent, setRecent] = useState(true);
   const [filter, setFilter] = useState<AlbumFilter>("all");
+  /** 위쪽 무대에 올려 둔 앨범 — 좌우 화살표로 넘긴다 */
+  const [hero, setHero] = useState(0);
+  const heroCover = useRef<HTMLDivElement>(null);
   const session = useSession();
   const participants = useAlbumParticipants();
   const membership = useMyAlbums();
@@ -65,9 +77,79 @@ export function HomeScreen({
   const picked = filter === "all" ? albums : albums.filter((a) => roleOf(a.id) === filter);
   // 정렬은 목록의 앞뒤만 뒤집는다 — 데이터에 수정 시각이 따로 없다.
   const list = recent ? picked : [...picked].reverse();
+  // 앨범이 줄면 무대에 올린 자리도 따라 줄인다.
+  const heroAt = albums.length ? Math.min(hero, albums.length - 1) : 0;
+  const heroAlbum = albums[heroAt];
+  const turnHero = (step: number) =>
+    setHero((at) => (albums.length ? (at + step + albums.length) % albums.length : 0));
+
   return (
     <>
-      <Topbar go={go} />
+      {/* 어두운 무대 — 로고는 왼쪽 위 흰 글씨, 그 아래 앨범 한 권을 크게 올린다 */}
+      <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] bg-[#7c6657] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8">
+        <div className="flex h-12 items-center">
+          <Wordmark className="text-canvas" />
+        </div>
+
+        {heroAlbum ? (
+          <>
+            {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다 */}
+            <div className="relative mt-2 flex h-[230px] items-center justify-center">
+              {albums.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => turnHero(-1)}
+                  aria-label="이전 앨범"
+                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                >
+                  <ChevronLeft className="size-6" />
+                </button>
+              )}
+              {/* 앨범 — 정면으로 세워 두고 잔잔한 그림자만 깐다 */}
+              <div
+                ref={heroCover}
+                role="button"
+                tabIndex={0}
+                aria-label={`${heroAlbum.title} 열기`}
+                onClick={() =>
+                  onOpenAlbum(heroAlbum.id, "detail", heroCover.current!.getBoundingClientRect())
+                }
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  onOpenAlbum(heroAlbum.id, "detail", heroCover.current!.getBoundingClientRect())
+                }
+                className="flex h-full max-w-[64%] cursor-pointer items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
+              >
+                <AlbumCover
+                  album={heroAlbum}
+                  photoCount={photoStore[heroAlbum.id]?.length ?? 0}
+                  className="h-full w-auto drop-shadow-[0_18px_26px_rgb(0_0_0/0.32)]"
+                />
+              </div>
+              {albums.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => turnHero(1)}
+                  aria-label="다음 앨범"
+                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                >
+                  <ChevronRight className="size-6" />
+                </button>
+              )}
+            </div>
+            <p className="mt-6 truncate text-center text-[15px] font-semibold text-canvas">
+              {heroAlbum.title}
+            </p>
+            <p className="mt-1 text-center text-xs text-canvas-soft/70">
+              {formatAlbumStart(heroAlbum)}
+            </p>
+          </>
+        ) : (
+          <p className="mt-6 mb-2 text-center text-sm text-canvas-soft/75">
+            아직 앨범이 없어요. 아래에서 첫 앨범을 만들어보세요.
+          </p>
+        )}
+      </section>
 
       <div className="mt-7">
         <h1 className="font-heading text-display-xl font-bold">
