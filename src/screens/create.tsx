@@ -1,10 +1,8 @@
 import { useState, type FormEvent } from "react";
-import { ImagePlus } from "lucide-react";
+import { ArrowLeft, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Topbar } from "@/components/topbar";
-import { PageIntro } from "@/components/page-intro";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
@@ -89,103 +87,128 @@ export function CreateScreen({
 
   return (
     <>
-      <Topbar back={() => go("home")} title="새 앨범 만들기" />
-      <PageIntro
-        title={
-          <>
-            어떤 순간을
-            <br />
-            기록해볼까요?
-          </>
-        }
-        description="사진과 기록은 나중에도 추가할 수 있어요."
-      />
+      {/* 어두운 작업대 — 만들 앨범을 눈앞에 두고 겉모습을 정한다.
+          좌우·위 여백을 무시하고 화면을 꽉 채우고, 그 위에 흰 상단 바를 얹는다. */}
+      <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] overflow-hidden bg-ink text-canvas">
+        {/* 표지 뒤로 번지는 빛 — 어둠이 납작해지지 않게 */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(68%_54%_at_50%_46%,rgb(255_255_255/0.17)_0%,rgb(255_255_255/0)_72%)]" />
 
-      <form className="mt-8 flex flex-col gap-6 pb-20" onSubmit={submit}>
-        <Field label="앨범 제목" htmlFor="record-title" required>
-          <Input
-            id="record-title"
-            autoFocus
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="예: 2023년 유럽여행"
+        <header className="relative z-10 flex h-14 items-center px-5 pt-[env(safe-area-inset-top)]">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="-ml-2 text-canvas hover:bg-canvas/15 hover:text-canvas"
+            onClick={() => go("home")}
+            aria-label="뒤로가기"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+          <h1 className="absolute left-1/2 -translate-x-1/2 text-[15px] font-semibold whitespace-nowrap text-canvas">
+            새 앨범 만들기
+          </h1>
+        </header>
+
+        <div className="relative z-10 flex flex-col items-center gap-4 px-5 pt-3 pb-10">
+          {/* 고른 색·판형·사진 자리가 실제 표지로 어떻게 보이는지 여기서 바로 보인다 */}
+          <AlbumCover
+            album={{
+              id: "preview",
+              coverColor,
+              coverShape,
+              coverFrame,
+              cover: cover ?? PLACEHOLDER_COVER,
+            }}
+            className="w-44 drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
           />
-        </Field>
-
-        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다.
-            둘 다 비워 둬도 된다 — 그러면 사진의 촬영 날짜가 앨범 기간이 된다. */}
-        <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="시작일" htmlFor="start" className="min-w-0">
-              <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
-            </Field>
-            <Field label="종료일" htmlFor="end" className="min-w-0">
-              <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
-            </Field>
-          </div>
-          <p className="text-xs text-body-mid">
-            비워 두면 사진을 넣을 때 가장 이른 촬영 날짜와 가장 늦은 촬영 날짜로 채워져요.
+          <p className="text-center text-xs leading-relaxed text-canvas-soft/70">
+            아래에서 고르는 대로 표지가 바뀌어요.
+            <br />
+            사진과 기록은 나중에도 추가할 수 있어요.
           </p>
         </div>
+      </section>
 
-        <Field label="짧은 설명" htmlFor="desc">
-          <Textarea
-            id="desc"
-            className="min-h-24"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
-          />
-        </Field>
+      <form className="mt-7 flex flex-col gap-7 pb-20" onSubmit={submit}>
+        {/* 겉모습 — 위 표지가 바로 따라 바뀌는 것들끼리 모은다 */}
+        <section className="flex flex-col gap-5">
+          <h2 className="text-sm font-semibold text-ink">표지 꾸미기</h2>
 
-        <label className="relative flex cursor-pointer flex-col items-center gap-2 overflow-hidden rounded-xl bg-muted p-6 text-center transition-colors hover:bg-accent has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40">
-          {cover ? (
-            <img src={cover} alt="대표 사진 미리보기" className="mb-2 aspect-[16/9] w-full rounded-lg object-cover" />
-          ) : (
-            <span className="mb-1 flex size-12 items-center justify-center rounded-full bg-canvas text-ink">
+          <label className="relative flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-mute px-4 py-3 transition-colors hover:bg-muted has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-ink">
               <ImagePlus className="size-5" />
             </span>
-          )}
-          <b className="text-[15px] font-semibold">{cover ? "대표 사진 변경" : "대표 사진 추가"}</b>
-          <small className="text-xs text-body-mid">JPG, PNG · 최대 10MB</small>
-          <input
-            className="visually-hidden"
-            type="file"
-            accept="image/*"
-            onChange={(e) => chooseFile(e.target.files?.[0])}
-          />
-        </label>
-
-        <Field label="앨범 커버 색">
-          <div className="flex items-start gap-4">
-            {/* 고른 색·판형·사진 자리가 실제 커버로 어떻게 보이는지 바로 보여준다. */}
-            <AlbumCover
-              album={{
-                id: "preview",
-                coverColor,
-                coverShape,
-                coverFrame,
-                cover: cover ?? PLACEHOLDER_COVER,
-              }}
-              className="mt-1 w-40 shrink-0"
+            <span className="min-w-0 flex-1">
+              <b className="block text-[15px] font-semibold">
+                {cover ? "대표 사진 변경" : "대표 사진 추가"}
+              </b>
+              <small className="block text-xs text-body-mid">JPG, PNG · 최대 10MB</small>
+            </span>
+            <input
+              className="visually-hidden"
+              type="file"
+              accept="image/*"
+              onChange={(e) => chooseFile(e.target.files?.[0])}
             />
+          </label>
+
+          <Field label="앨범 커버 색">
             <CoverColorPicker value={coverColor} onChange={setCoverColor} />
+          </Field>
+
+          <Field label="앨범 판형">
+            <CoverShapePicker value={coverShape} onChange={setCoverShape} />
+          </Field>
+
+          <Field label="사진이 보이는 자리">
+            <CoverFramePicker
+              value={coverFrame}
+              onChange={setCoverFrame}
+              shape={coverShape}
+              color={coverColor}
+              cover={cover ?? PLACEHOLDER_COVER}
+            />
+          </Field>
+        </section>
+
+        {/* 앨범 정보 — 겉모습과는 하는 일이 달라 줄 하나로 갈라 둔다 */}
+        <section className="flex flex-col gap-5 border-t border-border pt-7">
+          <h2 className="text-sm font-semibold text-ink">앨범 정보</h2>
+
+          <Field label="앨범 제목" htmlFor="record-title" required>
+            <Input
+              id="record-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="예: 2023년 유럽여행"
+            />
+          </Field>
+
+          {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다.
+              둘 다 비워 둬도 된다 — 그러면 사진의 촬영 날짜가 앨범 기간이 된다. */}
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="시작일" htmlFor="start" className="min-w-0">
+                <DateField id="start" label="시작일" compact value={startDate} onChange={setStartDate} />
+              </Field>
+              <Field label="종료일" htmlFor="end" className="min-w-0">
+                <DateField id="end" label="종료일" compact value={endDate} onChange={setEndDate} />
+              </Field>
+            </div>
+            <p className="text-xs text-body-mid">
+              비워 두면 사진을 넣을 때 가장 이른 촬영 날짜와 가장 늦은 촬영 날짜로 채워져요.
+            </p>
           </div>
-        </Field>
 
-        <Field label="앨범 판형">
-          <CoverShapePicker value={coverShape} onChange={setCoverShape} />
-        </Field>
-
-        <Field label="사진이 보이는 자리">
-          <CoverFramePicker
-            value={coverFrame}
-            onChange={setCoverFrame}
-            shape={coverShape}
-            color={coverColor}
-            cover={cover ?? PLACEHOLDER_COVER}
-          />
-        </Field>
+          <Field label="짧은 설명" htmlFor="desc">
+            <Textarea
+              id="desc"
+              className="min-h-24"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
+            />
+          </Field>
+        </section>
 
         <StickyBar>
           <Button size="lg" className="w-full" disabled={!title.trim() || ready}>
