@@ -36,10 +36,8 @@ export function CreateScreen({
   const [description, setDescription] = useState("");
   const [ready, setReady] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
-  // 커버 색은 무작위로 하나 골라 두고 시작한다 — 바꾸지 않아도 앨범마다 색이 갈린다.
-  const [coverColor, setCoverColor] = useState<CoverColorId>(
-    () => COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].id,
-  );
+  // 커버 색은 목록의 첫 색으로 시작한다 — 열 때마다 달라지지 않는다.
+  const [coverColor, setCoverColor] = useState<CoverColorId>(COVER_COLORS[0].id);
   // 비율과 디자인 — 기본값은 지금까지의 앨범과 같은 세로형·정사각형이다.
   const [coverShape, setCoverShape] = useState<CoverShapeId>("portrait");
   const [coverFrame, setCoverFrame] = useState<CoverFrameId>("window");
@@ -128,7 +126,7 @@ export function CreateScreen({
             value={coverColor}
             onChange={setCoverColor}
             tone="dark"
-            className="mt-2 max-w-[192px] justify-center gap-3"
+            className="mt-[14px] max-w-[216px] justify-center gap-3"
           />
         </div>
       </section>

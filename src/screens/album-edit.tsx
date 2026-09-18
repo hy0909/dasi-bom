@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Topbar } from "@/components/topbar";
 import { Field } from "@/components/field";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
@@ -44,10 +44,50 @@ export function AlbumEditScreen({
 
   return (
     <>
-      <Topbar back={back} title="앨범 정보" />
+      {/* 만들기와 같은 어두운 작업대 — 표지를 눈앞에 두고 겉모습을 고친다 */}
+      <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] overflow-hidden bg-ink px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(68%_54%_at_50%_46%,rgb(255_255_255/0.17)_0%,rgb(255_255_255/0)_72%)]" />
+
+        <header className="relative z-10 flex h-14 items-center px-0">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="-ml-2 text-canvas hover:bg-canvas/15 hover:text-canvas"
+            onClick={back}
+            aria-label="뒤로가기"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+          <h1 className="absolute left-1/2 -translate-x-1/2 text-[15px] font-semibold whitespace-nowrap text-canvas">
+            앨범 정보
+          </h1>
+        </header>
+
+        <div className="relative z-10 flex flex-col items-center gap-4 px-5 pt-3">
+          <div className="flex h-[154px] items-center justify-center">
+            <AlbumCover
+              album={{
+                id: album.id,
+                coverColor: coverColorOf(draft).id,
+                coverShape: coverShapeOf(draft).id,
+                coverFrame: coverFrameOf(draft).id,
+                cover: album.cover,
+              }}
+              style={{ width: 123 }}
+              className="drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
+            />
+          </div>
+          <CoverColorPicker
+            value={coverColorOf(draft).id}
+            onChange={(coverColor) => setDraft({ ...draft, coverColor })}
+            tone="dark"
+            className="mt-[14px] max-w-[216px] justify-center gap-3"
+          />
+        </div>
+      </section>
 
       {/* 앨범 정보는 만든 사람만의 것이 아니다 — 참여 중인 가족이면 누구나 고친다. */}
-      <p className="mt-4 rounded-lg bg-muted p-3 text-sm leading-relaxed text-body">
+      <p className="mt-6 rounded-lg bg-muted p-3 text-sm leading-relaxed text-body">
         참여 중인 가족은 누구나 앨범 정보를 고칠 수 있어요. 바꾼 내용은 함께 보는 모두에게 바로
         보여요.
       </p>
@@ -117,26 +157,6 @@ export function AlbumEditScreen({
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             placeholder="예: 가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요."
           />
-        </Field>
-
-        <Field label="앨범 커버 색">
-          <div className="flex items-start gap-4">
-            {/* 만들기와 같은 미리보기 — 고른 색이 실제 커버로 어떻게 보이는지 */}
-            <AlbumCover
-              album={{
-                id: album.id,
-                coverColor: coverColorOf(draft).id,
-                coverShape: coverShapeOf(draft).id,
-                coverFrame: coverFrameOf(draft).id,
-                cover: album.cover,
-              }}
-              className="mt-1 w-40 shrink-0"
-            />
-            <CoverColorPicker
-              value={coverColorOf(draft).id}
-              onChange={(coverColor) => setDraft({ ...draft, coverColor })}
-            />
-          </div>
         </Field>
 
         <Field label="앨범 비율">

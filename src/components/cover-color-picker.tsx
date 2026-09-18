@@ -32,7 +32,10 @@ export function CoverColorPicker({
           aria-label={c.label}
           onClick={() => onChange(c.id)}
           className={cn(
-            "size-[22px] rounded-full shadow-[inset_0_0_0_1px_rgb(32_21_21/0.14)] outline-none transition-transform focus-visible:ring-3 focus-visible:ring-ring/40",
+            // 누르는 자리는 동그라미보다 넓다 — 보이지 않는 테두리로 손끝이 닿을 자리를 넓힌다
+            "relative size-[26px] rounded-full shadow-[inset_0_0_0_1px_rgb(32_21_21/0.14)] outline-none transition-transform",
+            "before:absolute before:-inset-1.5 before:rounded-full before:content-['']",
+            "focus-visible:ring-3 focus-visible:ring-ring/40",
             value === c.id
               ? tone === "dark"
                 ? "scale-110 ring-2 ring-canvas ring-offset-2 ring-offset-ink"
