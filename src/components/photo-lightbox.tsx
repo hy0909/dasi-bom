@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 
 /**
  * 사진 크게 보기 — 화면을 덮는 검은 딤 위에 사진 한 장만 띄운다.
+ * 여백 없이 긴 쪽이 화면에 꽉 차고, 짧은 쪽은 비율대로 남는다(contain).
  * 손가락 두 개로 벌리면 커지고, 커진 뒤에는 한 손가락으로 끌어 볼 수 있다.
  * 두 번 두드리면(데스크톱은 두 번 누르거나 휠) 커졌다 작아졌다 한다.
  * 닫기는 오른쪽 위 ✕ 이거나, 사진 바깥의 어두운 자리를 누르는 것.
@@ -243,7 +244,7 @@ export function PhotoLightbox({
         }
         onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-6 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-md"
     >
       <button
         type="button"
