@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * 북클로스 하드커버 앨범 — 만들 때 고른 판형(4:5·1:1·4:3·3:5), 왼쪽 책등, 사진이 앉는 자리.
- * 사진 자리는 다섯 가지다 — 기본 창·고전 액자·정사각 창·타원 창·사진 표지(data-frame).
- * 기본 창의 사진은 원본 비율을 지키고, 커버 폭의 52%·높이의 46% 안에 들어간다.
+ * 앨범 디자인은 네 가지다 — 정사각형·문구·큰 정사각형·타원(data-frame).
+ * 정사각형의 사진은 원본 비율을 지키고, 커버 폭의 52%·높이의 46% 안에 들어간다.
  * 앞표지 뒤에 책등 옆면이 붙어 있어, 부모에 album-3d-hover 가 있으면 처음부터 살짝 돌아서서 옆면이 보인다(호버 때 조금 더).
  * 옆면 두께는 사진 장수를 따른다 — 사진이 많은 앨범이 실제로 더 두껍다.
  */
@@ -220,8 +220,6 @@ export function AlbumCover({
         {
           ...style,
           "--cover": tone,
-          // 사진 표지는 책등 옆면까지 이 사진이 감싼다
-          "--photo": `url("${album.cover}")`,
           "--depth": `${albumDepth(photoCount)}cqw`,
         } as CSSProperties
       }
@@ -240,7 +238,7 @@ export function AlbumCover({
               <img src={album.cover} alt="" draggable={false} />
             </span>
           </span>
-          {/* 레터링 표지 — 사진 대신 표지 위쪽에 무지개처럼 휜 박 글자 */}
+          {/* 문구 — 사진 대신 표지 위쪽에 무지개처럼 휜 박 글자 */}
           {frame.id === "lettering" && <CoverLettering />}
         </div>
         <span className="album-book-side" />
@@ -250,7 +248,7 @@ export function AlbumCover({
 }
 
 /**
- * 레터링 표지의 글자 — 무지개처럼 휜 반원 위에 얹은 'Our Happiest Days'.
+ * 문구 표지의 글자 — 무지개처럼 휜 반원 위에 얹은 'Our Happiest Days'.
  * 휜 글줄은 CSS 로 만들 수 없어 SVG textPath 를 쓴다.
  * 색은 무광 로즈골드 박 — 금속 그라데이션 위에 아주 가는 결을 덮고, 눌린 자국만큼의 그늘을 준다.
  * 글줄 바로 아래에는 같은 박으로 얇고 연한 가로선을 한 줄 긋는다.

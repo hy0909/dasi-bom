@@ -458,9 +458,9 @@ html {
 }
 
 /* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
-   기본 창(window)은 위의 규칙 그대로다. 아래는 나머지 넷만 덮어쓴다. */
+   정사각형(window)은 위의 규칙 그대로다. 아래는 나머지 셋만 덮어쓴다. */
 
-/* 레터링 표지 — 사진 창을 두지 않고, 표지 위쪽에 휜 글줄과 가로선만 남긴다.
+/* 문구 — 사진 창을 두지 않고, 표지 위쪽에 휜 글줄과 가로선만 남긴다.
    휜 글줄은 SVG textPath 로 그린다(CSS 로는 글줄을 휘게 할 수 없다). */
 .album-book[data-frame="lettering"] .album-cover-well {
   display: none;
@@ -486,7 +486,7 @@ html {
   filter: drop-shadow(0 -0.3px 0.35px rgb(0 0 0 / 0.42));
 }
 
-/* 정사각 창 — 매트지 위에 사진 전체가 들어간다(contain) */
+/* 큰 정사각형 — 창을 키워 사진이 정사각을 그대로 채운다 */
 /* 가운데가 아니라 표지 위쪽에 앉는다 */
 .album-book[data-frame="square"] .album-cover-well {
   align-items: flex-start;
@@ -516,7 +516,7 @@ html {
     inset 0 1px 3px rgb(0 0 0 / 0.15);
 }
 
-/* 타원 창 — 좌우로 긴 타원에 무광 실버 테를 두른 카메오.
+/* 타원 — 좌우로 긴 타원에 무광 실버 테를 두른 카메오.
    가로 반경을 세로 반경 가까이 키워 둔다 — 덜 주면 위아래가 평평해져 모서리만 둥근 네모로 보인다. */
 .album-book[data-frame="oval"] .album-cover-window {
   width: 67cqw;

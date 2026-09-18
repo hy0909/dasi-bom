@@ -40,7 +40,7 @@ export function CreateScreen({
   const [coverColor, setCoverColor] = useState<CoverColorId>(
     () => COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].id,
   );
-  // 판형과 사진이 앉는 자리 — 기본값은 지금까지의 앨범과 같은 세로형 기본 창이다.
+  // 비율과 디자인 — 기본값은 지금까지의 앨범과 같은 세로형·정사각형이다.
   const [coverShape, setCoverShape] = useState<CoverShapeId>("portrait");
   const [coverFrame, setCoverFrame] = useState<CoverFrameId>("window");
 
@@ -122,7 +122,7 @@ export function CreateScreen({
             value={coverColor}
             onChange={setCoverColor}
             tone="dark"
-            className="mt-1 max-w-[252px] justify-center gap-3"
+            className="mt-2 max-w-[192px] justify-center gap-3"
           />
         </div>
       </section>

@@ -32,10 +32,10 @@ export function CoverColorPicker({
           aria-label={c.label}
           onClick={() => onChange(c.id)}
           className={cn(
-            "size-8 rounded-full outline-none transition-transform focus-visible:ring-3 focus-visible:ring-ring/40",
+            "size-[22px] rounded-full shadow-[inset_0_0_0_1px_rgb(32_21_21/0.14)] outline-none transition-transform focus-visible:ring-3 focus-visible:ring-ring/40",
             value === c.id
               ? tone === "dark"
-                ? "scale-110 ring-2 ring-canvas"
+                ? "scale-110 ring-2 ring-canvas ring-offset-2 ring-offset-ink"
                 : "scale-110 ring-2 ring-ink ring-offset-2 ring-offset-canvas"
               : "hover:scale-105",
           )}

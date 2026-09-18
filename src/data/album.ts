@@ -35,10 +35,10 @@ export function coverShapeOf(album: Pick<Album, "coverShape">) {
 
 /** 표지에서 사진이 보이는 자리 — 만들 때 고르는 다섯 가지. */
 export const COVER_FRAMES = [
-  { id: "window", label: "기본 창", hint: "사진 비율 그대로 파인 창" },
-  { id: "lettering", label: "레터링 표지", hint: "사진 없이 로즈골드 박 레터링만" },
-  { id: "square", label: "정사각 창", hint: "정사각 안에 사진 전체" },
-  { id: "oval", label: "타원 창", hint: "좌우로 긴 타원 창" },
+  { id: "window", label: "정사각형", hint: "사진 비율 그대로 작게 파인 창" },
+  { id: "lettering", label: "문구", hint: "사진 없이 로즈골드 박 레터링만" },
+  { id: "square", label: "큰 정사각형", hint: "정사각 안에 사진 전체" },
+  { id: "oval", label: "타원", hint: "좌우로 긴 타원 창" },
 ] as const;
 export type CoverFrameId = (typeof COVER_FRAMES)[number]["id"];
 
@@ -60,6 +60,7 @@ export const COVER_COLORS = [
   { id: "turquoise", label: "청록", hex: "#26C8A2" },
   { id: "brown", label: "갈색", hex: "#CBAD70" },
   { id: "green", label: "초록", hex: "#36D72E" },
+  { id: "white", label: "흰색", hex: "#FFFFFF" },
 ] as const;
 export type CoverColorId = (typeof COVER_COLORS)[number]["id"];
 
@@ -108,6 +109,8 @@ function hslToHex(h: number, s: number, l: number) {
  */
 export function coverFabricTone(hex: string, variant: "fabric" | "vivid") {
   const [h, s, l] = hexToHsl(hex);
+  // 흰 천은 어둡게 눌러 두면 회색이 된다 — 아주 옅은 미색 천으로 따로 둔다.
+  if (s < 0.08 && l > 0.9) return "#f2ece1";
   if (variant === "vivid") return hslToHex(h, Math.min(1, s * 0.95), l * 0.88);
   return hslToHex(h, Math.min(s, 0.42), 0.3);
 }
