@@ -16,7 +16,7 @@ const idle = "border-border text-body hover:bg-muted";
 const PREVIEW_W = 76;
 const PREVIEW_H = 80;
 
-/** 앨범 판형 고르기 — 고른 비율 그대로 생긴 네 개의 작은 표지. */
+/** 앨범 비율 고르기 — 고른 비율 그대로 생긴 작은 표지들. */
 export function CoverShapePicker({
   value,
   onChange,
@@ -25,7 +25,7 @@ export function CoverShapePicker({
   onChange: (id: CoverShapeId) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label="앨범 판형" className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label="앨범 비율" className="flex flex-wrap gap-2">
       {COVER_SHAPES.map((s) => (
         <button
           key={s.id}
@@ -71,7 +71,7 @@ export function CoverFramePicker({
   const aspect = COVER_SHAPES.find((s) => s.id === shape)?.aspect ?? 1.25;
   const width = Math.min(PREVIEW_W, PREVIEW_H / aspect);
   return (
-    <div role="radiogroup" aria-label="사진이 보이는 자리" className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label="앨범 디자인" className="flex flex-wrap gap-2">
       {COVER_FRAMES.map((f) => (
         <button
           key={f.id}

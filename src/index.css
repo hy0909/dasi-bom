@@ -293,6 +293,20 @@ html {
     rgb(0 0 0 / 0.2)
   );
 }
+/* 나머지 면은 돌려 볼 수 있는 자리(목록)에서만 그린다 — 정면으로 놓인 표지에서는
+   면이 옆으로 서면서 1~2px 짜리 종이색 실선이 모서리에 비친다. */
+.album-book-back,
+.album-book-fore,
+.album-book-top,
+.album-book-bottom {
+  display: none;
+}
+.album-3d-hover .album-book-back,
+.album-3d-hover .album-book-fore,
+.album-3d-hover .album-book-top,
+.album-3d-hover .album-book-bottom {
+  display: block;
+}
 /* 뒤표지 — 앞표지와 같은 천, 빛은 덜 받는다 */
 .album-book-back {
   position: absolute;

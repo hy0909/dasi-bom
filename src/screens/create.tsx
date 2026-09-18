@@ -122,7 +122,7 @@ export function CreateScreen({
             value={coverColor}
             onChange={setCoverColor}
             tone="dark"
-            className="mt-1 grid w-fit grid-cols-6 gap-3"
+            className="mt-1 max-w-[252px] justify-center gap-3"
           />
         </div>
       </section>
@@ -130,9 +130,8 @@ export function CreateScreen({
       <form className="mt-7 flex flex-col gap-7 pb-20" onSubmit={submit}>
         {/* 겉모습 — 위 표지가 바로 따라 바뀌는 것들끼리 모은다 */}
         <section className="flex flex-col gap-5">
-          <h2 className="text-sm font-semibold text-ink">표지 꾸미기</h2>
-
-          <label className="relative flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-mute px-4 py-3 transition-colors hover:bg-muted has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40">
+          <Field label="대표 사진">
+            <label className="relative flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-mute px-4 py-3 transition-colors hover:bg-muted has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-ink">
               <ImagePlus className="size-5" />
             </span>
@@ -142,19 +141,20 @@ export function CreateScreen({
               </b>
               <small className="block text-xs text-body-mid">JPG, PNG · 최대 10MB</small>
             </span>
-            <input
-              className="visually-hidden"
-              type="file"
-              accept="image/*"
-              onChange={(e) => chooseFile(e.target.files?.[0])}
-            />
-          </label>
+              <input
+                className="visually-hidden"
+                type="file"
+                accept="image/*"
+                onChange={(e) => chooseFile(e.target.files?.[0])}
+              />
+            </label>
+          </Field>
 
-          <Field label="앨범 판형">
+          <Field label="앨범 비율">
             <CoverShapePicker value={coverShape} onChange={setCoverShape} />
           </Field>
 
-          <Field label="사진이 보이는 자리">
+          <Field label="앨범 디자인">
             <CoverFramePicker
               value={coverFrame}
               onChange={setCoverFrame}

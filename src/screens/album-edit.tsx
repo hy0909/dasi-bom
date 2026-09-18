@@ -139,14 +139,14 @@ export function AlbumEditScreen({
           </div>
         </Field>
 
-        <Field label="앨범 판형">
+        <Field label="앨범 비율">
           <CoverShapePicker
             value={coverShapeOf(draft).id}
             onChange={(coverShape) => setDraft({ ...draft, coverShape })}
           />
         </Field>
 
-        <Field label="사진이 보이는 자리">
+        <Field label="앨범 디자인">
           <CoverFramePicker
             value={coverFrameOf(draft).id}
             onChange={(coverFrame) => setDraft({ ...draft, coverFrame })}
