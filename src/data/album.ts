@@ -115,6 +115,17 @@ export function coverFabricTone(hex: string, variant: "fabric" | "vivid") {
   return hslToHex(h, Math.min(s, 0.42), 0.3);
 }
 
+/**
+ * 홈 무대의 바탕 — 표지 천과 같은 계열이되 한참 어둡다.
+ * 표지가 앞으로 떠 보이고, 앨범을 넘길 때 바탕도 그 색으로 스르륵 따라간다.
+ */
+export function coverStageTone(hex: string) {
+  const [h, s, l] = hexToHsl(hex);
+  // 흰 표지에는 색이 없다 — 중립적인 따뜻한 어둠으로 둔다
+  if (s < 0.08 && l > 0.9) return "#2b2521";
+  return hslToHex(h, Math.min(s, 0.32), 0.17);
+}
+
 /** 배너 배경 — A안은 쨍한 색 그대로, B안은 그 색의 연한 톤. */
 export function coverBannerTone(hex: string, variant: "fabric" | "vivid") {
   if (variant === "fabric") return hex;

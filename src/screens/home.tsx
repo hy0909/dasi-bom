@@ -23,7 +23,13 @@ import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { AlbumCover } from "@/components/album-cover";
-import { albumPeriod, coverShapeOf, formatAlbumStart } from "@/data/album";
+import {
+  albumPeriod,
+  coverColorOf,
+  coverShapeOf,
+  coverStageTone,
+  formatAlbumStart,
+} from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
@@ -90,13 +96,18 @@ export function HomeScreen({
   };
   /** 표지가 이 높이로 서고, 판형에 따라 폭이 정해진다 — 브라우저가 폭을 스스로 계산하게
       두면(w-auto + aspect-ratio) 카카오 인앱처럼 계산이 다른 곳에서 가운데가 틀어진다. */
-  const HERO_H = 272;
+  const HERO_H = 326;
   const heroShape = heroAlbum ? coverShapeOf(heroAlbum) : null;
+  /** 바탕은 지금 올라와 있는 표지의 색을 따라간다 */
+  const stageTone = heroAlbum ? coverStageTone(coverColorOf(heroAlbum).hex) : "#2b2521";
 
   return (
     <>
       {/* 어두운 무대 — 로고는 왼쪽 위 흰 글씨, 그 아래 앨범 한 권을 크게 올린다 */}
-      <section className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] bg-[#7c6657] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8">
+      <section
+        style={{ backgroundColor: stageTone }}
+        className="relative -mx-5 -mt-[max(16px,env(safe-area-inset-top))] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-8 transition-colors duration-500 ease-out"
+      >
         <div className="flex h-12 items-center">
           <Wordmark className="text-canvas" />
         </div>
@@ -106,7 +117,7 @@ export function HomeScreen({
             {/* 판형이 달라도 무대 높이는 그대로 — 넘길 때 화면이 들썩이지 않는다.
                 좌우로 밀면 앨범이 넘어가고, 위아래로 밀면 화면이 그대로 스크롤된다. */}
             <div
-              className="relative mt-2 flex h-[284px] touch-pan-y items-center justify-center"
+              className="relative mt-2 flex h-[338px] touch-pan-y items-center justify-center"
               onTouchStart={(e) => {
                 const t = e.touches[0];
                 swipeFrom.current = { x: t.clientX, y: t.clientY };
@@ -126,7 +137,7 @@ export function HomeScreen({
                   type="button"
                   onClick={() => turnHero(-1)}
                   aria-label="이전 앨범"
-                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-80 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute left-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-70 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronLeft className="size-6" />
                 </button>
@@ -151,7 +162,7 @@ export function HomeScreen({
                   e.key === "Enter" &&
                   onOpenAlbum(heroAlbum.id, "detail", heroCover.current!.getBoundingClientRect())
                 }
-                className="hero-turn max-w-[62%] cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
+                className="hero-turn max-w-[78%] cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
               >
                 <AlbumCover
                   album={heroAlbum}
@@ -164,7 +175,7 @@ export function HomeScreen({
                   type="button"
                   onClick={() => turnHero(1)}
                   aria-label="다음 앨범"
-                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-80 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
+                  className="absolute right-0 z-10 flex size-10 items-center justify-center rounded-full text-canvas opacity-70 transition-colors outline-none hover:bg-canvas/15 hover:opacity-100 focus-visible:ring-3 focus-visible:ring-canvas/50"
                 >
                   <ChevronRight className="size-6" />
                 </button>
