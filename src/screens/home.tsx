@@ -271,7 +271,7 @@ function AlbumCard({
       {/* 패브릭 앨범 — 그림자가 잘리지 않게 옆과 아래에 숨 쉴 공간을 둔다 */}
       <div className="relative px-2 pt-1 pb-3">
         <div ref={coverRef}>
-          <AlbumCover album={album} photoCount={photoCount} />
+          <AlbumCover album={album} photoCount={photoCount} tiltable />
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>

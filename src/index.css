@@ -248,6 +248,12 @@ html {
     transform: translateX(5%) rotateY(26deg);
   }
 }
+/* 눌러서 돌려보는 중 — 손끝을 그대로 따라간다. 호버 각도보다 이쪽이 이긴다(뒤에 온다).
+   손을 떼면 각도가 지워지고 전환이 살아나 제자리로 돌아간다. */
+.album-book[data-tilting] .album-book-body {
+  transition: none;
+  transform: rotateY(var(--tilt-y, 0deg)) rotateX(var(--tilt-x, 0deg));
+}
 /* 책등 옆면 — 앞표지 왼쪽 모서리에서 뒤로 뻗는 두께. 폭은 사진 장수(--depth)를 따른다 */
 .album-book-side {
   position: absolute;

@@ -1,4 +1,4 @@
-import { useId, type CSSProperties } from "react";
+import { useEffect, useId, useRef, type CSSProperties, type DOMAttributes } from "react";
 import { coverColorOf, coverFabricTone, coverFrameOf, coverShapeOf, type Album } from "@/data/album";
 import { coverVariant } from "@/lib/variant";
 import { cn } from "@/lib/utils";
@@ -21,23 +21,149 @@ export function albumDepth(photoCount: number) {
   return Math.round((DEPTH_MIN + (DEPTH_MAX - DEPTH_MIN) * fill) * 10) / 10;
 }
 
+/* ── 눌러서 돌려보기 ───────────────────────────────────────────────────────
+   목록에서 앨범을 누른 채 손을 움직이면 제자리에서 그 방향으로 돌아선다.
+   손을 떼면 원래 각도로 돌아온다.
+   손가락은 목록을 넘기는 데도 쓰이니, 잠깐 누르고 있어야 돌리기로 본다 —
+   바로 밀면 그건 스크롤이다. 마우스는 헷갈릴 일이 없어 누르는 즉시 돈다. */
+/** 좌우로 끝까지 돌아섰을 때의 각도 */
+const TILT_MAX_Y = 40;
+/** 위아래로 끝까지 젖혔을 때의 각도 */
+const TILT_MAX_X = 24;
+/** 이만큼 움직이면 끝까지 돌아선다(px) */
+const TILT_SPAN = 150;
+/** 손가락이 이만큼 머물러야 돌리기로 본다(ms) */
+const HOLD_MS = 160;
+/** 돌리기 전에 이보다 많이 움직였으면 목록을 넘기려는 손짓이다(px) */
+const SLOP = 10;
+
+type TiltHandlers = Pick<
+  DOMAttributes<HTMLDivElement>,
+  "onPointerDown" | "onPointerMove" | "onPointerUp" | "onPointerCancel" | "onClickCapture"
+>;
+
+function useAlbumTilt(enabled: boolean) {
+  const ref = useRef<HTMLDivElement>(null);
+  /** 누르기 시작한 지점 — 여기서 얼마나 움직였는지로 각도를 정한다 */
+  const from = useRef<{ id: number; x: number; y: number } | null>(null);
+  const turning = useRef(false);
+  /** 돌려본 손짓인가 — 그랬다면 손을 뗄 때 앨범이 열리지 않아야 한다 */
+  const turned = useRef(false);
+  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopHold = () => {
+    if (hold.current) clearTimeout(hold.current);
+    hold.current = null;
+  };
+
+  const turnTo = (dx: number, dy: number) => {
+    const el = ref.current;
+    if (!el) return;
+    const y = Math.max(-1, Math.min(1, dx / TILT_SPAN)) * TILT_MAX_Y;
+    const x = Math.max(-1, Math.min(1, -dy / TILT_SPAN)) * TILT_MAX_X;
+    el.style.setProperty("--tilt-y", `${y.toFixed(1)}deg`);
+    el.style.setProperty("--tilt-x", `${x.toFixed(1)}deg`);
+  };
+
+  const begin = () => {
+    const el = ref.current;
+    if (!el || !from.current) return;
+    turning.current = true;
+    el.dataset.tilting = "on";
+    // 손끝이 앨범 밖으로 나가도 계속 따라 돈다
+    try {
+      el.setPointerCapture(from.current.id);
+    } catch {
+      // 이미 놓친 포인터 — 그대로 둔다
+    }
+  };
+
+  const end = () => {
+    stopHold();
+    from.current = null;
+    if (!turning.current) return;
+    turning.current = false;
+    const el = ref.current;
+    if (!el) return;
+    // 각도를 지우면 전환이 다시 살아나 제자리로 돌아간다
+    delete el.dataset.tilting;
+    el.style.removeProperty("--tilt-x");
+    el.style.removeProperty("--tilt-y");
+  };
+
+  // 돌리는 동안에는 화면이 같이 밀리지 않게 막는다 — 리액트의 touchmove 는 막을 수 없어 직접 단다.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    const block = (e: TouchEvent) => {
+      if (turning.current) e.preventDefault();
+    };
+    el.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      el.removeEventListener("touchmove", block);
+      stopHold();
+    };
+  }, [enabled]);
+
+  if (!enabled) return { ref, handlers: {} as TiltHandlers };
+
+  const handlers: TiltHandlers = {
+    onPointerDown: (e) => {
+      if (e.button !== 0) return;
+      from.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      turned.current = false;
+      if (e.pointerType === "mouse") begin();
+      else hold.current = setTimeout(begin, HOLD_MS);
+    },
+    onPointerMove: (e) => {
+      const at = from.current;
+      if (!at) return;
+      const dx = e.clientX - at.x;
+      const dy = e.clientY - at.y;
+      if (!turning.current) {
+        if (Math.hypot(dx, dy) > SLOP) end();
+        return;
+      }
+      if (Math.hypot(dx, dy) > 6) turned.current = true;
+      turnTo(dx, dy);
+    },
+    onPointerUp: end,
+    onPointerCancel: end,
+    onClickCapture: (e) => {
+      // 돌려보기만 한 것이면 앨범을 열지 않는다
+      if (!turned.current) return;
+      turned.current = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+  };
+
+  return { ref, handlers };
+}
+
 export function AlbumCover({
   album,
   photoCount = 0,
   className,
   style,
+  tiltable = false,
 }: {
   album: Pick<Album, "id" | "coverColor" | "coverShape" | "coverFrame"> & { cover: string };
   /** 앨범에 든 사진 장수 — 책등 두께가 이걸 따른다 */
   photoCount?: number;
   className?: string;
   style?: CSSProperties;
+  /** 누른 채 움직여 돌려볼 수 있게 한다 — 앨범 목록에서만 쓴다 */
+  tiltable?: boolean;
 }) {
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
   const shape = coverShapeOf(album);
   const frame = coverFrameOf(album);
+  const tilt = useAlbumTilt(tiltable);
   return (
     <div
+      ref={tilt.ref}
+      {...tilt.handlers}
       className={cn("album-book relative w-full select-none", shape.cls, className)}
       data-frame={frame.id}
       style={
