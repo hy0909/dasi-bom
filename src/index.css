@@ -242,7 +242,13 @@ html {
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-/* 호버 — 왼쪽 옆면이 보이도록 살짝 돌아선다 (레퍼런스의 각도) */
+/* 목록의 앨범은 처음부터 돌아서 있다 — 책등 옆면이 보여야 몇 장이 담겼는지 두께로 읽힌다.
+   호버 각도에서 조금 덜 튼 자리가 평소 모습이다. */
+.album-3d-hover .album-book-body {
+  --rest-y: 20deg;
+  transform: translateX(4%) rotateY(var(--rest-y));
+}
+/* 호버 — 여기서 조금 더 돌아선다 (레퍼런스의 각도) */
 @media (hover: hover) {
   .album-3d-hover:hover .album-book-body {
     transform: translateX(5%) rotateY(26deg);
@@ -264,7 +270,9 @@ html {
    손을 떼면 각도가 지워지고 전환이 살아나 제자리로 돌아간다. */
 .album-book[data-tilting] .album-book-body {
   transition: none;
-  transform: rotateY(var(--tilt-y, 0deg)) rotateX(var(--tilt-x, 0deg));
+  /* 평소 각도에서 이어서 돈다 — 누르는 순간 앨범이 정면으로 튀지 않게 */
+  transform: translateX(4%) rotateY(calc(var(--rest-y, 0deg) + var(--tilt-y, 0deg)))
+    rotateX(var(--tilt-x, 0deg));
   will-change: transform;
 }
 /* 책등 옆면 — 앞표지 왼쪽 모서리에서 뒤로 뻗는 두께. 폭은 사진 장수(--depth)를 따른다 */
