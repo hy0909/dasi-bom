@@ -406,15 +406,14 @@ html {
 /* 가운데가 아니라 표지 위쪽에 앉는다 */
 .album-book[data-frame="square"] .album-cover-well {
   align-items: flex-start;
-  padding-top: 11cqh;
+  padding-top: 8cqh;
 }
 .album-book[data-frame="square"] .album-cover-window {
   /* 세로가 짧은 판형에서도 표지 안에 들어오도록 높이로도 한 번 잡아 준다 */
-  width: min(74cqw, 64cqh);
+  width: min(84cqw, 72cqh);
   aspect-ratio: 1;
-  padding: 2.6cqw;
   border-radius: 1px;
-  background: #f4efe6;
+  /* 흰 대지 없이 사진이 창을 그대로 채운다 — 파인 자리의 그늘만 남긴다 */
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 0.1),
     0 3px 8px -6px rgb(0 0 0 / 0.3);
@@ -424,11 +423,10 @@ html {
   height: 100%;
   max-width: none;
   max-height: none;
-  object-fit: contain;
-  background: #e6ded1;
+  object-fit: cover;
 }
 .album-book[data-frame="square"] .album-cover-window::after {
-  inset: 2.6cqw;
+  inset: 0;
   box-shadow:
     inset 0 0 0 1px rgb(0 0 0 / 0.13),
     inset 0 1px 3px rgb(0 0 0 / 0.15);
