@@ -59,7 +59,7 @@ const GHOST_MS = 700;
 
 type TiltHandlers = Pick<DOMAttributes<HTMLDivElement>, "onClickCapture">;
 
-function useAlbumTilt(enabled: boolean) {
+function useAlbumTilt(enabled: boolean, mode: "free" | "hold" = "free") {
   const ref = useRef<HTMLDivElement>(null);
   /** 돌려본 손짓인가 — 그랬다면 손을 뗄 때 앨범이 열리지 않아야 한다 */
   const turned = useRef(false);
@@ -102,6 +102,11 @@ function useAlbumTilt(enabled: boolean) {
       watching = false;
       if (!turning) return;
       turning = false;
+      if (turned.current) {
+        // 방금 돌려본 손짓이다 — 같은 손짓을 스와이프로 또 세지 않도록 잠깐 표시를 남긴다
+        el.dataset.turned = "on";
+        window.setTimeout(() => delete el.dataset.turned, 400);
+      }
       // 각도를 지우면 전환이 다시 살아나 제자리로 돌아간다
       delete el.dataset.tilting;
       el.style.removeProperty("--tilt-x");
@@ -135,9 +140,10 @@ function useAlbumTilt(enabled: boolean) {
       const dx = t.clientX - x0;
       const dy = t.clientY - y0;
       if (!turning) {
-        // 가로로 먼저 움직였으면 돌리기 — 세로로 먼저 움직였으면 목록 넘기기
-        if (Math.abs(dx) > SLOP && Math.abs(dx) > Math.abs(dy)) begin();
-        else if (Math.abs(dy) > SLOP) return rest();
+        // free: 가로로 먼저 움직였으면 바로 돌리기.
+        // hold: 가로로 미는 손짓은 옆 앨범으로 넘기는 데 쓰이므로, 누르고 기다린 뒤에만 돈다.
+        if (mode === "free" && Math.abs(dx) > SLOP && Math.abs(dx) > Math.abs(dy)) begin();
+        else if (Math.abs(dy) > SLOP || (mode === "hold" && Math.hypot(dx, dy) > SLOP)) return rest();
         else return;
       }
       if (e.cancelable) e.preventDefault(); // 돌리는 동안 화면이 같이 밀리지 않게
@@ -204,19 +210,22 @@ export function AlbumCover({
   className,
   style,
   tiltable = false,
+  tiltMode = "free",
 }: {
   album: Pick<Album, "id" | "coverColor" | "coverShape" | "coverFrame"> & { cover: string };
   /** 앨범에 든 사진 장수 — 책등 두께가 이걸 따른다 */
   photoCount?: number;
   className?: string;
   style?: CSSProperties;
-  /** 누른 채 움직여 돌려볼 수 있게 한다 — 앨범 목록에서만 쓴다 */
+  /** 누른 채 움직여 돌려볼 수 있게 한다 */
   tiltable?: boolean;
+  /** free: 가로로 밀면 바로 돈다 / hold: 잠깐 누르고 있어야 돈다(옆으로 넘기는 손짓과 함께 쓸 때) */
+  tiltMode?: "free" | "hold";
 }) {
   const tone = coverFabricTone(coverColorOf(album).hex, coverVariant);
   const shape = coverShapeOf(album);
   const frame = coverFrameOf(album);
-  const tilt = useAlbumTilt(tiltable);
+  const tilt = useAlbumTilt(tiltable, tiltMode);
   return (
     <div
       ref={tilt.ref}

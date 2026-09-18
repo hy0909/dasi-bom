@@ -128,6 +128,9 @@ export function HomeScreen({
                 const from = swipeFrom.current;
                 swipeFrom.current = null;
                 if (!from || albums.length < 2) return;
+                // 방금 표지를 돌려본 손짓이면 넘기지 않는다
+                if (heroCover.current?.querySelector<HTMLElement>(".album-book")?.dataset.turned)
+                  return;
                 const t = e.changedTouches[0];
                 const dx = t.clientX - from.x;
                 const dy = t.clientY - from.y;
@@ -169,6 +172,8 @@ export function HomeScreen({
                 <AlbumCover
                   album={heroAlbum}
                   photoCount={photoStore[heroAlbum.id]?.length ?? 0}
+                  tiltable
+                  tiltMode="hold"
                   className="drop-shadow-[0_18px_26px_rgb(0_0_0/0.32)]"
                 />
               </div>
