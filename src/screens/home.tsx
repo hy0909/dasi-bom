@@ -175,7 +175,7 @@ export function HomeScreen({
           </span>
           <span className="min-w-0 flex-1">
             <b className="block text-[17px] font-semibold text-ink">새 앨범 만들기</b>
-            <small className="block text-sm text-body">기록하고 싶은 사진을 첨부해 보세요</small>
+            <small className="block text-sm text-body-mid">기록하고 싶은 사진을 첨부해 보세요</small>
           </span>
           <ArrowRight className="size-5 text-ink" />
         </CardContent>
