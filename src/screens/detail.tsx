@@ -229,7 +229,7 @@ export function DetailScreen({
                   <EllipsisVertical className="size-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="p-4">
                 {/* 초대도 자주 쓰는 일은 아니다 — 앨범에 손대는 일끼리 여기 모은다 */}
                 <DropdownMenuItem onSelect={() => go("invite")}>구성원 초대</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => go("albumEdit")}>앨범 수정</DropdownMenuItem>
@@ -403,8 +403,9 @@ function AlbumReader({
           {photo.story ? (
             <p className="text-[15px] leading-relaxed text-body">{photo.story}</p>
           ) : (
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-mute p-4">
-              <p className="min-w-0 text-sm leading-relaxed text-body">
+            // 높이는 아래 목소리 줄과 같게 — 테두리 1px 두 줄만큼 위아래를 덜어낸다(11+36+11+2=60)
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-mute px-4 py-[11px]">
+              <p className="min-w-0 text-sm leading-relaxed text-body-mid">
                 그 날의 이야기를 기록해요.
               </p>
               <Button
@@ -439,7 +440,7 @@ function AlbumReader({
       />
 
       {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
-      <p className="border-t border-border pt-6 text-center font-serif text-[15px] italic text-body-mid">
+      <p className="border-t border-border pt-6 text-center font-serif text-xs italic text-body-mid">
         {formatKoreanDate(new Date())} 기록
       </p>
     </article>

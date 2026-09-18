@@ -198,7 +198,7 @@ export function HomeScreen({
                       <EllipsisVertical className="size-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuContent align="end" className="p-4" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenuItem onSelect={() => onOpenAlbum(item.id, "albumEdit")}>
                       정보 수정
                     </DropdownMenuItem>
