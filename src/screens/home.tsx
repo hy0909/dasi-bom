@@ -214,7 +214,7 @@ export function HomeScreen({
         tabIndex={0}
         onClick={() => go("create")}
         onKeyDown={(e) => e.key === "Enter" && go("create")}
-        className="mt-4 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
+        className="mt-2.5 cursor-pointer shadow-none ring-1 ring-border transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40 outline-none"
       >
         <CardContent className="flex items-center gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-ink text-canvas">
