@@ -365,7 +365,7 @@ export function HomeScreen({
         </span>
         <p className="text-sm leading-relaxed text-body">
           <b className="block font-semibold text-ink">기록 Tip</b>
-          그날의 기억을 되살려 목소리와 글로 기록해 보세요.
+          그날의 기억을 되살려 목소리나 글로 기록해 보세요.
         </p>
       </div>
 
@@ -412,7 +412,7 @@ function AlbumCard({
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-[14px]">
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
