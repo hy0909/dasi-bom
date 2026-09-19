@@ -46,7 +46,7 @@ export function CoverShapePicker({
             />
           </span>
           <span>{s.label}</span>
-          <span className="-mt-0.5 text-[10px] tabular-nums opacity-60">{s.ratio}</span>
+          <span className="-mt-1 text-[10px] tabular-nums opacity-60">{s.ratio}</span>
         </button>
       ))}
     </div>

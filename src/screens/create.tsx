@@ -7,6 +7,7 @@ import { Field } from "@/components/field";
 import { StickyBar } from "@/components/sticky-bar";
 import {
   COVER_COLORS,
+  coverPreviewWidth,
   type CoverColorId,
   type CoverFrameId,
   type CoverShapeId,
@@ -105,8 +106,7 @@ export function CreateScreen({
 
         <div className="relative z-10 flex flex-col items-center gap-4 px-5 pt-3 pb-10">
           {/* 고른 색·비율·디자인이 실제 표지로 어떻게 보이는지 여기서 바로 보인다.
-              폭은 세로형(4:5) 기준 하나로 고정하고 높이는 비율을 따른다 — 그래서 정사각형과
-              가로형은 세로형보다 작아 보인다. 실제로도 같은 폭의 책을 눕힌 것이다.
+              폭은 판형마다 다르다 — 실제 앨범도 정사각형과 가로형이 세로형보다 넓다.
               자리 높이는 가장 큰 경우(세로형)로 잡아 두어 비율을 바꿔도 화면이 들썩이지 않는다. */}
           <div className="flex h-[154px] items-center justify-center">
             <AlbumCover
@@ -117,7 +117,7 @@ export function CreateScreen({
                 coverFrame,
                 cover: cover ?? PLACEHOLDER_COVER,
               }}
-              style={{ width: 123 }}
+              style={{ width: coverPreviewWidth({ coverShape }) }}
               className="drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
             />
           </div>
@@ -169,10 +169,8 @@ export function CreateScreen({
           </Field>
         </section>
 
-        {/* 앨범 정보 — 겉모습과는 하는 일이 달라 줄 하나로 갈라 둔다 */}
+        {/* 제목·설명 — 겉모습과는 하는 일이 달라 줄 하나로만 갈라 둔다. 제목이 곧 머리글이라 따로 이름표를 얹지 않는다 */}
         <section className="flex flex-col gap-5 border-t border-border pt-7">
-          <h2 className="text-sm font-semibold text-ink">앨범 정보</h2>
-
           <Field label="앨범 제목" htmlFor="record-title" required>
             <Input
               id="record-title"
