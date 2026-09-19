@@ -74,8 +74,8 @@ export const initialAlbums: AlbumCardData[] = [
     endDate: "",
     description: "졸업하고 처음 떠난 일본, 엿새 동안의 사진과 기록을 모았어요.",
     coverColor: "red",
-    // 가로 판형에 표지를 사진으로 가득 채운 예
-    coverShape: "landscape",
+    // 정사각 판형에 정사각 창을 둔 예
+    coverShape: "square",
     coverFrame: "square",
     cover: photosOf("japan25")[0].src,
     coverAlt: "여행 첫날 공항으로 가는 새벽",

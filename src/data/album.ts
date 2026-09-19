@@ -18,13 +18,12 @@ export type Album = {
 };
 
 /**
- * 앨범 판형 — 만들 때 고르는 세 가지 표지 비율.
+ * 앨범 판형 — 만들 때 고르는 두 가지 표지 비율.
  * aspect 는 세로/가로 — 열림 모션과 상세 hero 가 이 값으로 앨범의 자리를 잡는다.
  */
 export const COVER_SHAPES = [
   { id: "portrait", label: "세로형", ratio: "4:5", aspect: 5 / 4, cls: "aspect-[4/5]", preview: 123 },
   { id: "square", label: "정사각형", ratio: "1:1", aspect: 1, cls: "aspect-square", preview: 137 },
-  { id: "landscape", label: "가로형", ratio: "4:3", aspect: 3 / 4, cls: "aspect-[4/3]", preview: 150 },
 ] as const;
 export type CoverShapeId = (typeof COVER_SHAPES)[number]["id"];
 
