@@ -494,20 +494,23 @@ html {
 /* ─── 사진이 앉는 자리 다섯 가지 (data-frame) ───────────────────────────────
    정사각형(window)은 위의 규칙 그대로다. 아래는 나머지 셋만 덮어쓴다. */
 
-/* 직사각형 창 — 사진 비율이 무엇이든 창은 늘 4:3 이다. 사진은 그 안에 전부 들어오고,
-   남는 자리는 창 안쪽의 매트지가 채운다. */
+/* 직사각형 창 — 사진 비율이 무엇이든 창은 늘 4:3 이다. 사진은 잘리지 않고 그 안에 전부 들어온다.
+   폭은 표지 폭과 높이 양쪽으로 묶는다 — 한쪽만 보면 가로형 표지에서 창이 혼자 커진다.
+   비율 대신 높이를 직접 계산한다: 안의 사진이 height:100% 라 aspect-ratio 로는 값이 서로 맞물린다. */
 .album-book[data-frame="window"] .album-cover-window {
-  /* 비율 대신 높이를 직접 준다 — 안의 사진이 height:100% 라 aspect-ratio 로는 값이 맞물린다 */
-  width: 52cqw;
-  height: 39cqw;
+  --win-w: min(52cqw, 61cqh);
+  width: var(--win-w);
+  height: calc(var(--win-w) * 0.75);
 }
+/* 사진은 창을 남김없이 채운다 — 비율이 다르면 넘치는 쪽만 잘린다.
+   맞춰 넣으면(contain) 남는 자리에 띠가 생겨, 보이는 사진이 4:3 이 아니라 원본 비율로 읽힌다.
+   정사각형·타원 창도 같은 규칙이라, 디자인을 바꿔 가며 골라도 창 모양이 그대로 보인다. */
 .album-book[data-frame="window"] .album-cover-window img {
   width: 100%;
   height: 100%;
   max-width: none;
   max-height: none;
-  object-fit: contain;
-  background: #e9e2d6;
+  object-fit: cover;
 }
 
 /* 문구 — 사진 창을 두지 않고, 표지 위쪽에 휜 글줄과 가로선만 남긴다.

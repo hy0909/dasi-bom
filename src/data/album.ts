@@ -22,9 +22,9 @@ export type Album = {
  * aspect 는 세로/가로 — 열림 모션과 상세 hero 가 이 값으로 앨범의 자리를 잡는다.
  */
 export const COVER_SHAPES = [
-  { id: "portrait", label: "세로형", ratio: "4:5", aspect: 5 / 4, cls: "aspect-[4/5]" },
-  { id: "square", label: "정사각형", ratio: "1:1", aspect: 1, cls: "aspect-square" },
-  { id: "landscape", label: "가로형", ratio: "4:3", aspect: 3 / 4, cls: "aspect-[4/3]" },
+  { id: "portrait", label: "세로형", ratio: "4:5", aspect: 5 / 4, cls: "aspect-[4/5]", preview: 123 },
+  { id: "square", label: "정사각형", ratio: "1:1", aspect: 1, cls: "aspect-square", preview: 137 },
+  { id: "landscape", label: "가로형", ratio: "4:3", aspect: 3 / 4, cls: "aspect-[4/3]", preview: 150 },
 ] as const;
 export type CoverShapeId = (typeof COVER_SHAPES)[number]["id"];
 
@@ -33,11 +33,20 @@ export function coverShapeOf(album: Pick<Album, "coverShape">) {
   return COVER_SHAPES.find((s) => s.id === album.coverShape) ?? COVER_SHAPES[0];
 }
 
+/**
+ * 만들기·앨범 정보의 표지 미리보기 폭.
+ * 셋을 같은 폭으로 세우면 정사각형과 가로형이 세로형보다 작아 보인다 — 실제 앨범은 그 반대다.
+ * 판형마다 폭을 따로 두어, 눕힌 책이 더 넓게 보이게 한다.
+ */
+export function coverPreviewWidth(album: Pick<Album, "coverShape">) {
+  return coverShapeOf(album).preview;
+}
+
 /** 표지에서 사진이 보이는 자리 — 만들 때 고르는 다섯 가지. */
 export const COVER_FRAMES = [
-  { id: "window", label: "직사각형", hint: "4:3 창 안에 사진 전체" },
+  { id: "window", label: "직사각형", hint: "4:3 창을 채우는 사진" },
   { id: "lettering", label: "문구", hint: "사진 없이 로즈골드 박 레터링만" },
-  { id: "square", label: "정사각형", hint: "정사각 안에 사진 전체" },
+  { id: "square", label: "정사각형", hint: "정사각 창을 채우는 사진" },
   { id: "oval", label: "타원", hint: "좌우로 긴 타원 창" },
 ] as const;
 export type CoverFrameId = (typeof COVER_FRAMES)[number]["id"];
@@ -203,8 +212,9 @@ export const defaultAlbum: Album = {
   inviteCode: "EU23",
   inviteIssuedAt: daysAgo(2),
   title: "2023년 유럽여행",
-  startDate: "2023-07-10",
-  endDate: "2023-07-17",
+  // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.
+  startDate: "",
+  endDate: "",
   description: "가족들과 처음 떠난 유럽여행의 사진과 기록을 모았어요.",
 };
 
