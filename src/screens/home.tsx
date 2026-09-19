@@ -115,7 +115,7 @@ export function HomeScreen({
           <button
             type="button"
             onClick={() => go("home")}
-            aria-label="Story Album 홈"
+            aria-label="그때우리 홈"
             className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
           >
             <Wordmark className="text-canvas" />

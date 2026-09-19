@@ -35,7 +35,7 @@ export function Topbar({
         <button
           type="button"
           onClick={() => go?.("home")}
-          aria-label="Story Album 홈"
+          aria-label="그때우리 홈"
           className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
         >
           <Wordmark />

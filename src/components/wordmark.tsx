@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils";
 
-/** 브랜드 워드마크 — 로고 전용 서체(Pathway Gothic One)로 쓴 서비스 이름. */
+/** 브랜드 워드마크 — 로고 전용 서체(카페24 프로슬림)로 쓴 서비스 이름. */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        // Pathway Gothic One 은 폭이 좁고 키가 크다 — 크기를 조금 키우고 자간을 넉넉히 벌린다
-        "font-logo text-[22px] leading-tight font-normal tracking-[0.06em] text-ink",
+        // 획이 가늘고 길쭉한 한글 서체다 — 굵게 세우고 자간은 살짝 좁혀 한 덩어리로 읽히게 한다
+        "font-logo text-[22px] leading-none font-bold tracking-[-0.01em] text-ink",
         className,
       )}
     >
-      STORY ALBUM
+      그때우리
     </span>
   );
 }

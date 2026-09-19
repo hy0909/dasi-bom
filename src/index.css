@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────
-   다시, 봄 — 디자인 토큰 (DESIGN-zapier.md 기반)
+   그때우리 — 디자인 토큰 (DESIGN-zapier.md 기반)
    warm cream canvas · deep coffee ink · single orange CTA
    ───────────────────────────────────────────────────────────── */
 @theme inline {
@@ -18,8 +18,8 @@
   --font-heading: var(--font-sans);
   /* 기록의 맺음말처럼 책에서 온 말투에 쓰는 명조 */
   --font-serif: "Nanum Myeongjo", "Apple Myungjo", Batang, serif;
-  /* 로고 전용 — 좁고 키 큰 Pathway Gothic One (Google Fonts, OFL) */
-  --font-logo: "Pathway Gothic One", var(--font-sans);
+  /* 로고 전용 — 획이 가늘고 길쭉한 카페24 프로슬림 */
+  --font-logo: "Cafe24 PRO Slim", var(--font-sans);
 
   /* 브랜드 원색 토큰 */
   --color-canvas: var(--canvas);
@@ -129,6 +129,22 @@ html {
      표지 아래에 겹쳐 놓는 판(뒤표지·열림 모션의 속장)도 같은 값으로 잘라야
      각진 모서리가 표지의 둥근 꼭지점 밖으로 삐져나오지 않는다. */
   --album-corner: 0 6px 6px 0;
+}
+
+/* 로고 서체 — 카페24 PRO 슬림 (상업용 무료). 로고 한 줄에만 쓰므로 두 굵기만 받는다. */
+@font-face {
+  font-family: "Cafe24 PRO Slim";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/Cafe24PROSlim-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cafe24 PRO Slim";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/Cafe24PROSlim-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 
