@@ -39,7 +39,7 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
           <br />
           순간이 있나요?
         </h1>
-        <p className="text-base leading-relaxed text-body">함께 만드는 앨범 서비스, 그날을 담다</p>
+        <p className="text-base leading-relaxed text-body">함께 만드는 앨범 서비스, Story Album</p>
       </section>
 
       <div className="mt-7 flex flex-col gap-3">
