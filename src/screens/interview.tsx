@@ -99,7 +99,7 @@ export function InterviewScreen({
             icon={<Type className="size-5" />}
             iconClass="bg-ink text-canvas"
             title="글로 답하기"
-            description="차분히 써서 남겨보세요"
+            description="글로 직접 작성하세요"
             onClick={() => setTextMode(true)}
           />
         </div>
