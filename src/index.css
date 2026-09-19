@@ -74,6 +74,9 @@
   --text-display-sm: 22px;
   --text-display-sm--line-height: 1.32;
   --text-display-sm--letter-spacing: -0.02em;
+  --text-display-xs: 20px;
+  --text-display-xs--line-height: 1.32;
+  --text-display-xs--letter-spacing: -0.02em;
   --text-eyebrow: 13px;
   --text-eyebrow--line-height: 1;
   --text-eyebrow--letter-spacing: 0.08em;

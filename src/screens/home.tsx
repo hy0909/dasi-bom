@@ -211,7 +211,7 @@ export function HomeScreen({
       </section>
 
       <div className="mt-7">
-        <h1 className="font-heading text-display-sm font-bold">기억하고 싶은 순간이 있나요?</h1>
+        <h1 className="font-heading text-display-xs font-bold">기억하고 싶은 순간이 있나요?</h1>
       </div>
 
       {/* 새 앨범 CTA — canvas 표면 + 소프트 섀도, 오렌지는 아이콘에만 */}
