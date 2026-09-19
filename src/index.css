@@ -31,6 +31,7 @@
   --color-body-mid: var(--body-mid);
   --color-mute: var(--mute);
   --color-primary-deep: var(--primary-deep);
+  --color-primary-deeper: var(--primary-deeper);
 
   /* shadcn 시맨틱 토큰 */
   --color-ring: var(--ring);
@@ -101,6 +102,8 @@ html {
   --mute: #c5c0b1;
   /* 포인트색의 눌린 상태 — 같은 하늘색을 한 단계 눌렀다 */
   --primary-deep: #8db1c7;
+  /* 거기서 한 단계 더 — 연한 바탕 위의 작은 글씨가 묻히지 않게 쓰는 하늘색 */
+  --primary-deeper: #7ba6c1;
 
   /* 시맨틱 */
   --background: var(--canvas);

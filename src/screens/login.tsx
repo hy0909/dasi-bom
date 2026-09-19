@@ -28,7 +28,7 @@ export function LoginScreen({ go, notify }: { go: Go; notify: Notify }) {
   return (
     <>
       <div className="flex h-14 items-center justify-center">
-        <Wordmark className="text-[26px]" />
+        <Wordmark className="text-[22px]" />
       </div>
 
       <MediaFrame className="mt-1" src={photos[0].src} alt="가족과 함께 본 유럽여행 사진" />

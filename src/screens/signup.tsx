@@ -106,7 +106,7 @@ export function SignupTerms({ go, notify }: { go: Go; notify: Notify }) {
                   />
                   <span className="min-w-0 flex-1">
                     <b className="block font-semibold">
-                      <span className={term.required ? "text-primary" : "text-body-mid"}>
+                      <span className={term.required ? "text-primary-deeper" : "text-body-mid"}>
                         {term.required ? "[필수] " : "[선택] "}
                       </span>
                       {term.label}
