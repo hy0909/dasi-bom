@@ -18,8 +18,8 @@
   --font-heading: var(--font-sans);
   /* 기록의 맺음말처럼 책에서 온 말투에 쓰는 명조 */
   --font-serif: "Nanum Myeongjo", "Apple Myungjo", Batang, serif;
-  /* 로고 전용 — 손으로 쓴 듯한 Rock Salt (Google Fonts, OFL) */
-  --font-logo: "Rock Salt", var(--font-sans);
+  /* 로고 전용 — 좁고 키 큰 Pathway Gothic One (Google Fonts, OFL) */
+  --font-logo: "Pathway Gothic One", var(--font-sans);
 
   /* 브랜드 원색 토큰 */
   --color-canvas: var(--canvas);
