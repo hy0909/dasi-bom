@@ -4,6 +4,8 @@ export type Album = {
   inviteCode: string;
   /** 지금 쓰는 초대 코드를 발급한 시각(ISO) — 여기서 일주일이 유효 기간이다. */
   inviteIssuedAt: string;
+  /** 링크와 함께 알려 주는 네 자리 비밀번호 — 링크만으로는 들어오지 못한다. */
+  invitePin: string;
   title: string;
   /** yyyy-mm-dd — 입력 필드 값 그대로 */
   startDate: string;
@@ -206,9 +208,24 @@ export function newInviteCode() {
   return Math.random().toString(36).slice(2, 6).toUpperCase();
 }
 
+/**
+ * 링크와 함께 알려 주는 네 자리 비밀번호.
+ * 링크를 받은 사람은 이 네 자리까지 맞아야 앨범에 들어올 수 있다 — 링크만 흘러나가도 남이 못 들어온다.
+ * 코드를 새로 발급하면 비밀번호도 함께 새로 만든다.
+ */
+export function newInvitePin() {
+  return String(Math.floor(Math.random() * 10_000)).padStart(4, "0");
+}
+
+/** 적어 넣은 네 자리가 이 앨범의 비밀번호와 같은가 */
+export function isInvitePin(album: Pick<Album, "invitePin">, typed: string) {
+  return typed.trim() === album.invitePin;
+}
+
 export const defaultAlbum: Album = {
   id: "eu23",
   inviteCode: "EU23",
+  invitePin: "2731",
   inviteIssuedAt: daysAgo(2),
   title: "2023년 유럽여행",
   // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.

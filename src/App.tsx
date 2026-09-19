@@ -15,12 +15,13 @@ import { StoryScreen } from "@/screens/story";
 import { InviteScreen } from "@/screens/invite";
 import { UploadScreen } from "@/screens/upload";
 import { GuestWelcome, GuestInfo, GuestAnswer, GuestDone } from "@/screens/guest";
+import { GuestPin } from "@/screens/guest-pin";
 import { NoticesScreen } from "@/screens/notices";
 import { ProfileScreen } from "@/screens/profile";
 import { ProfileEditScreen } from "@/screens/profile-edit";
 import { AlbumEditScreen } from "@/screens/album-edit";
 import { RecordListScreen } from "@/screens/record-list";
-import { isInviteExpired, newInviteCode } from "@/data/album";
+import { isInviteExpired, newInviteCode, newInvitePin } from "@/data/album";
 import { initialAlbums, type AlbumCardData } from "@/data/albums";
 import { joinAlbum } from "@/data/family";
 import { joinMyAlbum, useMyAlbums } from "@/data/membership";
@@ -71,22 +72,12 @@ export default function App() {
       setOpenId(invited.id);
       if (isInviteExpired(invited)) {
         // 만료된 링크는 회원·비회원 모두 막고, 초대한 사람에게 새 링크를 받게 안내한다.
+        // 이미 못 쓰는 링크라 비밀번호는 묻지 않는다.
         setInviteExpired(true);
         setScreen("guest");
-      } else if (session?.onboarded) {
-        // 회원이 링크를 타고 오면 그 앨범 그룹에 바로 합류한다.
-        joinAlbum(invited.id, {
-          name: session.name,
-          character: session.tone,
-          color: session.color,
-        });
-        // 남이 만든 앨범이어도 합류한 순간부터 내 앨범 목록에 들어온다.
-        joinMyAlbum(invited.id, { role: "member" });
-        window.history.replaceState({}, "", window.location.pathname);
-        setScreen("detail");
       } else {
-        // 회원이 아니면 가입 없이 참여하는 비회원 흐름으로 간다.
-        setScreen("guest");
+        // 링크만으로는 열리지 않는다 — 네 자리 비밀번호를 맞혀야 그다음으로 간다.
+        setScreen("guestPin");
       }
     } else if (session) {
       // 가입을 중간에 멈춘 계정이면 약관 단계부터 이어서 진행한다.
@@ -94,6 +85,31 @@ export default function App() {
     }
     setReady(true);
   }, []);
+
+  /**
+   * 초대 비밀번호를 맞힌 뒤 — 회원이면 그 앨범에 합류해 상세로, 회원이 아니면 비회원 참여 흐름으로 간다.
+   * 잠금 화면을 지나기 전에는 어느 쪽으로도 가지 않는다.
+   */
+  const unlockInvite = () => {
+    const invitedAlbum = albums.find((a) => a.id === invitedId);
+    if (!invitedAlbum) return;
+    const session = getSession();
+    if (session?.onboarded) {
+      // 회원이 링크를 타고 오면 그 앨범 그룹에 바로 합류한다.
+      joinAlbum(invitedAlbum.id, {
+        name: session.name,
+        character: session.tone,
+        color: session.color,
+      });
+      // 남이 만든 앨범이어도 합류한 순간부터 내 앨범 목록에 들어온다.
+      joinMyAlbum(invitedAlbum.id, { role: "member" });
+      window.history.replaceState({}, "", window.location.pathname);
+      setScreen("detail");
+    } else {
+      // 회원이 아니면 가입 없이 참여하는 비회원 흐름으로 간다.
+      setScreen("guest");
+    }
+  };
 
   const go = (next: Screen, instant = false) => {
     const move = () => {
@@ -137,12 +153,20 @@ export default function App() {
     go(next);
   };
 
-  /** 만료된 초대 링크를 새 코드로 다시 발급한다 — 참여자는 앨범 id 로 묶여 그대로 남는다. */
+  /**
+   * 만료된 초대 링크를 새 코드로 다시 발급한다 — 참여자는 앨범 id 로 묶여 그대로 남는다.
+   * 코드가 바뀌면 네 자리 비밀번호도 함께 바뀐다. 옛 링크와 옛 비밀번호로는 들어올 수 없다.
+   */
   const reissueInvite = (albumId: string) => {
     setAlbums((list) =>
       list.map((a) =>
         a.id === albumId
-          ? { ...a, inviteCode: newInviteCode(), inviteIssuedAt: new Date().toISOString() }
+          ? {
+              ...a,
+              inviteCode: newInviteCode(),
+              invitePin: newInvitePin(),
+              inviteIssuedAt: new Date().toISOString(),
+            }
           : a,
       ),
     );
@@ -251,6 +275,9 @@ export default function App() {
         {screen === "recordList" && <RecordListScreen go={go} album={current} back={goBack} />}
         {screen === "profileEdit" && (
           <ProfileEditScreen go={go} back={goBack} notify={notify} />
+        )}
+        {screen === "guestPin" && (
+          <GuestPin album={invited} onUnlock={unlockInvite} notify={notify} />
         )}
         {screen === "guest" && <GuestWelcome go={go} album={invited} expired={inviteExpired} />}
         {screen === "guestInfo" && <GuestInfo go={go} notify={notify} />}

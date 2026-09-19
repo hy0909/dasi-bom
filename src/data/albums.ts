@@ -21,6 +21,7 @@ export const initialAlbums: AlbumCardData[] = [
   {
     id: "jeju",
     inviteCode: "JEJU",
+    invitePin: "4508",
     // 초대한 지 오래된 앨범 — 링크가 이미 만료돼 새로 만들어야 한다.
     inviteIssuedAt: daysAgo(23),
     title: "제주 가족여행",
@@ -38,6 +39,7 @@ export const initialAlbums: AlbumCardData[] = [
   {
     id: "summer",
     inviteCode: "SUMMER",
+    invitePin: "1962",
     inviteIssuedAt: daysAgo(1),
     title: "할머니와 보낸 여름",
     coverColor: "green",
@@ -53,6 +55,7 @@ export const initialAlbums: AlbumCardData[] = [
   {
     id: "seaside",
     inviteCode: "SEA",
+    invitePin: "3374",
     inviteIssuedAt: daysAgo(6),
     title: "바닷가 산책",
     coverColor: "skyblue",
@@ -67,6 +70,7 @@ export const initialAlbums: AlbumCardData[] = [
     // 사진을 많이 넣은 앨범의 예 — 한 앨범에 담을 수 있는 20장. 책등이 가장 두껍게 보인다.
     id: "japan25",
     inviteCode: "JPN5",
+    invitePin: "8145",
     inviteIssuedAt: daysAgo(3),
     title: "2025년 일본 졸업 여행",
     // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.

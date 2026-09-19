@@ -8,6 +8,7 @@ import { StickyBar } from "@/components/sticky-bar";
 import {
   COVER_COLORS,
   coverPreviewWidth,
+  newInvitePin,
   type CoverColorId,
   type CoverFrameId,
   type CoverShapeId,
@@ -63,6 +64,8 @@ export function CreateScreen({
         onCreate({
           id: code.toLowerCase(),
           inviteCode: code,
+          // 링크와 함께 알려 줄 네 자리 비밀번호도 이때 한 번 만든다.
+          invitePin: newInvitePin(),
           title: title.trim(),
           // 기간은 사진의 촬영 날짜에서 채워진다 — 직접 적는 일은 앨범 정보 수정에서 한다.
           startDate: "",

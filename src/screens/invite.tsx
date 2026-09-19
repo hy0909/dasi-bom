@@ -120,16 +120,22 @@ function InviteBody({
   const leftDays = inviteDaysLeft(album);
   const expiresAt = inviteExpiresAt(album);
   const expiresShort = `${expiresAt.getMonth() + 1}월 ${expiresAt.getDate()}일`;
+  /** 링크와 비밀번호는 언제나 같이 간다 — 링크만 받으면 들어올 수 없다 */
+  const invite = `${link}\n비밀번호 ${album.invitePin}`;
   async function copy() {
-    await copyText(link);
-    notify("참여 링크를 복사했어요");
+    await copyText(invite);
+    notify("참여 링크와 비밀번호를 복사했어요");
+  }
+  async function copyPin() {
+    await copyText(album.invitePin);
+    notify("비밀번호를 복사했어요");
   }
   async function share() {
     if (navigator.share) {
       try {
         await navigator.share({
           title: `${album.title}에 초대해요`,
-          text: "사진을 보고 떠오르는 기억을 들려주세요.",
+          text: `사진을 보고 떠오르는 기억을 들려주세요. 비밀번호 ${album.invitePin}`,
           url: link,
         });
       } catch {
@@ -298,6 +304,38 @@ function InviteBody({
           >
             {link}
           </p>
+          {/* 네 자리 비밀번호 — 링크를 받은 사람은 이 번호까지 맞아야 들어올 수 있다.
+              앨범 구성원이면 누구나 여기서 링크와 함께 본다. */}
+          <span
+            className={cn(
+              "mt-1 flex items-center gap-2 rounded-lg px-3 py-2",
+              expired ? "bg-muted" : "bg-accent",
+            )}
+          >
+            <small className="shrink-0 text-xs font-semibold text-body">비밀번호</small>
+            <b
+              className={cn(
+                "text-[17px] leading-none font-bold tracking-[0.34em] tabular-nums",
+                expired ? "text-body-mid line-through" : "text-ink",
+              )}
+            >
+              {album.invitePin}
+            </b>
+            <InfoHint label="비밀번호 안내" align="end">
+              링크를 받은 사람은 이 네 자리를 적어야 앨범에 들어올 수 있어요. 링크를 새로 만들면
+              비밀번호도 새 번호로 바뀌어요.
+            </InfoHint>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-my-1 ml-auto shrink-0 text-ink hover:bg-border hover:text-ink"
+              onClick={copyPin}
+              disabled={expired}
+            >
+              <Copy className="size-3.5" />
+              복사
+            </Button>
+          </span>
           {/* 남은 기간은 위 D-n으로 보이므로, 만료됐을 때만 안내 문장을 둔다. */}
           {expired && (
             <p className="text-xs text-body-mid">
@@ -315,7 +353,7 @@ function InviteBody({
           className="mt-3 w-full"
           onClick={() => {
             onReissue(album.id);
-            notify(`새 참여 링크를 만들었어요. ${INVITE_DAYS}일간 쓸 수 있어요`);
+            notify(`새 참여 링크와 비밀번호를 만들었어요. ${INVITE_DAYS}일간 쓸 수 있어요`);
           }}
         >
           <RefreshCw className="size-5" />
