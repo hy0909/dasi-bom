@@ -19,14 +19,15 @@ import { cn } from "@/lib/utils";
  */
 /** 한 앨범에 담을 수 있는 사진 장수 — 책등 두께도 이 장수에서 가장 두꺼워진다. */
 export const MAX_PHOTOS = 20;
-/** 책등 두께(커버 폭 대비 %) — 1장이 가장 얇고 MAX_PHOTOS 장이 가장 두껍다.
-    한 장만 담아도 책은 책이다 — 가장 얇은 앨범도 손에 잡히는 두께로 둔다.
-    한 장짜리도 책으로 보이되 벽돌처럼 두껍지는 않게. */
-const DEPTH_MIN = 22;
+/** 책등 두께(커버 폭 대비 %) — 빈 앨범이 가장 얇고 MAX_PHOTOS 장이 가장 두껍다.
+    아직 사진이 없어도 책은 책이다 — 빈 앨범도 책등이 보이는 두께로 남긴다.
+    빈 앨범이 책으로 보이되 벽돌처럼 두껍지는 않게. */
+const DEPTH_MIN = 12;
 const DEPTH_MAX = 42;
 export function albumDepth(photoCount: number) {
-  // 1장과 MAX_PHOTOS 장 사이를 고르게 나눈다 — 한 장 늘 때마다 같은 폭씩 두꺼워진다.
-  const fill = Math.min(1, Math.max(0, photoCount - 1) / (MAX_PHOTOS - 1));
+  // 0장과 MAX_PHOTOS 장 사이를 고르게 나눈다 — 한 장 늘 때마다 같은 폭씩 두꺼워진다.
+  // 0장을 눈금의 시작에 두어, 첫 한 장을 넣는 것도 두께로 드러나게 한다.
+  const fill = Math.min(1, Math.max(0, photoCount) / MAX_PHOTOS);
   return Math.round((DEPTH_MIN + (DEPTH_MAX - DEPTH_MIN) * fill) * 10) / 10;
 }
 
