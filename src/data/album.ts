@@ -285,6 +285,26 @@ export function formatAlbumPeriod({ startDate, endDate }: Pick<Album, "startDate
   return `${head} - ${tail}`;
 }
 
+/**
+ * 2023년 7월 · 2023년 7월 - 8월 · 2023년 12월 - 2024년 1월
+ * 상세 맨 위처럼 한눈에 '언제쯤'만 읽히면 되는 자리에서는 날짜를 떼고 달까지만 적는다.
+ * 사진이 한 달 안에 다 있으면 달 하나로 끝난다.
+ */
+export function formatAlbumMonths({ startDate, endDate }: Pick<Album, "startDate" | "endDate">) {
+  if (!startDate) return "";
+  const start = new Date(startDate);
+  const head = `${start.getFullYear()}년 ${start.getMonth() + 1}월`;
+  if (!endDate) return head;
+
+  const end = new Date(endDate);
+  const sameYear = end.getFullYear() === start.getFullYear();
+  if (sameYear && end.getMonth() === start.getMonth()) return head;
+  const tail = sameYear
+    ? `${end.getMonth() + 1}월`
+    : `${end.getFullYear()}년 ${end.getMonth() + 1}월`;
+  return `${head} - ${tail}`;
+}
+
 /** 2023년 7월 10일 — 목록 카드처럼 폭이 좁은 자리에서는 시작일만 보여준다. */
 export function formatAlbumStart({ startDate }: Pick<Album, "startDate">) {
   return formatAlbumPeriod({ startDate, endDate: "" });

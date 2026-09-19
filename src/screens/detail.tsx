@@ -34,7 +34,7 @@ import {
 import {
   albumPeriod,
   coverShapeOf,
-  formatAlbumPeriod,
+  formatAlbumMonths,
   formatKoreanDateWithDay,
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
@@ -48,6 +48,7 @@ import {
   formatTime,
   byTakenAt,
   photoStatus,
+  placeSummary,
   useAlbumPhotos,
 } from "@/data/photos";
 import { useSession } from "@/lib/auth";
@@ -166,7 +167,10 @@ export function DetailScreen({
   const others = participants.filter((p) => p.name !== session?.name);
   const iAmOwner = useMyAlbums()[album.id]?.role !== "member";
   // 기간을 비워 둔 앨범은 사진의 촬영 날짜가 곧 기간이다 — 사진이 없으면 아직 기간도 없다.
-  const period = formatAlbumPeriod(albumPeriod(album, photos));
+  // 맨 위에는 날짜까지 적지 않는다 — 몇 년 몇 월의 앨범인지만 읽히면 된다.
+  const period = formatAlbumMonths(albumPeriod(album, photos));
+  // 어디서 찍은 앨범인지도 한 조각 — 가장 많이 찍힌 곳 하나와 나머지 개수만.
+  const place = placeSummary(photos);
 
   return (
     <>
@@ -179,7 +183,11 @@ export function DetailScreen({
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/55 to-transparent" />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-6 text-left text-canvas">
-            {period && <p className="text-sm font-medium text-canvas-soft/80">{period}</p>}
+            {(period || place) && (
+              <p className="text-sm font-medium text-canvas-soft/80">
+                {[period, place].filter(Boolean).join(" · ")}
+              </p>
+            )}
             {/* 제목은 한 줄로 둔다 — 폭을 넘길 때만 저절로 다음 줄로 넘어간다 */}
             <h1 className="font-heading text-display-xl font-bold text-balance">{album.title}</h1>
             <MemberSummary

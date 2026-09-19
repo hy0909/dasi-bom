@@ -27,6 +27,24 @@ export type Photo = {
 };
 
 /**
+ * 사진들이 찍힌 곳을 한 줄로 — '파리', 여러 곳이면 '파리 외 +1'.
+ * 가장 많이 찍힌 곳을 앞에 두고, 나머지 장소가 몇 군데인지만 뒤에 붙인다.
+ * 장소를 모르는 사진('위치 없음')은 세지 않는다.
+ */
+export function placeSummary(photos: Pick<Photo, "shortPlace">[]) {
+  const counts = new Map<string, number>();
+  for (const { shortPlace } of photos) {
+    const name = shortPlace?.trim();
+    if (!name || name === NO_PLACE.shortPlace) continue;
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  if (counts.size === 0) return "";
+  // 가장 많이 찍힌 곳 — 수가 같으면 먼저 나온 곳이 앞이다
+  const [top] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  return counts.size === 1 ? top : `${top} 외 +${counts.size - 1}`;
+}
+
+/**
  * 사진 한 장의 기록 상태.
  * 목소리든 글이든 하나라도 남았으면 기록 완료다 — 화면마다 다르게 세지 않도록 여기 한 곳에서 정한다.
  */
