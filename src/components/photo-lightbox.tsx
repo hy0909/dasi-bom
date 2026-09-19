@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 /**
  * 사진 크게 보기 — 화면을 덮는 검은 딤 위에 사진 한 장만 띄운다.
@@ -20,16 +20,23 @@ const TAP_SCALE = 2.5;
 const DOUBLE_TAP_MS = 300;
 /** 이보다 움직였으면 끌어 본 것 — 손을 떼도 닫히지 않는다(px) */
 const DRAG_SLOP = 6;
+/** 이만큼 옆으로 밀면 앞뒤 사진으로 넘어간다(px) */
+const SWIPE_PX = 48;
 
 type View = { scale: number; x: number; y: number };
 
 export function PhotoLightbox({
   photo,
   onClose,
+  onPrev,
+  onNext,
 }: {
   /** 열려 있는 사진 — 없으면 닫힌 상태 */
   photo: { src: string; alt?: string } | null;
   onClose: () => void;
+  /** 앞뒤 사진으로 — 없는 쪽은 화살표도 손짓도 받지 않는다 */
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
   const view = useRef<View>({ scale: 1, x: 0, y: 0 });
@@ -45,6 +52,8 @@ export function PhotoLightbox({
   });
   /** 방금 끌어 본 손짓인가 — 그 끝에서는 닫지 않는다 */
   const dragged = useRef(false);
+  /** 옆으로 미는 손짓의 시작점 — 사진이 커져 있지 않을 때만 앞뒤로 넘긴다 */
+  const swipe = useRef<{ x: number; y: number; ok: boolean } | null>(null);
   const lastTap = useRef(0);
 
   const apply = useCallback(() => {
@@ -112,13 +121,15 @@ export function PhotoLightbox({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrev?.();
+      if (e.key === "ArrowRight") onNext?.();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = scroll;
       window.removeEventListener("keydown", onKey);
     };
-  }, [photo, onClose]);
+  }, [photo, onClose, onPrev, onNext]);
 
   if (!shown) return null;
 
@@ -153,6 +164,8 @@ export function PhotoLightbox({
     }
     if (e.touches.length === 1) {
       const t = e.touches[0];
+      // 커져 있지 않을 때의 한 손가락은 앞뒤로 넘기는 손짓일 수 있다
+      swipe.current = { x: t.clientX, y: t.clientY, ok: view.current.scale <= 1.02 };
       grab.current = {
         mode: view.current.scale > 1.02 ? "pan" : "none",
         dist: 0,
@@ -196,6 +209,21 @@ export function PhotoLightbox({
   const onTouchEnd = (e: React.TouchEvent) => {
     const g = grab.current;
     g.mode = "none";
+    // 옆으로 민 손짓이면 앞뒤 사진으로 — 위아래로 더 많이 움직였으면 넘기지 않는다
+    const from = swipe.current;
+    swipe.current = null;
+    const end = e.changedTouches[0];
+    if (from?.ok && end && view.current.scale <= 1.02) {
+      const dx = end.clientX - from.x;
+      const dy = end.clientY - from.y;
+      if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        dragged.current = true; // 이 손짓으로는 닫지도, 키우지도 않는다
+        lastTap.current = 0;
+        if (dx < 0) onNext?.();
+        else onPrev?.();
+        return;
+      }
+    }
     // 원래 크기보다 작아졌으면 제자리로 돌려놓는다
     if (view.current.scale <= 1.02 && (view.current.x !== 0 || view.current.y !== 0 || view.current.scale !== 1))
       settle({ scale: 1, x: 0, y: 0 });
@@ -273,6 +301,34 @@ export function PhotoLightbox({
       >
         <X className="size-6" strokeWidth={2.2} />
       </button>
+
+      {/* 앞뒤 사진 — 흰 화살표에 까만 그림자를 깔아 어떤 사진 위에서도 보인다 */}
+      {onPrev && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev();
+          }}
+          aria-label="이전 사진"
+          className="absolute top-1/2 left-2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-canvas drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)] transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+        >
+          <ChevronLeft className="size-7" strokeWidth={2.2} />
+        </button>
+      )}
+      {onNext && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          aria-label="다음 사진"
+          className="absolute top-1/2 right-2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-canvas drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)] transition-colors outline-none hover:bg-canvas/15 focus-visible:ring-3 focus-visible:ring-canvas/50"
+        >
+          <ChevronRight className="size-7" strokeWidth={2.2} />
+        </button>
+      )}
 
       <img
         ref={imgRef}

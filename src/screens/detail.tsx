@@ -7,6 +7,7 @@ import {
   PenLine,
   Play,
   Plus,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,10 +74,12 @@ function MemberSummary({
   session,
   others,
   iAmOwner,
+  go,
 }: {
   session: ReturnType<typeof useSession>;
   others: Participant[];
   iAmOwner: boolean;
+  go: Go;
 }) {
   const me = {
     character: session?.tone ?? 0,
@@ -121,9 +124,7 @@ function MemberSummary({
       <DialogContent className="max-w-[360px] gap-3 p-5">
         <DialogHeader>
           <DialogTitle>기록 중인 사람 {total}명</DialogTitle>
-          <DialogDescription>
-            링크를 받은 가족은 누구나 이 앨범에 기록을 남길 수 있어요.
-          </DialogDescription>
+          <DialogDescription>앨범 구성원은 누구나 새 구성원을 초대할 수 있어요.</DialogDescription>
         </DialogHeader>
         <div className="-mx-1 flex max-h-[320px] flex-col overflow-y-auto overscroll-contain">
           <MemberRow
@@ -143,6 +144,11 @@ function MemberSummary({
             />
           ))}
         </div>
+        {/* 여기서 바로 부를 수 있게 — 상세에서 여는 그 앨범의 초대 화면으로 간다 */}
+        <Button variant="outline" size="lg" className="w-full" onClick={() => go("invite")}>
+          <UserPlus className="size-5" />
+          초대하기
+        </Button>
       </DialogContent>
     </Dialog>
   );
@@ -194,6 +200,7 @@ export function DetailScreen({
               session={session}
               others={others}
               iAmOwner={iAmOwner}
+              go={go}
             />
           </div>
         </div>
@@ -357,6 +364,8 @@ function AlbumReader({
   const [ratios, setRatios] = useState<Record<string, number>>({});
   /** 크게 보고 있는 사진 — 누르면 화면을 덮고 열린다 */
   const [zoomed, setZoomed] = useState<Photo | null>(null);
+  /** 그 사진이 앨범에서 몇 번째인가 — 앞뒤로 넘길 자리를 여기서 정한다 */
+  const zoomIndex = zoomed ? photos.findIndex((p) => p.src === zoomed.src) : -1;
 
   if (photos.length === 0)
     return <Empty>아직 사진이 없어요. 위 ‘사진 추가’로 시작해보세요.</Empty>;
@@ -450,6 +459,13 @@ function AlbumReader({
       <PhotoLightbox
         photo={zoomed ? { src: zoomed.src, alt: zoomed.alt ?? zoomed.title } : null}
         onClose={() => setZoomed(null)}
+        // 크게 본 채로 앨범의 앞뒤 사진으로 넘어간다 — 처음과 끝에서는 그쪽 화살표를 두지 않는다
+        onPrev={zoomIndex > 0 ? () => setZoomed(photos[zoomIndex - 1]) : undefined}
+        onNext={
+          zoomIndex >= 0 && zoomIndex < photos.length - 1
+            ? () => setZoomed(photos[zoomIndex + 1])
+            : undefined
+        }
       />
 
       {/* 책의 맺음말처럼 — 읽는 날짜와 함께 한 줄로 닫는다 */}
