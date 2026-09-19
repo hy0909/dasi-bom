@@ -115,11 +115,7 @@ export function UploadScreen({
         <b className="text-[17px] font-semibold">
           {touch ? "폰에 저장된 사진 불러오기" : "내 컴퓨터에서 사진 고르기"}
         </b>
-        <small className="text-sm text-body-mid">
-          {folder
-            ? `다운로드 폴더부터 열려요 · 최대 ${MAX_PHOTOS}장`
-            : `JPG, PNG, WebP · 최대 ${MAX_PHOTOS}장`}
-        </small>
+        <small className="text-sm text-body-mid">{`JPG, PNG, WebP · 최대 ${MAX_PHOTOS}장`}</small>
       </button>
 
       {/* 파일 선택기를 열 수 없는 환경(모바일·사파리)의 기본 경로 */}
@@ -189,9 +185,24 @@ export function UploadScreen({
         </div>
       )}
 
+      {/* 기록은 나중에 — 사진만 넣고 앨범으로 돌아간다. 무게는 아래 버튼보다 가볍게 둔다 */}
       <Button
+        variant="outline"
         size="lg"
         className="mt-6 w-full"
+        disabled={!items.length || reading}
+        onClick={() => {
+          addPhotos(album.id, items);
+          notify(`사진 ${items.length}장을 앨범에 넣었어요. 기록은 나중에 남길 수 있어요`);
+          go("detail");
+        }}
+      >
+        사진만 추가(기록 생략)
+      </Button>
+
+      <Button
+        size="lg"
+        className="mt-2 w-full"
         disabled={!items.length || reading}
         onClick={() => {
           addPhotos(album.id, items);
