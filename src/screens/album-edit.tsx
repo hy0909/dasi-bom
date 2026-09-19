@@ -4,9 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/field";
+import { InfoHint } from "@/components/info-hint";
 import { DateField } from "@/components/date-field";
 import { StickyBar } from "@/components/sticky-bar";
-import { albumPeriod, coverColorOf, coverFrameOf, coverShapeOf } from "@/data/album";
+import {
+  albumPeriod,
+  coverColorOf,
+  coverFrameOf,
+  coverPreviewWidth,
+  coverShapeOf,
+} from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { useAlbumPhotos } from "@/data/photos";
 import { AlbumCover } from "@/components/album-cover";
@@ -87,7 +94,7 @@ export function AlbumEditScreen({
                 coverFrame: coverFrameOf(draft).id,
                 cover: draft.cover,
               }}
-              style={{ width: 123 }}
+              style={{ width: coverPreviewWidth(draft) }}
               className="drop-shadow-[0_20px_30px_rgb(0_0_0/0.55)]"
             />
           </div>
@@ -151,9 +158,17 @@ export function AlbumEditScreen({
           />
         </Field>
 
-        {/* 시작일과 종료일은 한 줄에 반씩 나눠 갖는다 — 폭이 같고 사이가 벌어져 서로 닿지 않는다.
-            비워 두면 사진의 촬영 날짜가 대신 쓰이므로, 그 날짜를 칸 안에 연하게 보여준다. */}
+        {/* 앨범 기간 — 기본은 사진이 정한다. 앨범에 담긴 사진 중 가장 오래된 날짜가 시작일,
+            가장 최근 날짜가 종료일이다. 여기서만 손으로 고칠 수 있고, 고친 값은 사진보다 앞선다.
+            그 규칙은 ⓘ 말풍선으로 설명하고, 칸 안에는 지금 쓰이고 있는 날짜를 연하게 비춰 준다. */}
         <div className="flex flex-col gap-2">
+          <div className="-mb-1 flex items-center gap-0.5">
+            <span className="text-sm font-semibold text-ink">앨범 기간</span>
+            <InfoHint label="앨범 기간 안내">
+              시작일과 종료일은 앨범에 담긴 사진 중 가장 오래된 날짜와 가장 최근 날짜로 자동으로
+              채워져요. 사진이 늘면 기간도 따라 넓어져요. 직접 고치고 싶을 때만 여기서 바꾸면 돼요.
+            </InfoHint>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="시작일" htmlFor="album-start" className="min-w-0">
               <DateField
