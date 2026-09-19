@@ -111,7 +111,15 @@ export function HomeScreen({
         {/* 줄 높이를 12px 줄여 로고가 6px 위로 올라간다. 줄어든 만큼은 아래 여백으로 돌려줘
             표지 자리는 그대로 둔다. */}
         <div className="flex h-9 items-center">
-          <Wordmark className="text-canvas" />
+          {/* 로고를 누르면 홈으로 — 어디까지 내려와 있어도 맨 위로 돌아온다 */}
+          <button
+            type="button"
+            onClick={() => go("home")}
+            aria-label="그날을 담다 홈"
+            className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-canvas/50"
+          >
+            <Wordmark className="text-canvas" />
+          </button>
         </div>
 
         {heroAlbum ? (
@@ -398,13 +406,13 @@ function AlbumCard({
       className="group/album album-3d-hover flex cursor-pointer flex-col gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
     >
       {/* 패브릭 앨범 — 좌우 여백 없이 칸을 꽉 채운다. 그림자는 바깥으로 번져도 잘리지 않는다 */}
-      <div className="relative pt-1 pb-2">
+      <div className="relative pt-1 pb-[7px]">
         <div ref={coverRef}>
           <AlbumCover album={album} photoCount={photoCount} tiltable className="mx-auto w-[97%]" />
         </div>
         <span className="sr-only">{album.coverAlt}</span>
       </div>
-      <div className="flex flex-col gap-[18px]">
+      <div className="flex flex-col gap-4">
         <div>
           {/* 제목 오른쪽 끝에 더보기 — 연한 회색으로, 카드 오른쪽 가장자리에 붙인다 */}
           <div className="flex items-start justify-between gap-1">
@@ -413,7 +421,7 @@ function AlbumCard({
             </h3>
             {menu}
           </div>
-          <p className="mt-0.5 text-xs text-body-mid">{formatAlbumStart(album)}</p>
+          <p className="mt-px text-xs text-body-mid">{formatAlbumStart(album)}</p>
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-1.5">
