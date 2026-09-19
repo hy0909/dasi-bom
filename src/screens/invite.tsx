@@ -164,7 +164,7 @@ function InviteBody({
             </Button>
           </header>
           <section className="mt-4 flex flex-col gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full bg-accent text-body-mid">
+            <span className="flex size-12 items-center justify-center rounded-full bg-accent text-primary">
               <Check className="size-6" strokeWidth={2.5} />
             </span>
             <h1 className="font-heading text-display-lg font-bold">앨범을 만들었어요</h1>
