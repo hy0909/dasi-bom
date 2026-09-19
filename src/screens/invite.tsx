@@ -3,7 +3,6 @@ import {
   Check,
   ChevronDown,
   Copy,
-  Info,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -19,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { InfoHint } from "@/components/info-hint";
 import { Topbar } from "@/components/topbar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SectionHeading } from "@/components/section-heading";
@@ -121,10 +120,6 @@ function InviteBody({
   const leftDays = inviteDaysLeft(album);
   const expiresAt = inviteExpiresAt(album);
   const expiresShort = `${expiresAt.getMonth() + 1}월 ${expiresAt.getDate()}일`;
-  // 말풍선이 폰 캔버스 밖으로 나가지 않게 — 넓은 화면 미리보기에서도 폰 폭 안에 머문다.
-  const [canvas, setCanvas] = useState<Element | null>(null);
-  useEffect(() => setCanvas(document.querySelector("[data-screen]")), []);
-
   async function copy() {
     await copyText(link);
     notify("참여 링크를 복사했어요");
@@ -275,41 +270,11 @@ function InviteBody({
                 <b className="text-xs font-bold tabular-nums text-primary">
                   {leftDays === 0 ? "D-DAY" : `D-${leftDays}`}
                 </b>
-                {/* 유효기간 안내 — 한 줄 말풍선. 닫기나 바깥을 누르면 닫힌다(Popover 기본 동작). */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label="유효기간 안내"
-                      className="flex size-6 items-center justify-center rounded-full text-body-mid outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/40"
-                    >
-                      <Info className="size-3.5" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="bottom"
-                    align="end"
-                    collisionBoundary={canvas}
-                    collisionPadding={16}
-                    className="w-auto max-w-[calc(100vw-40px)] flex-row items-center gap-1 py-1.5 pr-1 pl-3"
-                    // 폰 캔버스보다 넓어지지 않게 — 넓은 화면 미리보기에서는 100vw 기준이 폰 폭을 넘는다.
-                    style={canvas ? { maxWidth: canvas.clientWidth - 32 } : undefined}
-                  >
-                    <span className="text-xs leading-snug">
-                      초대 링크 유효기간은 일주일이에요. {expiresShort}까지 쓸 수 있고, 만료되면 새로
-                      만들 수 있어요.
-                    </span>
-                    <PopoverClose asChild>
-                      <button
-                        type="button"
-                        aria-label="닫기"
-                        className="flex size-6 shrink-0 items-center justify-center rounded-full text-body-mid outline-none hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/40"
-                      >
-                        <X className="size-3.5" />
-                      </button>
-                    </PopoverClose>
-                  </PopoverContent>
-                </Popover>
+                {/* 유효기간 안내 — 설명이 필요한 자리마다 쓰는 같은 ⓘ 말풍선 */}
+                <InfoHint label="유효기간 안내" align="end">
+                  초대 링크 유효기간은 일주일이에요. {expiresShort}까지 쓸 수 있고, 만료되면 새로
+                  만들 수 있어요.
+                </InfoHint>
               </span>
             )}
             <Button

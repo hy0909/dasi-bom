@@ -28,8 +28,9 @@ export const initialAlbums: AlbumCardData[] = [
     // 정사각 판형에 가로로 긴 타원 창 — 만들 때 고를 수 있는 판형·창의 예
     coverShape: "square",
     coverFrame: "oval",
-    startDate: "2024-05-03",
-    endDate: "2024-05-06",
+    // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.
+    startDate: "",
+    endDate: "",
     description: "사촌들까지 다 모인 3박 4일. 바다와 오름을 돌아다닌 기록이에요.",
     cover: photosOf("jeju")[0].src,
     coverAlt: "제주 바닷가 난간에서 바다를 바라보는 뒷모습",
@@ -42,8 +43,9 @@ export const initialAlbums: AlbumCardData[] = [
     coverColor: "green",
     // 사진 창 없이 로즈골드 박 레터링만 있는 표지
     coverFrame: "lettering",
-    startDate: "2024-08-02",
-    endDate: "2024-08-11",
+    // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.
+    startDate: "",
+    endDate: "",
     description: "방학 내내 할머니 댁에서 지낸 여름의 기록이에요.",
     cover: photosOf("summer")[0].src,
     coverAlt: "숲에서 아이들과 함께 있는 할머니의 뒷모습",
@@ -54,8 +56,9 @@ export const initialAlbums: AlbumCardData[] = [
     inviteIssuedAt: daysAgo(6),
     title: "바닷가 산책",
     coverColor: "skyblue",
-    startDate: "2024-09-21",
-    endDate: "2024-09-21",
+    // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.
+    startDate: "",
+    endDate: "",
     description: "특별할 것 없던 하루가 제일 오래 남았어요.",
     cover: photosOf("seaside")[0].src,
     coverAlt: "바닷가를 나란히 걷는 어른과 아이의 뒷모습",
@@ -66,8 +69,9 @@ export const initialAlbums: AlbumCardData[] = [
     inviteCode: "JPN5",
     inviteIssuedAt: daysAgo(3),
     title: "2025년 일본 졸업 여행",
-    startDate: "2025-02-12",
-    endDate: "2025-02-17",
+    // 기간은 사진의 촬영 날짜가 정한다 — 앨범 정보에서 손으로 고칠 때만 값이 생긴다.
+    startDate: "",
+    endDate: "",
     description: "졸업하고 처음 떠난 일본, 엿새 동안의 사진과 기록을 모았어요.",
     coverColor: "red",
     // 가로 판형에 표지를 사진으로 가득 채운 예
