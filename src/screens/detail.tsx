@@ -568,10 +568,6 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
                   alt={photo.alt ?? photo.title}
                   className="size-full object-cover transition-transform duration-300 group-hover/tile:scale-[1.03]"
                 />
-                {/* 앨범에서 몇 번째 사진인지 — 목소리·글·연대표가 부르는 번호와 같다. */}
-                <Badge variant="glass" className="absolute top-2 left-2 tabular-nums">
-                  {orderOf(photo)}번째
-                </Badge>
                 {/* 기록이 끝난 사진에는 표시를 붙이지 않는다 — 남은 사진만 눈에 띄면 된다. */}
                 {photoStatus(photo) === "기록 전" && (
                   <Badge variant="glass" className="absolute top-2 right-2">
@@ -581,8 +577,12 @@ function PhotoTab({ go, photos }: { go: Go; photos: Photo[] }) {
               </span>
               <span className="px-0.5">
                 <b className="block truncate text-sm font-semibold">{photo.title}</b>
-                <small className="block text-xs text-body-mid">
-                  {formatShortDate(photo.takenAt)} · {photo.shortPlace}
+                {/* 앨범에서 몇 번째 사진인지 — 목소리·글·연대표가 부르는 번호와 같다. 사진 위를 덮지 않고 날짜 앞에 선다. */}
+                <small className="block truncate text-xs text-body-mid">
+                  <span className="font-semibold text-body tabular-nums">
+                    {orderOf(photo)}번째 사진
+                  </span>{" "}
+                  · {formatShortDate(photo.takenAt)} · {photo.shortPlace}
                 </small>
               </span>
             </button>
