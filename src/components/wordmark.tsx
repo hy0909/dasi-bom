@@ -6,11 +6,11 @@ export function Wordmark({ className }: { className?: string }) {
     <span
       className={cn(
         // Pathway Gothic One 은 폭이 좁고 키가 크다 — 크기를 조금 키우고 자간을 넉넉히 벌린다
-        "font-logo text-[20px] leading-tight font-normal tracking-[0.06em] text-ink",
+        "font-logo text-[22px] leading-tight font-normal tracking-[0.06em] text-ink",
         className,
       )}
     >
-      Story Album
+      STORY ALBUM
     </span>
   );
 }

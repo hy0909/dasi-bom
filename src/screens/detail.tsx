@@ -379,7 +379,7 @@ function AlbumReader({
       {photos.map((photo, i) => (
         <section key={photo.title} className="flex flex-col gap-3">
           <header className="flex items-baseline gap-2">
-            <span className="font-heading text-sm font-bold text-primary tabular-nums">
+            <span className="font-heading text-sm font-bold text-primary-deep tabular-nums">
               {String(i + 1).padStart(2, "0")}
             </span>
             <span className="text-xs text-body-mid">
