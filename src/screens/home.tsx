@@ -29,7 +29,6 @@ import {
   coverColorOf,
   coverStageTone,
   formatAlbumMonths,
-  formatAlbumStart,
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
 import { type Participant, useAlbumParticipants } from "@/data/family";
@@ -202,7 +201,7 @@ export function HomeScreen({
               {heroAlbum.title}
             </p>
             <p className="mt-1 text-center text-xs text-canvas-soft/55">
-              {formatAlbumStart(heroAlbum)}
+              {formatAlbumMonths(heroAlbum)}
             </p>
           </>
         ) : (
