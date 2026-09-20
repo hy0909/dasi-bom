@@ -7,7 +7,6 @@ import {
   PenLine,
   Play,
   Plus,
-  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,16 +21,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionHeading } from "@/components/section-heading";
 import { StatusFilter, useStatusFilter } from "@/components/status-filter";
 import { CharacterAvatar } from "@/components/character-avatar";
-import { MemberRow } from "@/components/member-row";
+import { MembersDialog } from "@/components/members-dialog";
 import { PhotoLightbox } from "@/components/photo-lightbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   albumPeriod,
   coverShapeOf,
@@ -96,61 +87,29 @@ function MemberSummary({
   ].slice(0, FACES_SHOWN);
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          className="-mx-1 mt-3 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
-        >
-          {/* 맨 앞 한 명만 온전히 보이고, 나머지는 그 뒤에서 오른쪽으로 조금씩만 내민다 */}
-          <span className="flex shrink-0 -space-x-6">
-            {faces.map((f, i) => (
-              <CharacterAvatar
-                key={f.key}
-                index={f.character}
-                color={f.color}
-                className={cn("size-8 ring-2 ring-ink/50", i === 0 ? "z-20" : i === 1 ? "z-10" : "z-0")}
-              />
-            ))}
-          </span>
-          <span className="min-w-0 truncate text-[13px] font-semibold text-canvas-soft/90">
-            {shown.join(" · ")}
-            {hidden > 0 && <span className="text-canvas-soft/60"> 외 {hidden}명</span>}
-          </span>
-          <span className="sr-only">기록 중인 사람 {total}명 — 눌러서 전체 보기</span>
-        </button>
-      </DialogTrigger>
-
-      <DialogContent className="max-w-[360px] gap-3 p-5">
-        <DialogHeader>
-          <DialogTitle>기록 중인 사람 {total}명</DialogTitle>
-          <DialogDescription>앨범 구성원은 누구나 새 구성원을 초대할 수 있어요.</DialogDescription>
-        </DialogHeader>
-        <div className="-mx-1 flex max-h-[320px] flex-col overflow-y-auto overscroll-contain">
-          <MemberRow
-            character={me.character}
-            color={me.color}
-            name={me.name}
-            note={iAmOwner ? "이 앨범을 만들었어요" : "초대 링크로 참여했어요"}
-          />
-          {others.map((p) => (
-            <MemberRow
-              key={p.name}
-              character={p.character}
-              color={p.color}
-              name={p.name}
-              note={p.note}
-              trailing={<Badge variant={p.status === "참여 중" ? "primarySoft" : "default"}>{p.status}</Badge>}
+    <MembersDialog me={me} others={others} iAmOwner={iAmOwner} onInvite={() => go("invite")}>
+      <button
+        type="button"
+        className="-mx-1 mt-3 flex items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-canvas/10 focus-visible:ring-3 focus-visible:ring-canvas/40"
+      >
+        {/* 맨 앞 한 명만 온전히 보이고, 나머지는 그 뒤에서 오른쪽으로 조금씩만 내민다 */}
+        <span className="flex shrink-0 -space-x-6">
+          {faces.map((f, i) => (
+            <CharacterAvatar
+              key={f.key}
+              index={f.character}
+              color={f.color}
+              className={cn("size-8 ring-2 ring-ink/50", i === 0 ? "z-20" : i === 1 ? "z-10" : "z-0")}
             />
           ))}
-        </div>
-        {/* 여기서 바로 부를 수 있게 — 상세에서 여는 그 앨범의 초대 화면으로 간다 */}
-        <Button variant="outline" size="lg" className="w-full" onClick={() => go("invite")}>
-          <UserPlus className="size-5" />
-          초대하기
-        </Button>
-      </DialogContent>
-    </Dialog>
+        </span>
+        <span className="min-w-0 truncate text-[13px] font-semibold text-canvas-soft/90">
+          {shown.join(" · ")}
+          {hidden > 0 && <span className="text-canvas-soft/60"> 외 {hidden}명</span>}
+        </span>
+        <span className="sr-only">기록 중인 사람 {total}명 — 눌러서 전체 보기</span>
+      </button>
+    </MembersDialog>
   );
 }
 

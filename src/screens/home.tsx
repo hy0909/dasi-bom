@@ -23,14 +23,16 @@ import { Fab } from "@/components/fab";
 import { SectionHeading } from "@/components/section-heading";
 import { CharacterAvatar } from "@/components/character-avatar";
 import { AlbumCover } from "@/components/album-cover";
+import { MembersDialog } from "@/components/members-dialog";
 import {
   albumPeriod,
   coverColorOf,
   coverStageTone,
+  formatAlbumMonths,
   formatAlbumStart,
 } from "@/data/album";
 import type { AlbumCardData } from "@/data/albums";
-import { useAlbumParticipants } from "@/data/family";
+import { type Participant, useAlbumParticipants } from "@/data/family";
 import { useMyAlbums } from "@/data/membership";
 import { usePhotoStore } from "@/data/photos";
 import { useSession } from "@/lib/auth";
@@ -314,14 +316,16 @@ export function HomeScreen({
               key={item.id}
               album={item}
               photoCount={photoStore[item.id]?.length ?? 0}
-              members={[
-                { character: session?.tone ?? 0, color: session?.color ?? 0 },
-                // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 두 번 세지 않는다.
-                ...(participants[item.id] ?? [])
-                  .filter((p) => p.name !== session?.name)
-                  .map((p) => ({ character: p.character, color: p.color })),
-              ]}
+              me={{
+                character: session?.tone ?? 0,
+                color: session?.color ?? 0,
+                name: session?.name ? `나 (${session.name})` : "나",
+              }}
+              // 링크를 타고 합류하면 참여자 명단에도 내가 들어간다 — 두 번 세지 않는다.
+              others={(participants[item.id] ?? []).filter((p) => p.name !== session?.name)}
+              iAmOwner={roleOf(item.id) === "owner"}
               onOpen={(from) => onOpenAlbum(item.id, "detail", from)}
+              onInvite={() => onOpenAlbum(item.id, "invite")}
               menu={
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -383,16 +387,23 @@ const MAX_FACES = 3;
 function AlbumCard({
   album,
   photoCount,
-  members,
+  me,
+  others,
+  iAmOwner,
   onOpen,
+  onInvite,
   menu,
 }: {
   album: AlbumCardData;
   photoCount: number;
-  members: { character: number; color: number }[];
+  me: { character: number; color: number; name: string };
+  others: Participant[];
+  iAmOwner: boolean;
   onOpen: (from: DOMRect) => void;
+  onInvite: () => void;
   menu?: React.ReactNode;
 }) {
+  const members = [me, ...others];
   const overflow = members.length - MAX_FACES;
   const coverRef = useRef<HTMLDivElement>(null);
   // 열림 모션이 이 커버 자리에서 시작하도록 위치를 넘긴다.
@@ -421,24 +432,32 @@ function AlbumCard({
             </h3>
             {menu}
           </div>
-          <p className="mt-px text-xs text-body-mid">{formatAlbumStart(album)}</p>
+          <p className="mt-px text-xs text-body-mid">{formatAlbumMonths(album)}</p>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className="flex items-center gap-1.5">
-            <span className="flex -space-x-1.5">
-              {members.slice(0, MAX_FACES).map((m, i) => (
-                <CharacterAvatar
-                  key={i}
-                  index={m.character}
-                  color={m.color}
-                  className="size-6 ring-2 ring-canvas"
-                />
-              ))}
-            </span>
-            {/* 사진 개수와 같은 굵기·같은 색 — 굵게 두면 그쪽만 진해 보인다 */}
-            {overflow > 0 && <span className="text-xs text-body">+{overflow}</span>}
-            <span className="sr-only">{members.length}명이 함께해요</span>
-          </span>
+          {/* 카드 전체가 앨범을 여는 버튼이라 — 여기서 클릭을 멈춰 세워야 앨범이 같이 열리지 않는다 */}
+          <MembersDialog me={me} others={others} iAmOwner={iAmOwner} onInvite={onInvite}>
+            <button
+              type="button"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              className="-m-1 flex items-center gap-1.5 rounded-lg p-1 transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/40"
+            >
+              <span className="flex -space-x-1.5">
+                {members.slice(0, MAX_FACES).map((m, i) => (
+                  <CharacterAvatar
+                    key={i}
+                    index={m.character}
+                    color={m.color}
+                    className="size-6 ring-2 ring-canvas"
+                  />
+                ))}
+              </span>
+              {/* 사진 개수와 같은 굵기·같은 색 — 굵게 두면 그쪽만 진해 보인다 */}
+              {overflow > 0 && <span className="text-xs text-body">+{overflow}</span>}
+              <span className="sr-only">기록 중인 사람 {members.length}명 — 눌러서 전체 보기</span>
+            </button>
+          </MembersDialog>
           <span className="flex items-center gap-1 text-xs text-body">
             <Image className="size-3.5 text-body-mid" aria-hidden />
             <span className="sr-only">사진</span>
